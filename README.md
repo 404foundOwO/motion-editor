@@ -9,6 +9,7 @@ I'm trying to add features that most simple editors don't have some simple stuff
 - Camera bop
 - 3D preview of canvas
 - Import 3D GLB Models (Experimental)
+- Text physics (not pixel accurate yet!)
 - Autosave and saving projects with the videos bundled
 - Ability to set preview to 1/4 res, and disabling effects temporarily
 anndd much mooreee ! (and will continue to add when i need)
