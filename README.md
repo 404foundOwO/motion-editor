@@ -7,6 +7,7 @@ I'm trying to add features that most simple editors don't have some simple stuff
 - Alight motion type of keyframe handling (And keybinds to move between them fast!)
 - Repeat objects for set bpm with each copy mirroring
 - Camera bop
+- Particle emitters
 - 3D preview of canvas
 - Import 3D GLB Models (Experimental)
 - Text physics (not pixel accurate yet!)
