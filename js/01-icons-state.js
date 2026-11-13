@@ -50,3 +50,5 @@ const LN=L=>{if((L.type=='text'||L.type=='bubble')&&isDefName(L)){const x=(L.tex
 const setIc=(b,n,t,f)=>{if(!b)return;b.innerHTML=IC(n,(f||FILLED[n])?'f':'');if(t)b.title=t};
 document.querySelectorAll('[data-ic]').forEach(b=>{const n=b.dataset.ic;b.innerHTML=IC(n,FILLED[n]?'f':'')+(b.dataset.lbl?`<span class=lbl>${b.dataset.lbl}</span>`:'');if(!b.dataset.lbl&&b.tagName=='BUTTON')b.setAttribute('data-ib','')});
 
+
+let NW=innerWidth<700?120:170; /* timeline name column width (px), resizable, saved in meUI */

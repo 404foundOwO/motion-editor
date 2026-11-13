@@ -377,3 +377,23 @@ body.rdrag,body.rdrag *{cursor:grabbing!important}
 #empty button{pointer-events:auto;margin-top:6px;background:var(--a);color:#fff;border:0;border-radius:999px;padding:8px 16px;display:inline-flex;gap:6px;align-items:center}
 #empty svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
 .fxbar{flex-wrap:nowrap;gap:6px}.fxbar>button{padding-left:8px;padding-right:9px}.fxbar>button[data-fxcol]{margin-left:auto;flex:none}
+/* timeline: resizable name column, row hover, effect + visibility toggles */
+.row{width:calc(var(--nw,170px) + var(--tw,800px) + 12px)}
+.nm{width:var(--nw,170px)}
+.nwr{position:absolute;top:0;right:-3px;width:7px;height:100%;cursor:col-resize;z-index:4}
+.nwr::after{content:"";position:absolute;left:3px;top:20%;height:60%;width:1px;background:var(--l)}
+.nwr:hover::after,body.nwdrag .nwr::after{background:var(--a);width:2px;left:2px}
+body.nwdrag,body.nwdrag *{cursor:col-resize!important;user-select:none}
+#tlin .row[data-id]:hover .nm{background:color-mix(in srgb,var(--a) 9%,var(--p))}
+#tlin .row[data-id]:hover{background:color-mix(in srgb,var(--a) 4%,transparent)}
+.nm .nt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.fxbd.off{color:var(--m);background:transparent;outline:1px dashed color-mix(in srgb,var(--m) 60%,transparent);outline-offset:-1px;text-decoration:line-through}
+.eyeb{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex:none;border-radius:6px;color:var(--m);cursor:pointer;opacity:0}
+.eyeb svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+#tlin .row:hover .eyeb,.eyeb.on,.eyeb:focus{opacity:1}
+.eyeb:hover{background:var(--hv);color:var(--t)}
+@media (hover:none){.eyeb{opacity:.7}}
+.row.hid .nt,.row.hid .nic{opacity:.45}
+.row.hid .bar{opacity:.35;background-image:repeating-linear-gradient(135deg,transparent 0 5px,rgba(0,0,0,.12) 5px 10px)}
+/* the add button lives in the stage corner on desktop, clear of the timeline and side panel */
+@media (min-width:901px){#app:not(.land) #fab{right:calc(var(--rw) + 22px);bottom:calc(var(--th) + 22px)}}

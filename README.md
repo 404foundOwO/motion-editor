@@ -64,6 +64,9 @@ Press `?` in the app for this list. On macOS use Cmd instead of Ctrl.
 | `Double-click layer name` | Rename the layer |
 | `Drag a layer onto a group row` | Move it into the group |
 | `Drag a layer between rows` | Reorder (and leave a group) |
+| `Click ✦ next to a layer name` | Turn that layer's effects off / on (Shift+click to edit them) |
+| `Click the eye next to a layer name` | Hide / show the layer |
+| `Drag the edge of the name column` | Resize it (double-click to fit names) |
 | `Right-click` | Context menu |
 
 ### 3D orbit view
