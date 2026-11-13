@@ -31,6 +31,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 
 ## Conventions
 - Never hard-code 1920x1080 or device pixels. Shaders get `R` (project size) and `q` (render scale); canvas shadow/line sizes that ignore the transform must be multiplied by `Q`.
+- The preview must render exactly the same whether paused or playing: no `play`-dependent shortcuts in the render path (tests/consistency.js checks this).
 - WebGL results go through `glRun`, which reads pixels back (`GLRB`) on non-Chromium browsers. Don't draw a WebGL canvas into a 2D canvas anywhere else.
 - Effect parameters are `[key,label,default]` entries in `EP`; add the effect in `EF` and the draw code in the render path.
 - A render failure must never freeze the preview: new draw code is wrapped by the `layerDraw`/`postSrc` wrappers in 15-render-safety.

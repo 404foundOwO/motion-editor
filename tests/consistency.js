@@ -1,6 +1,6 @@
 // Preview consistency (needs Playwright + Chromium; uses SwiftShader WebGL so it runs headless).
 // For every visual effect: render at full and at 1/4 preview, downscale full to 1/4 and compare;
-// toggling effects off and on must give the identical frame; the WebGL pixel read-back path
+// toggling effects off and on, or playing instead of paused, must give the identical frame; the WebGL pixel read-back path
 // (used by Firefox/Safari) must match the direct path.
 // Run: node tests/consistency.js   (optional: a URL or file path as the first argument)
 const path=require('path');let chromium;try{({chromium}=require('playwright'))}catch(e){console.log('SKIP: playwright not installed');process.exit(0)}
@@ -16,7 +16,8 @@ const res=await p.evaluate(()=>{
  for(const e of Object.keys(EF)){if(skip.has(e))continue;setup(e);exp=0;FXOFF=0;GLRB=false;
   PV=0;draw(t0);const full=shot();PV=2;draw(t0);const q=shot();FXOFF=1;draw(t0);FXOFF=0;draw(t0);const q2=shot();
   GLRB=true;draw(t0);const rb=shot();GLRB=false;
-  out.push({e,res:mad(full,q),toggle:mad(q,q2),readback:mad(q,rb)})}
+  play=1;draw(t0);const qp=shot();play=0;
+  out.push({e,res:mad(full,q),toggle:mad(q,q2),readback:mad(q,rb),playing:mad(q,qp)})}
  PV=0;return out});
-let fails=0;for(const r of res){const lim=LIMIT[r.e]||LIMIT.default,ok=r.res<=lim&&r.toggle==0&&r.readback<.05;if(!ok){fails++;console.log('FAIL',r.e,JSON.stringify({res:+r.res.toFixed(2),toggle:+r.toggle.toFixed(2),readback:+r.readback.toFixed(3)}))}}
+let fails=0;for(const r of res){const lim=LIMIT[r.e]||LIMIT.default,ok=r.res<=lim&&r.toggle==0&&r.readback<.05&&r.playing==0;if(!ok){fails++;console.log('FAIL',r.e,JSON.stringify({res:+r.res.toFixed(2),toggle:+r.toggle.toFixed(2),readback:+r.readback.toFixed(3),playing:+r.playing.toFixed(2)}))}}
 console.log('checked',res.length,'effects; errs',errs.slice(0,3),'FAILS',fails);await b.close();process.exit(fails?1:0)})()

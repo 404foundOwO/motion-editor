@@ -43,7 +43,7 @@ const pc=PTW.getContext('2d');pc.setTransform(1,0,0,1,0,0);pc.clearRect(X0,Y0,X1
 for(let j=0;j<N;j++)for(let i=0;i<N;i++){const a=Vt[j*(N+1)+i],b=Vt[j*(N+1)+i+1],d=Vt[(j+1)*(N+1)+i],e=Vt[(j+1)*(N+1)+i+1];if(!a||!b||!d||!e)continue;
 const sa=[i/N*tw,j/N*th],sb=[(i+1)/N*tw,j/N*th],sd=[i/N*tw,(j+1)/N*th],se=[(i+1)/N*tw,(j+1)/N*th];triD(pc,TXC,a,b,d,sa,sb,sd);triD(pc,TXC,b,e,d,sb,se,sd)}
 cx.save();cx.globalAlpha=Math.max(0,E.o)*al;if(fs)cx.filter=fq(fs);cx.drawImage(PTW,X0,Y0,X1-X0,Y1-Y0,X0,Y0,X1-X0,Y1-Y0);cx.restore();return true}
-function layerDraw0(L,t,cm){const m=L.efa.includes('mb')?val(L,'mb',t):0,n=m>0?(PV&&play&&!exp?2:8):1,lp=()=>{for(let i=0;i<n;i++)one(L,n>1?t+(i/(n-1)-.5)*m/FPS:t,cm,1/(i+1))};
+function layerDraw0(L,t,cm){const m=L.efa.includes('mb')?val(L,'mb',t):0,n=m>0?8:1,lp=()=>{for(let i=0;i<n;i++)one(L,n>1?t+(i/(n-1)-.5)*m/FPS:t,cm,1/(i+1))};
  const bl=L.bl&&L.bl!='normal'?L.bl:null;if(!bl&&!L.efa.some(k=>OFFK.includes(k)&&!(k=='tile'&&val(L,'tlf',t)>.5))){lp();return}const A=offBegin();lp();const src=postSrc(L,t,A.o);offEnd(A);if(bl)blendDraw(cx,src,bl);else cx.drawImage(src,0,0,W,H)}
 function drawGroup0(G,t,cm,d3){const kids=P.layers.filter(l=>l.par==G.id);if(!isOff(G)){drawList(kids,t,cm,d3);return}
  const ge=effOf(G,t),A=offBegin();drawList(kids,t,cm,d3,true);const ms=kids.filter(l=>l.mask);
