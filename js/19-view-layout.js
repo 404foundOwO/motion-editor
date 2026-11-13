@@ -10,9 +10,10 @@ else if(k=='KeyF')frameSel();else if(k=='Home')Object.assign(orb,{ry:.5,rx:-.3,d
 else if(k=='Digit1'||k=='Numpad1')Object.assign(orb,{rx:0,ry:0});else if(k=='Digit3'||k=='Numpad3')Object.assign(orb,{rx:0,ry:-Math.PI/2});else if(k=='Digit7'||k=='Numpad7')Object.assign(orb,{rx:-1.5,ry:0});else h=0;
 if(h){e.preventDefault();dirty=1}});
 addEventListener('keydown',e=>{const ty=!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName);if(e.code=='Space'&&ty){e.preventDefault();$('#pl').click()}if(e.code=='Delete'&&ty)$('#del').click();if((e.code=='ArrowRight'||e.code=='ArrowLeft')&&ty){e.preventDefault();seek(Math.round(t*FPS)/FPS+(e.code=='ArrowRight'?1:-1)*(e.shiftKey?10:1)/FPS)}if((e.ctrlKey||e.metaKey)&&ty&&e.code=='KeyZ'){e.preventDefault();e.shiftKey?redo():undo()}if((e.ctrlKey||e.metaKey)&&ty&&e.code=='KeyY'){e.preventDefault();redo()}});
-let last=0,sa=0;function tick0(ts){if(OFFX){last=ts;return}const d=Math.min(.1,(ts-last)/1000);last=ts;refx();const hasA=P.layers.some(l=>l.type=='audio'&&l.buf);
+let last=0,sa=0,WASPLAY=false;function tick0(ts){if(OFFX){last=ts;return}const d=Math.min(.1,(ts-last)/1000);last=ts;refx();const hasA=P.layers.some(l=>l.type=='audio'&&l.buf);
  if(play&&hasA&&AON&&Math.abs(t-LT)>.002)aStart();
- if(play){t=AON&&AC.state=='running'?A0.t+(AC.currentTime-A0.c):t+d;const lp=!exp&&P.lp&&P.lp.on?P.lp:null;if(lp&&t>=Math.min(lp.b,P.dur)){t=lp.a;if(AON)aStart()}else if(t>=P.dur){if(exp){exp=0;play=0;t=P.dur;rec.stop()}else{t=0;if(AON)aStart()}}dirty=1;ph();if(ts-sa>150&&!$('#side').contains(document.activeElement)){sa=ts;side()}}
+ if(play){t=AON&&AC.state=='running'?A0.t+(AC.currentTime-A0.c):t+d;const lp=!exp&&P.lp&&P.lp.on?P.lp:null;if(lp&&t>=Math.min(lp.b,P.dur)){t=lp.a;if(AON)aStart()}else if(t>=P.dur){if(exp){exp=0;play=0;t=P.dur;rec.stop()}else{t=0;if(AON)aStart()}}dirty=1;ph();if(ts-sa>100){sa=ts;sideLive()}}
+ if(WASPLAY&&!play)side();WASPLAY=!!play;
  if(play&&hasA){if(!AON||sig()!=ASIG)aStart();else aUpd()}else if(AON)aStop();
  metTick();blipTick();LT=t;if(dirty){dirty=0;safeDraw(t);ovd=1}if(ovd){ovd=0;try{drawOverlay()}catch(e){console.error('[overlay]',e)}}}
 const PVL=['Preview: full resolution (click for half)','Preview: half resolution – faster (click for quarter)','Preview: quarter resolution – fastest (click for full)'];
