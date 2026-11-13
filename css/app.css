@@ -458,3 +458,7 @@ body.fddrag,body.fddrag *{cursor:ew-resize!important;user-select:none}
  #side .fxh{min-height:32px}
  #side p,#side .hint{font-size:11px;line-height:1.45}
 }
+/* add menu: search + categories at the bottom, next to the + button, so they never jump when a category is taller or shorter */
+#menu:not(.down) .mscroll{order:0}
+#menu:not(.down) .mtabs{order:1}
+#menu:not(.down) .msw{order:2}

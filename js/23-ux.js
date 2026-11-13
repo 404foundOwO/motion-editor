@@ -21,7 +21,7 @@ function placeAddMenu(){const m=$('#menu'),f=$('#fab');if(!m||m.hidden||!f)retur
  let right=Math.max(8,innerWidth-r.right);if(innerWidth-right-mw<8)right=Math.max(8,innerWidth-mw-8);
  const above=r.top-gap-8,below=innerHeight-r.bottom-gap-8,up=above>=Math.min(320,below)||above>=below;
  m.style.left='auto';m.style.right=right+'px';
- if(up){m.style.top='auto';m.style.bottom=(innerHeight-r.top+gap)+'px';m.style.maxHeight=Math.max(160,Math.min(540,above))+'px';m.style.transformOrigin='100% 100%'}
+ m.classList.toggle('down',!up);if(up){m.style.top='auto';m.style.bottom=(innerHeight-r.top+gap)+'px';m.style.maxHeight=Math.max(160,Math.min(540,above))+'px';m.style.transformOrigin='100% 100%'}
  else{m.style.bottom='auto';m.style.top=(r.bottom+gap)+'px';m.style.maxHeight=Math.max(160,Math.min(540,below))+'px';m.style.transformOrigin='100% 0'}}
 $('#fab').addEventListener('click',()=>{placeAddMenu();requestAnimationFrame(placeAddMenu)});
 addEventListener('resize',placeAddMenu);
