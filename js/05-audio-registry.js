@@ -12,12 +12,12 @@ function mkStage(k){const c=AC,sm=(p,v)=>p.setTargetAtTime(v,c.currentTime+SMO,.
 const sig=()=>P.layers.filter(l=>l.type=='audio'||l.type=='cam'||l.type=='group').map(l=>(l.par||'')+l.id+l.efa.join('.')+l.s+l.e+(l.off||0)).join('|');
 function aStop(){Object.values(AS).forEach(a=>{try{a.src.stop()}catch(e){}a.g.disconnect()});for(const k in AS)delete AS[k];AON=0}
 function aStart(){aStop();refx();const c=ac();if(c.state=='suspended')c.resume();A0={c:c.currentTime,t};const GC={};AG=[];{const C=P.layers.find(l=>l.type=='cam');AN.disconnect();let nd=AN;AM=(C?C.efa.filter(k=>AUDK.includes(k)):[]).map(k=>({k,s:mkStage(k)}));AM.forEach(x=>{nd.connect(x.s.i);nd=x.s.o});nd.connect(MO)}
- P.layers.forEach(L=>{if(L.type!='audio'||!L.buf||t>=L.e)return;const g=c.createGain(),pn=c.createStereoPanner();g.connect(pn);let node=pn;
+ P.layers.forEach(L=>{if(L.type!='audio'||!L.buf||t>=L.e)return;const g=c.createGain(),pn=c.createStereoPanner();g.gain.value=Math.max(0,val(L,'vol',t)*fadeK(L,t));g.connect(pn);let node=pn;
   const st=L.efa.filter(k=>AUDK.includes(k)).map(k=>({k,s:mkStage(k)}));st.forEach(x=>{node.connect(x.s.i);node=x.s.o});node.connect(gin(P.layers.find(l=>l.id==L.par&&l.type=='group'),GC));
   const src=c.createBufferSource();src.buffer=L.buf;src.connect(g);const into=Math.max(0,t-L.s),off=into+(L.off||0);
   if(off<L.buf.duration)src.start(c.currentTime+Math.max(0,L.s-t),off,Math.max(.001,Math.min(L.buf.duration-off,L.e-L.s-into)));AS[L.id]={src,g,pn,st,L}});
  AON=1;ASIG=sig();aUpd()}
-function aUpd(){AG.forEach(x=>x.s.u(val(x.G,x.k,t)));const c=AC,C=P.layers.find(l=>l.type=='cam');if(C)AM.forEach(x=>x.s.u(val(C,x.k,t)));Object.values(AS).forEach(a=>{const L=a.L;a.g.gain.setTargetAtTime(Math.max(0,val(L,'vol',t)),c.currentTime,.02);a.pn.pan.setTargetAtTime(Math.max(-1,Math.min(1,val(L,'pan',t))),c.currentTime,.02);a.st.forEach(x=>x.s.u(val(L,x.k,t)))})}
+function aUpd(){AG.forEach(x=>x.s.u(val(x.G,x.k,t)));const c=AC,C=P.layers.find(l=>l.type=='cam');if(C)AM.forEach(x=>x.s.u(val(C,x.k,t)));Object.values(AS).forEach(a=>{const L=a.L;a.g.gain.setTargetAtTime(Math.max(0,val(L,'vol',t)*fadeK(L,t)),c.currentTime,.02);a.pn.pan.setTargetAtTime(Math.max(-1,Math.min(1,val(L,'pan',t))),c.currentTime,.02);a.st.forEach(x=>x.s.u(val(L,x.k,t)))})}
 function addAudio(buf,name,blob){const L=mk('audio');L.name=name.slice(0,14);L.buf=buf;BUF[L.id]=buf;if(blob)MB[L.id]={blob,name,kind:'audio'};L.e=L.s+buf.duration;sel=L.id;all();return L}
 const rotM=(rx,ry,rz)=>{const c=a=>Math.cos(a*R),n=a=>Math.sin(a*R);return mm([[c(ry),0,n(ry)],[0,1,0],[-n(ry),0,c(ry)]],mm([[1,0,0],[0,c(rx),-n(rx)],[0,n(rx),c(rx)]],[[c(rz),-n(rz),0],[n(rz),c(rz),0],[0,0,1]]))};
 function mm(A,B){return A.map(r=>[0,1,2].map(j=>r[0]*B[0][j]+r[1]*B[1][j]+r[2]*B[2][j]))}
@@ -52,7 +52,9 @@ function mov(L,t){const m={dx:0,dy:0,dz:0,rx:0,ry:0,rz:0,s:1},a=L.efa||[],v=k=>v
  if(a.includes('orbit')){const q=6.2832*v('ors')*t+v('orp')*R;m.dx+=v('orr')*Math.cos(q);m.dy+=v('orr')*Math.sin(q)}
  return m}
 function flk(L,t){if(!L.efa.includes('flick'))return 1;const f=t*(val(L,'fkr',t)||12),i=Math.floor(f),sd=(parseInt(String(L.id).replace(/\D/g,''))||1)*7.3,h=n=>{const x=Math.sin(n*127.1+sd)*43758.5453;return x-Math.floor(x)},u=f-i,sm=Math.max(0,Math.min(1,val(L,'fks',t)||0)),a=h(i),b=h(i+1);return Math.max(0,1-val(L,'flick',t)*(a+(b-a)*sm*u*u*(3-2*u)))}
-function effOf(L,t,d=0){const v=k=>val(L,k,t),mo0=mov(L,t),lk=lnk(L,t),mo=lk?{...mo0,dx:mo0.dx+lk.dx,dy:mo0.dy+lk.dy,dz:mo0.dz+(lk.dz||0),rz:mo0.rz+lk.rz,s:mo0.s*lk.s}:mo0,ri=RINST&&RINST.id==L.id?RINST:null,R0=mirR(rotM(v('rx')+mo.rx,v('ry')+mo.ry,v('rz')+mo.rz+(ri&&ri.rz||0)),ri),lo={p:[v('x')+mo.dx+(ri?ri.dx:0),v('y')+mo.dy+(ri?ri.dy:0),v('z')+mo.dz],s:v('sc')*mo.s*(ri?ri.sc:1),o:v('op')*(ri?ri.o:1)*flk(L,t)},G=d<8&&L.par&&P.layers.find(l=>l.id==L.par&&l.type=='group');if(!G)return{...lo,R:R0};
+/* clip fades set on the timeline: L.fi (fade in) and L.fo (fade out), seconds, linear */
+function fadeK(L,t){const fi=L.fi||0,fo=L.fo||0;if(!fi&&!fo)return 1;const e=Math.min(L.e,P.dur);let k=1;if(fi>0)k*=Math.max(0,Math.min(1,(t-L.s)/fi));if(fo>0)k*=Math.max(0,Math.min(1,(e-t)/fo));return k}
+function effOf(L,t,d=0){const v=k=>val(L,k,t),mo0=mov(L,t),lk=lnk(L,t),mo=lk?{...mo0,dx:mo0.dx+lk.dx,dy:mo0.dy+lk.dy,dz:mo0.dz+(lk.dz||0),rz:mo0.rz+lk.rz,s:mo0.s*lk.s}:mo0,ri=RINST&&RINST.id==L.id?RINST:null,R0=mirR(rotM(v('rx')+mo.rx,v('ry')+mo.ry,v('rz')+mo.rz+(ri&&ri.rz||0)),ri),lo={p:[v('x')+mo.dx+(ri?ri.dx:0),v('y')+mo.dy+(ri?ri.dy:0),v('z')+mo.dz],s:v('sc')*mo.s*(ri?ri.sc:1),o:v('op')*(ri?ri.o:1)*flk(L,t)*fadeK(L,t)},G=d<8&&L.par&&P.layers.find(l=>l.id==L.par&&l.type=='group');if(!G)return{...lo,R:R0};
  const g=effOf(G,t,d+1),w=mv(g.R,lo.p.map(x=>x*g.s));return{p:[g.p[0]+w[0],g.p[1]+w[1],g.p[2]+w[2]],R:mm(g.R,R0),s:g.s*lo.s,o:lo.o*(isOff(G)?1:g.o)}}
 const root=l=>!(l.par&&P.layers.some(x=>x.id==l.par)),treeOrder=(par=null,dp=0)=>P.layers.filter(l=>(root(l)?null:l.par)==par).flatMap(l=>[[l,dp],...(l.type=='group'&&!l.col?treeOrder(l.id,dp+1):[])]);
 const desc=(G,o=new Set())=>{P.layers.filter(l=>l.par==G.id).forEach(c=>{o.add(c.id);desc(c,o)});return o};

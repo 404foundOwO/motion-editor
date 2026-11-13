@@ -48,3 +48,7 @@ function colDef(M,ts0){const v=k=>val(M,k,ts0),ty=M.type,D={M};
 const TYPE_LBL={cam:'Camera',media:'Media',audio:'Audio',mshape:'Shape',group:'Group',emitter:'Particles',fx:'Adjustment'};
 function typeLabel(type){if(TYPE_LBL[type])return TYPE_LBL[type];for(const[,it]of ADDS)for(const a of it)if(a[0]==type)return a[1];return type.charAt(0).toUpperCase()+type.slice(1)}
 function defLayerName(type){const b=typeLabel(type),used=new Set(P.layers.map(l=>l.name));if(!used.has(b))return b;for(let k=2;;k++)if(!used.has(b+' '+k))return b+' '+k}
+/* timeline clip fades (kdenlive style): green dot = fade in, red dot = fade out */
+function fadeHTML(L,e){const len=Math.max(0,e-L.s),fi=Math.min(L.fi||0,len),fo=Math.min(L.fo||0,len),pc=x=>x/P.dur*100,s=n=>n.toFixed(2)+'s';
+ return (fi>0?`<i class="fdz fi" style="left:${pc(L.s)}%;width:${pc(fi)}%"></i>`:'')+(fo>0?`<i class="fdz fo" style="left:${pc(e-fo)}%;width:${pc(fo)}%"></i>`:'')+
+ `<i class="fd fdi${fi>0?' act':''}" data-fd=i style="left:${pc(L.s+fi)}%" title="Fade in${fi>0?' '+s(fi):''} – drag into the clip"></i><i class="fd fdo${fo>0?' act':''}" data-fd=o style="left:${pc(e-fo)}%" title="Fade out${fo>0?' '+s(fo):''} – drag into the clip"></i>`}

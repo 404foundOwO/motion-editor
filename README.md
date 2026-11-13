@@ -67,6 +67,8 @@ Press `?` in the app for this list. On macOS use Cmd instead of Ctrl.
 | `Click ✦ next to a layer name` | Turn that layer's effects off / on (Shift+click to edit them) |
 | `Click the eye next to a layer name` | Hide / show the layer |
 | `Drag the edge of the name column` | Resize it (double-click to fit names) |
+| `Drag the green / red dot on a clip` | Fade in / fade out (double-click the dot to remove) |
+| `Drag a clip or its ends` | Move it or trim it, no need to select first |
 | `Right-click` | Context menu |
 
 ### 3D orbit view

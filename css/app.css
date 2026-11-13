@@ -397,3 +397,42 @@ body.nwdrag,body.nwdrag *{cursor:col-resize!important;user-select:none}
 .row.hid .bar{opacity:.35;background-image:repeating-linear-gradient(135deg,transparent 0 5px,rgba(0,0,0,.12) 5px 10px)}
 /* the add button lives in the stage corner on desktop, clear of the timeline and side panel */
 @media (min-width:901px){#app:not(.land) #fab{right:calc(var(--rw) + 22px);bottom:calc(var(--th) + 22px)}}
+/* ---- timeline clips: comfortable by default, #app.tlc = compact ---- */
+#tlin{--bt:5px;--bh:36px;--wvh:calc(100% - 13px)}
+#app.tlc #tlin{--bt:7px;--bh:20px;--wvh:100%}
+#app:not(.tlc) #tlin .row[data-id]{height:46px}
+#app:not(.tlc) #tlin .row[data-id] .nm{line-height:45px}
+.bar{top:var(--bt);height:var(--bh);overflow:hidden;overflow:clip;background-position:0 0}
+#app:not(.tlc) .bar{border-radius:7px}
+#app:not(.tlc) .bar::after{content:"";position:absolute;left:0;right:0;bottom:0;height:13px;background:rgba(0,0,0,.18);pointer-events:none}
+.row.on .bar{border-color:var(--a);box-shadow:0 0 0 1px var(--a) inset}
+/* name inside the clip, sticks to the left edge while scrolling */
+.bn{position:sticky;left:calc(var(--nw,170px) + 6px);display:inline-block;max-width:calc(100% - 10px);margin:3px 0 0 6px;font:600 11px/14px Inter,system-ui,sans-serif;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;text-shadow:0 0 3px var(--p),0 0 2px var(--p)}
+#app.tlc .bn{display:none}
+/* keyframes ride in the lane at the bottom of the clip */
+#app:not(.tlc) .kf{top:calc(var(--bt) + var(--bh) - 12.5px)}
+#app:not(.tlc) .kf.sel{top:calc(var(--bt) + var(--bh) - 14px)}
+#app:not(.tlc) .kf{filter:drop-shadow(0 0 1px #000a)}
+/* trim grips: big grab area, visible grip on hover/selected */
+.hd{top:var(--bt);height:var(--bh);width:16px}
+.hd[data-h=l],.hd[data-h=r]{margin-left:-8px}
+.hd::after{top:22%;bottom:22%;width:4px;border-radius:3px;background:var(--a);opacity:0;transition:opacity .12s}
+.hd[data-h=l]::after{left:8px}.hd[data-h=r]::after{left:4px}
+#tlin .row:hover .hd::after{opacity:.55}
+#tlin .row.on .hd::after,.hd:hover::after{opacity:1}
+@media (pointer:coarse){.hd{width:24px}.hd[data-h=l],.hd[data-h=r]{margin-left:-12px}.hd[data-h=l]::after{left:12px}.hd[data-h=r]::after{left:8px}.hd::after{opacity:.6}}
+/* fades: shaded ramp + green / red dots at the clip's top corners */
+.fdz{position:absolute;top:var(--bt);height:var(--bh);pointer-events:none;z-index:1}
+.fdz.fi{background:linear-gradient(to bottom right,transparent calc(50% - 1px),#3ecf8e calc(50% - 1px),#3ecf8e calc(50% + 1px),transparent calc(50% + 1px)),linear-gradient(to bottom right,rgba(0,0,0,.38) 50%,transparent 50%);border-top-left-radius:7px}
+.fdz.fo{background:linear-gradient(to bottom left,transparent calc(50% - 1px),#ff5d6c calc(50% - 1px),#ff5d6c calc(50% + 1px),transparent calc(50% + 1px)),linear-gradient(to bottom left,rgba(0,0,0,.38) 50%,transparent 50%);border-top-right-radius:7px}
+.fd{position:absolute;top:calc(var(--bt) - 4px);width:12px;height:12px;margin-left:-6px;border-radius:50%;border:2px solid #fff;cursor:ew-resize;z-index:4;opacity:0;transition:opacity .12s;box-shadow:0 1px 3px #0008}
+.fd::before{content:"";position:absolute;inset:-6px}
+.fdi{background:#3ecf8e}.fdo{background:#ff5d6c}
+#tlin .row:hover .fd,#tlin .row.on .fd,.fd.act{opacity:1}
+@media (pointer:coarse){.fd{opacity:.85;width:16px;height:16px;margin-left:-8px;top:calc(var(--bt) - 6px)}}
+body.fddrag,body.fddrag *{cursor:ew-resize!important;user-select:none}
+#fdtip{position:fixed;z-index:90;pointer-events:none;background:#1b1b21;color:#eee;border:1px solid #3a3a45;border-radius:6px;padding:3px 7px;font:12px Inter,system-ui,sans-serif}
+/* cut mode: where the split will happen */
+#cutl{position:absolute;width:2px;margin-left:-1px;background:#ff5d6c;z-index:6;pointer-events:none;box-shadow:0 0 0 1px #0006}
+#cutl::after{content:attr(data-t);position:absolute;left:5px;top:2px;font:10px Inter,system-ui,sans-serif;color:#fff;background:#ff5d6c;border-radius:4px;padding:1px 4px;white-space:nowrap}
+#cutl[hidden]{display:none}
