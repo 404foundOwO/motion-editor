@@ -33,6 +33,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 24-timeline-clips | clip fade dots (`L.fi`/`L.fo`, applied by `fadeK`), cut-mode split preview, compact/comfortable density |
 | 25-projects | the Projects dialog (`#prj` top-bar button): switch, create, rename, duplicate, delete. Storage is in 16 |
 | 26-reveal-fx | Shape reveal shader (`srev`) and Droplets (`drRun`, Canvas 2D, Placement Manual: `L.dpts` points in layer space, edited on canvas by `drDown`/`drOv`; a few circles in the layer's own space grow until it is covered; timing is stretched so the last gap closes at 100%). After changing Droplets run `node tests/droplets.js` |
+| 27-copy-bg | Copy background effect (`cbg`): snapshot of the canvas before the layer (`cbgSnap`, called in `layerDraw0`), layer shape masks it (`cbgRun`, in `postSrc0`); CSS-filter effects apply to the copy |
 
 ## Conventions
 - Never hard-code 1920x1080 or device pixels. Shaders get `R` (project size) and `q` (render scale); canvas shadow/line sizes that ignore the transform must be multiplied by `Q`.
