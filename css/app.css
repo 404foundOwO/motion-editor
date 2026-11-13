@@ -462,3 +462,6 @@ body.fddrag,body.fddrag *{cursor:ew-resize!important;user-select:none}
 #menu:not(.down) .mscroll{order:0}
 #menu:not(.down) .mtabs{order:1}
 #menu:not(.down) .msw{order:2}
+/* add menu keeps one size; the item grid scrolls inside it */
+#menu .mscroll{flex:1 1 auto;min-height:0;overflow:auto}
+#menu .msw,#menu .mtabs{flex:none}
