@@ -13,7 +13,10 @@ const a=ev(`mk('audio')`);a.buf={duration:1};a.e=5;ev('OFFC.opus=true;OFFC.aac=t
 q('#exv').click();ok('audio formats enabled when project has audio',!q('[data-f=wav]').disabled&&!q('[data-f=ogg]').disabled&&!q('[data-f=m4a]').disabled);
 q('[data-f=wav]').click();ok('WAV shows bit depth, hides quality',vis('axbr')&&!vis('xqr')&&!vis('axkr')&&vis('axsr'));
 q('[data-f=ogg]').click();ok('Ogg shows bitrate, hides sample rate',vis('axkr')&&!vis('axsr')&&!vis('axbr'));
-q('[data-f=mp4]').click();ok('mp4 unsupported stays disabled and keeps webm selected',q('[data-f=mp4]').disabled);
+q('[data-f=mp4]').click();ok('mp4 unsupported -> convert note, WebM export at Max',vis('xrr')&&q('#xcv').style.display=='block'&&q('#xg').textContent=='Export WebM'&&q('#xq').value=='0'||q('#xb').value=='50',[q('#xcv').style.display,q('#xg').textContent,q('#xb').value]);
+ok('note mentions Chromium',/Chrome, Edge or Brave/.test(q('#xcv').textContent)&&/ffmpeg -i motion.webm/.test(q('#xcm').textContent));
+q('[data-f=wav]').click();ok('note hidden for audio',q('#xcv').style.display=='none'&&q('#xg').textContent=='Export');
+q('[data-f=webm]').click();ok('note hidden for WebM',q('#xcv').style.display=='none');
 q('#xc').click();ok('cancel closes',!q('#exm'));
 const f=new Float32Array(480);for(let i=0;i<480;i++)f[i]=Math.sin(i/5);
 const blob=ev('(c=>axWav(c,48000,16))')([f,f]);ok('WAV size = 44 + 480*2*2',blob.size==44+480*4,blob.size);
