@@ -436,3 +436,30 @@ body.fddrag,body.fddrag *{cursor:ew-resize!important;user-select:none}
 #cutl{position:absolute;width:2px;margin-left:-1px;background:#ff5d6c;z-index:6;pointer-events:none;box-shadow:0 0 0 1px #0006}
 #cutl::after{content:attr(data-t);position:absolute;left:5px;top:2px;font:10px Inter,system-ui,sans-serif;color:#fff;background:#ff5d6c;border-radius:4px;padding:1px 4px;white-space:nowrap}
 #cutl[hidden]{display:none}
+/* ---- desktop layout: timeline runs the full width; properties sit beside the preview ---- */
+@media (min-width:901px){
+ #app:not(.land) .hs{grid-column:1/-1}
+ #app:not(.land) .vs{grid-row:2}
+ #app:not(.land) #side{grid-row:2;padding-bottom:16px}
+ #app:not(.land) #tl{grid-column:1/-1}
+ #app:not(.land) #fab{right:calc(var(--rw) + 22px);bottom:calc(var(--th) + 22px)}
+}
+.tabh{display:none}
+/* ---- compact properties panel for mouse users ---- */
+@media (pointer:fine){
+ #side{padding-top:8px}
+ #side .r{margin:3px 0;min-height:26px;gap:6px}
+ #side input,#side select{height:26px;font-size:12px;border-radius:6px}
+ #side input[type=color]{height:26px;padding:2px}
+ #side .r>label{font-size:12px}
+ #side .r button[data-ib]{width:24px;height:24px;min-width:24px}
+ #side .lsub{margin-bottom:6px}
+ #side .tabs{flex-wrap:nowrap;gap:2px;padding-bottom:4px}
+ #side .tabs b{height:28px;padding:0 7px;flex:none}
+ #side .tabs b.on span{display:none}
+ #side .tabh{display:block;margin:2px 0 6px;padding-bottom:6px;border-bottom:1px solid var(--l);font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--m)}
+ #side .tabs{border-bottom:0;margin-bottom:0}
+ #side .fxc{margin:6px 0}
+ #side .fxh{min-height:32px}
+ #side p,#side .hint{font-size:11px;line-height:1.45}
+}
