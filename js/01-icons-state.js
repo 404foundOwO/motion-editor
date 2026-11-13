@@ -52,4 +52,4 @@ const setIc=(b,n,t,f)=>{if(!b)return;b.innerHTML=IC(n,(f||FILLED[n])?'f':'');if(
 document.querySelectorAll('[data-ic]').forEach(b=>{const n=b.dataset.ic;b.innerHTML=IC(n,FILLED[n]?'f':'')+(b.dataset.lbl?`<span class=lbl>${b.dataset.lbl}</span>`:'');if(!b.dataset.lbl&&b.tagName=='BUTTON')b.setAttribute('data-ib','')});
 
 
-let NW=innerWidth<700?120:170; /* timeline name column width (px), resizable, saved in meUI */
+let NW=innerWidth<700?120:170,FABG=64; /* FABG: right gutter in the timeline so the + button in the corner never covers clip ends */ /* timeline name column width (px), resizable, saved in meUI */

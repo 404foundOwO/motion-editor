@@ -367,8 +367,6 @@ body.rdrag,body.rdrag *{cursor:grabbing!important}
 .fxh>b{flex:1;min-width:0}
 .fxh>span[style]{display:none}
 @media (hover:hover){.fxh button[data-up],.fxh button[data-dn],.fxh button[data-fxpre]{display:none}.fxc:hover .fxh button[data-up],.fxc:hover .fxh button[data-dn],.fxc:hover .fxh button[data-fxpre],.fxh:focus-within button[data-up],.fxh:focus-within button[data-dn],.fxh:focus-within button[data-fxpre]{display:inline-flex}}
-/* the add button sits left of the side panel on desktop so it never covers inputs */
-@media (min-width:901px){#app:not(.land) #fab{right:calc(var(--rw) + 22px)}}
 /* empty canvas hint */
 #empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;color:#9a9aa6;pointer-events:none;padding:16px}
 #empty[hidden]{display:none}
@@ -395,8 +393,6 @@ body.nwdrag,body.nwdrag *{cursor:col-resize!important;user-select:none}
 @media (hover:none){.eyeb{opacity:.7}}
 .row.hid .nt,.row.hid .nic{opacity:.45}
 .row.hid .bar{opacity:.35;background-image:repeating-linear-gradient(135deg,transparent 0 5px,rgba(0,0,0,.12) 5px 10px)}
-/* the add button lives in the stage corner on desktop, clear of the timeline and side panel */
-@media (min-width:901px){#app:not(.land) #fab{right:calc(var(--rw) + 22px);bottom:calc(var(--th) + 22px)}}
 /* ---- timeline clips: comfortable by default, #app.tlc = compact ---- */
 #tlin{--bt:5px;--bh:36px;--wvh:calc(100% - 13px)}
 #app.tlc #tlin{--bt:7px;--bh:20px;--wvh:100%}
@@ -442,7 +438,6 @@ body.fddrag,body.fddrag *{cursor:ew-resize!important;user-select:none}
  #app:not(.land) .vs{grid-row:2}
  #app:not(.land) #side{grid-row:2;padding-bottom:16px}
  #app:not(.land) #tl{grid-column:1/-1}
- #app:not(.land) #fab{right:calc(var(--rw) + 22px);bottom:calc(var(--th) + 22px)}
 }
 .tabh{display:none}
 /* ---- compact properties panel for mouse users ---- */
