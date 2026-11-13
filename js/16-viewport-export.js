@@ -93,14 +93,14 @@ async function startOffline(o){
   if(cancel){try{venc.close()}catch(e){}venc=null;return}
   setP('Finishing…',1);await venc.flush();venc.close();venc=null;if(err)throw err;
   flushA(Infinity);mux.finalize();
-  sv(mp4?'motion.mp4':'motion.webm',new Blob([mux.target.buffer],{type:mp4?'video/mp4':'video/webm'}));
+  {const vb=new Blob([mux.target.buffer],{type:mp4?'video/mp4':'video/webm'});if(o.onBlob)o.onBlob(vb);else sv(mp4?'motion.mp4':'motion.webm',vb)}
   if(note)alert(note);
  }catch(e){console.error(e);alert('Export failed: '+(e&&e.message||e)+'\n\nTry real-time recording in the export dialog instead.')}
  finally{try{venc&&venc.state!='closed'&&venc.close()}catch(e){}try{aenc&&aenc.state!='closed'&&aenc.close()}catch(e){}ovl.remove();OFFX=0;exp=0;mode=m0;t=t0;play=p0;dirty=1;ph&&ph()}
 }
 function startExport(o){const ec=document.createElement('canvas'),sc=o.sc;ec.width=Math.round(W*sc);ec.height=Math.round(H*sc);const eg=ec.getContext('2d'),src=sc==1?cv:ec;let raf=0;const copy=()=>{eg.drawImage(cv,0,0,ec.width,ec.height);raf=requestAnimationFrame(copy)};
 const mt=o.mp4?'video/mp4;codecs=avc1':(MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm'),ch=[],r=new MediaRecorder(new MediaStream([...src.captureStream(o.fps).getVideoTracks(),...(P.layers.some(l=>l.type=='audio'||l.sbuf)?(ac(),AD.stream.getAudioTracks()):[])]),{mimeType:mt,videoBitsPerSecond:o.br*1e6}),m=mode;
-mode='comp';r.ondataavailable=e=>e.data.size&&ch.push(e.data);r.onstop=()=>{cancelAnimationFrame(raf);play=0;mode=m;dirty=1;setIc($('#pl'),'play','Play / pause (Space)',1);$('#exs').textContent='';sv(o.mp4?'motion.mp4':'motion.webm',new Blob(ch,{type:o.mp4?'video/mp4':'video/webm'}))};
+mode='comp';r.ondataavailable=e=>e.data.size&&ch.push(e.data);r.onstop=()=>{cancelAnimationFrame(raf);play=0;mode=m;dirty=1;setIc($('#pl'),'play','Play / pause (Space)',1);$('#exs').textContent='';{const vb=new Blob(ch,{type:o.mp4?'video/mp4':'video/webm'});if(o.onBlob)o.onBlob(vb);else sv(o.mp4?'motion.mp4':'motion.webm',vb)}};
 rec=r;t=0;dirty=1;exp=1;play=1;setIc($('#pl'),'pause','Play / pause (Space)',1);$('#exs').textContent='Recording in real time…';if(sc!=1)copy();r.start()}
 $('#exp').onclick=()=>{const m=mode,e0=exp;mode='comp';exp=1;draw(t);cv.toBlob(b=>{mode=m;dirty=1;sv('frame.png',b)});exp=e0;dirty=1};
 const MB={},STORED=new Set(),FB=[];let SAVEON=false,sTimer=0;
@@ -121,5 +121,12 @@ async function regFont(n,blob){try{const ff=new FontFace(n,await blob.arrayBuffe
 const fixP=()=>{P.layers.forEach(l=>{l.efx=l.efx||[];l.efa=[];l.efo=l.efo||[];l.font=l.font||'Roboto Flex'});P.bpm=P.bpm||120;P.bpb=P.bpb||4;P.sub=P.sub||1;id=Math.max(0,...P.layers.map(l=>l.id))+1;sel=null;ks=[];rep=null;$('#du').value=P.dur};
 async function restore(){let rec=null;try{rec=await idb('proj','readonly',q=>q.get('cur'))}catch(e){}
  if(!rec||!rec.json){SAVEON=true;setSv('Autosave on');return}
- try{const fl=await idb('fonts','readonly',q=>q.get('all'));for(const f of fl||[])await regFont(f.name,f.blob);P=JSON.parse(rec.json);fixP();for(const l of P.layers)if(l.type=='media'||l.type=='audio'||l.hasBlip){const m=await idb('media','readonly',q=>q.get(String(l.id)));if(m)await attach(l,m)}
-  HS=[];RD=[];c0=ser();all();setSv('Restored your last session')}catch(e){console.warn(e)}SAVEON=true}
+ const LD=loadingShow('Restoring your project','Reading your saved session…');
+ try{LD.set(.05);await new Promise(r=>setTimeout(r,0));
+  const fl=await idb('fonts','readonly',q=>q.get('all'));for(const f of fl||[])await regFont(f.name,f.blob);
+  P=JSON.parse(rec.json);fixP();
+  const med=P.layers.filter(l=>l.type=='media'||l.type=='audio'||l.hasBlip);let k=0;
+  for(const l of med){LD.set(.1+.85*k/med.length,'Loading media '+(k+1)+' of '+med.length+(l.name?': '+String(l.name).slice(0,24):'')+'…');
+   const m=await idb('media','readonly',q=>q.get(String(l.id)));if(m)await attach(l,m);k++}
+  LD.set(.98,'Almost there…');
+  HS=[];RD=[];c0=ser();all();setSv('Restored your last session')}catch(e){console.warn(e)}finally{LD.done()}SAVEON=true}

@@ -2,7 +2,7 @@
 let EXFMT='webm';
 function exportMenu(){
  const old=$('#exm');if(old){old.remove();return}
- const hasAud=P.layers.some(l=>(l.type=='audio'&&l.buf)||l.sbuf),canA=axHasAudio();
+ const canConv=location.protocol!='file:',hasAud=P.layers.some(l=>(l.type=='audio'&&l.buf)||l.sbuf),canA=axHasAudio();
  const rtMp4=typeof MediaRecorder!='undefined'&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported('video/mp4;codecs=avc1');
  /* video: which capture methods can make this format here */
  const vm={mp4:[],webm:[]};
@@ -28,15 +28,15 @@ ${row('Sample rate',`<select id=axs style="${sty}"><option value=48000>48 kHz<op
 ${row('Bitrate',`<select id=axk style="${sty}"><option value=96>96 kbps<option value=128>128 kbps<option value=192 selected>192 kbps<option value=256>256 kbps<option value=320>320 kbps</select>`,'axkr')}
 ${row('Prevent clipping',`<input id=axn type=checkbox checked>`,'axnr')}
 <p id=xi style="margin:10px 0 0;color:#9a9aa6;font-size:12px;line-height:1.45"></p>
-<div id=xcv style="display:none;margin-top:10px;padding:8px 10px;border-left:2px solid #55556a;color:#9a9aa6;font-size:11.5px;line-height:1.5"><div>This browser can't encode MP4, so this saves a high-quality <b style="font-weight:600;color:#c4c4cf">WebM</b>. Convert it to MP4 with ffmpeg:</div><code id=xcm style="display:block;margin:6px 0;padding:6px 8px;background:#0d0d10;border-radius:6px;color:#c4c4cf;font-size:11px;word-break:break-all">ffmpeg -i motion.webm -c:v libx264 -crf 14 -preset slow -pix_fmt yuv420p -c:a aac -b:a 192k motion.mp4</code><div>Converting re-encodes the video once more, so expect a very small quality loss. For MP4 with no loss at all, open the editor in <b style="font-weight:600;color:#c4c4cf">Chrome, Edge or Brave</b> and export MP4 directly.</div><button id=xcp style="${sty};margin-top:6px;font-size:11px;padding:3px 8px">Copy command</button></div></div></div>
-<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button id=xc style="${sty}">Cancel</button><button id=xg style="${sty.replace('#0d0d10','#6c5ce7')}">Export</button></div></div>`;
+<div id=xcv style="display:none;margin-top:10px;padding:8px 10px;border-left:2px solid #55556a;color:#9a9aa6;font-size:11.5px;line-height:1.5"><div id=xcv1>This browser can't encode MP4 directly. <b style="font-weight:600;color:#c4c4cf">Export as MP4</b> saves a high-quality WebM and converts it here. The first time, it downloads a converter (about 30 MB), and converting takes longer than the video itself.</div><div id=xcv2 style="display:none">Converting inside the editor needs the hosted version (it can't run from a local file), so this saves a high-quality WebM.</div><div style="margin-top:6px">Converting re-encodes the video once more, so expect a very small quality loss. For MP4 with no loss at all, open the editor in <b style="font-weight:600;color:#c4c4cf">Chrome, Edge or Brave</b> and export MP4 directly.</div><details style="margin-top:6px"><summary style="cursor:pointer">Or convert it yourself with ffmpeg</summary><code id=xcm style="display:block;margin:6px 0;padding:6px 8px;background:#0d0d10;border-radius:6px;color:#c4c4cf;font-size:11px;word-break:break-all">ffmpeg -i motion.webm -c:v libx264 -crf 14 -preset slow -pix_fmt yuv420p -c:a aac -b:a 192k motion.mp4</code><button id=xcp style="${sty};font-size:11px;padding:3px 8px">Copy command</button></details></div></div></div>
+<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button id=xc style="${sty}">Cancel</button><button id=xgw style="${sty};display:none">Export WebM</button><button id=xg style="${sty.replace('#0d0d10','#6c5ce7')}">Export</button></div></div>`;
  document.body.appendChild(d);const g=i=>d.querySelector('#'+i),show=(id,on)=>{g(id).style.display=on?'flex':'none'};
  const info=()=>{
   const f=EXFMT,vid=f=='mp4'||f=='webm',conv=f=='mp4'&&!vm.mp4.length,ms=vid?(conv?vm.webm:vm[f]):[];
   d.querySelectorAll('#xfl button[data-f]').forEach(b=>{const on=b.dataset.f==f&&!b.disabled;b.style.borderColor=on?'#8b7bff':'#3a3a45';b.style.background=on?'#2a2650':'#0d0d10'});
   ['xrr','xfr','xqr','xbr','xtr'].forEach(i=>show(i,vid));
   if(vid)['axbr','axsr','axkr','axnr'].forEach(i=>show(i,false));
-  g('xcv').style.display=conv?'block':'none';g('xg').textContent=conv?'Export WebM':'Export';
+  g('xcv').style.display=conv?'block':'none';g('xcv1').style.display=conv&&canConv?'block':'none';g('xcv2').style.display=conv&&!canConv?'block':'none';g('xgw').style.display=conv&&canConv?'':'none';g('xg').textContent=conv?(canConv?'Export as MP4':'Export WebM'):'Export';
   if(vid){
    const xt=g('xt'),cur=xt.value;xt.innerHTML=ms.map(m=>m=='1'?'<option value=1>Frame by frame (true fps)':'<option value=0>Real-time recording').join('');if(ms.includes(cur))xt.value=cur;
    show('xtr',ms.length>1);if(conv&&!g('xcv').dataset.q){g('xcv').dataset.q=1;g('xq').value=50;g('xb').value=50}
@@ -45,7 +45,7 @@ ${row('Prevent clipping',`<input id=axn type=checkbox checked>`,'axnr')}
    g('xi').textContent=(pre?`About ${mb} MB. Every frame is rendered exactly, so you get a true ${g('xf').value} fps however slow your graphics are. It can take longer than the video itself.`:`About ${mb} MB. Real-time recording takes as long as the video, and heavy projects at high resolution may drop frames.`)+(OFFC.ok?'':' Frame by frame export is not available in this browser (it needs WebCodecs).')+' The canvas shape comes from the aspect ratio button in the top bar.';
   }else{
    const wav=f=='wav',opus=f=='ogg';
-   g('xcv').style.display='none';g('xg').textContent='Export';
+   g('xcv').style.display='none';g('xgw').style.display='none';g('xg').textContent='Export';
    show('axbr',wav);show('axsr',!opus);show('axkr',!wav);show('axnr',true);
    const sr=opus?48000:+g('axs').value,kb=+g('axk').value,mb=wav?P.dur*sr*2*(+g('axb').value)/8/1e6:kb*P.dur/8/1e3;
    g('xi').textContent='Whole project, '+P.dur.toFixed(1)+' s, stereo. About '+(mb<1?mb.toFixed(2):mb.toFixed(1))+' MB.'+(opus?' Opus always runs at 48 kHz.':'')}};
@@ -55,8 +55,10 @@ ${row('Prevent clipping',`<input id=axn type=checkbox checked>`,'axnr')}
  g('xb').oninput=()=>{g('xq').value=[...g('xq').options].some(o=>o.value==g('xb').value)?g('xb').value:0;info()};
  g('xc').onclick=()=>d.remove();g('xcp').onclick=()=>{const t=g('xcm').textContent;try{navigator.clipboard.writeText(t).then(()=>{g('xcp').textContent='Copied'})}catch(e){const r=document.createRange();r.selectNodeContents(g('xcm'));getSelection().removeAllRanges();getSelection().addRange(r);g('xcp').textContent='Selected, press Ctrl+C'}};
  d.addEventListener('keydown',e=>{if(e.key=='Escape')d.remove()});d.tabIndex=-1;d.focus();
- g('xg').onclick=()=>{const f=EXFMT;d.remove();
-  if(f=='mp4'||f=='webm'){const o={sc:+g('xr').value,fps:+g('xf').value,br:Math.max(1,+g('xb').value||25),mp4:f=='mp4'&&vm.mp4.length>0,precise:g('xt').value=='1'};o.precise?startOffline(o):startExport(o)}
-  else startAudioExport({f:f=='wav'?'wav'+g('axb').value:f,sr:+g('axs').value,kb:+g('axk').value,norm:g('axn').checked})};
+ const goVideo=(f,conv)=>{const o={sc:+g('xr').value,fps:+g('xf').value,br:Math.max(1,+g('xb').value||25),mp4:f=='mp4'&&vm.mp4.length>0,precise:g('xt').value=='1'};if(conv)o.onBlob=webmToMp4;d.remove();o.precise?startOffline(o):startExport(o)};
+ g('xgw').onclick=()=>goVideo('webm',false);
+ g('xg').onclick=()=>{const f=EXFMT;
+  if(f=='mp4'||f=='webm')goVideo(f,f=='mp4'&&!vm.mp4.length&&canConv);else{d.remove();
+  startAudioExport({f:f=='wav'?'wav'+g('axb').value:f,sr:+g('axs').value,kb:+g('axk').value,norm:g('axn').checked})}};
  info()}
 $('#exv').onclick=exportMenu;

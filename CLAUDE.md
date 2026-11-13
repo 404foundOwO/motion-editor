@@ -5,6 +5,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 ## Where things are
 | File | Contents |
 |---|---|
+| 00-loading | `loadingShow(title,msg,{cancel})` loading screen (progress or indeterminate) |
 | 01-icons-state | globals (W,H,Q,PV), icon set |
 | 02-shapes | Material 3 expressive shape generators |
 | 03-model-layers | add-layer list, project `P`, `val`/keyframes, `mk()` layer factory |
@@ -26,6 +27,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 19-view-layout | orbit view, layout, toolbar |
 | 20-audio-export | audio-only encoders (WAV, Ogg Opus, M4A AAC) |
 | 21-export-dialog | the Export dialog: format list + settings (video and audio) |
+| 22-mp4-convert | WebM to MP4 with ffmpeg.wasm, downloaded from a CDN on demand (never bundled: x264 is GPL) |
 
 ## Conventions
 - Effect parameters are `[key,label,default]` entries in `EP`; add the effect in `EF` and the draw code in the render path.

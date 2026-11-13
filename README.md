@@ -18,6 +18,8 @@ I'm trying to add features that most simple editors don't have some simple stuff
 anndd much mooreee ! (and will continue to add when i need)
 
 
+MP4 export: Chrome, Edge and Brave encode MP4 directly (no extra quality loss). Where the browser can't, "Export as MP4" saves a high-quality WebM and converts it in the page with ffmpeg.wasm, which is downloaded on demand (about 30 MB, never bundled) and costs one extra encode, so expect a very small quality loss. It needs the hosted site, not a local file.
+
 Frame-by-frame 60 fps export uses WebCodecs. The app checks what your browser supports instead of guessing by name: Chrome, Edge and Brave are known to work, recent Firefox and Safari may work depending on version and codecs, and the app falls back to real-time recording if they don't. Editing and preview work in any modern browser.
 
 ## Keybinds!

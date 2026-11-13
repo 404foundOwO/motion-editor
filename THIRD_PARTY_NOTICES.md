@@ -292,3 +292,8 @@ DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 ```
+
+
+## ffmpeg.wasm (loaded at run time, not distributed with this repository)
+
+The optional WebM-to-MP4 converter downloads `@ffmpeg/ffmpeg` (MIT) and `@ffmpeg/core` (a WebAssembly build of FFmpeg with x264, licensed under the GPL) from the jsDelivr CDN when the user asks for it. Their source and license texts are available at https://github.com/ffmpegwasm/ffmpeg.wasm and https://ffmpeg.org/legal.html. Nothing from them is bundled in this repository or in `dist/`.
