@@ -45,7 +45,7 @@ const IC=(n,c='')=>`<svg class="${c}" viewBox="0 0 24 24" aria-hidden="true">${I
 const FILLED={play:1,pause:1};
 const LTI={bubble:'msg',mshape:'shapes',text:'type',rect:'square',circle:'circle',line:'line',tri:'tri',poly:'hex',star:'star',ring:'ring',emitter:'dots',group:'folder2',cam:'camera',audio:'wave',media:'image',fx:'sparkles'};
 let SG=null;const FXC=new Set();let fxFocus=0;
-const isDefName=L=>!L.name||new RegExp('^'+L.type+'\\d+$').test(L.name);
+const isDefName=L=>!L.name||new RegExp('^'+L.type+'\\d+$').test(L.name)||new RegExp('^'+typeLabel(L.type).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'( \\d+)?$').test(L.name);
 const LN=L=>{if((L.type=='text'||L.type=='bubble')&&isDefName(L)){const x=(L.text||'').replace(/\s+/g,' ').trim();if(x)return x.length>22?x.slice(0,21)+'…':x}return L.name||L.type};
 const setIc=(b,n,t,f)=>{if(!b)return;b.innerHTML=IC(n,(f||FILLED[n])?'f':'');if(t)b.title=t};
 document.querySelectorAll('[data-ic]').forEach(b=>{const n=b.dataset.ic;b.innerHTML=IC(n,FILLED[n]?'f':'')+(b.dataset.lbl?`<span class=lbl>${b.dataset.lbl}</span>`:'');if(!b.dataset.lbl&&b.tagName=='BUTTON')b.setAttribute('data-ib','')});

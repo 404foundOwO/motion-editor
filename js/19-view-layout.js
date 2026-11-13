@@ -63,7 +63,7 @@ cv.addEventListener('pointerup',endT,{capture:true});cv.addEventListener('pointe
 })();
 
 (()=>{const mq=matchMedia('(max-width:900px)');
-const KEEP_TOP=['m1','m2','tpn','tmo'],KEEP_TB=['pl','tm','un','re','pk','nk','sp','del'];
+const KEEP_TOP=['m1','m2','tpn','tmo','ver'],KEEP_TB=['pl','tm','un','re','pk','nk','sp','del'];
 const ICON={pl:'▶',un:'↶',re:'↷',pk:'‹◆',nk:'◆›',sp:'✂',del:'✕',zo:'−',zi:'+',tpn:'☰',tmo:'⋯',m1:'Comp',m2:'3D'};
 const moveable=()=>[...document.querySelectorAll('#top > *, #tb > *')].filter(e=>!KEEP_TOP.includes(e.id)&&!KEEP_TB.includes(e.id)&&e.id!='tmo2'&&!(e.tagName=='DIV'&&e.id=='tbd'));
 const more=document.createElement('button');more.id='tmo';more.innerHTML=IC('more');more.setAttribute('data-ib','');more.title='More tools';

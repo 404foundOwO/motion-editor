@@ -17,9 +17,9 @@ def css(m):
     c = re.sub(r'url\(\.\./(fonts/[^)]+)\)',
                lambda u: 'url(data:font/woff2;base64,' + base64.b64encode(open(os.path.join(ROOT, u.group(1)), 'rb').read()).decode() + ')', c)
     return '<style>' + c + '</style>'
-html = re.sub(r'<link rel=stylesheet href="([^"]+)">', css, html)
+html = re.sub(r'<link rel=stylesheet href="([^"?]+)(?:\?[^"]*)?">', css, html)
 
-html = re.sub(r'<script src="((?:js|vendor/(?:mp4|webm)-muxer)[^"]*)"></script>',
+html = re.sub(r'<script src="((?:js|vendor/(?:mp4|webm)-muxer)[^"?]*)(?:\?[^"]*)?"></script>',
               lambda m: '<script>' + rd(m.group(1)).rstrip('\n') + '</script>', html)
 
 # the lazy 3D libraries: embed as text, swap the loader to read them from the page

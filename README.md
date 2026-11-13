@@ -94,6 +94,7 @@ Press `?` in the app for this list. On macOS use Cmd instead of Ctrl.
 - `js/` the app, in numbered files that load in order and share one global scope (shapes, render core, effects, timeline, gradient blur, wipe, blend and groups, export, and so on)
 - `vendor/` three.js, GLTFLoader and the mp4/webm muxers
 - `tools/build.py` bundles everything into one offline file
+- `tools/bump.py` raises the version shown at the top of the app; run it before each push
 - `tests/` headless smoke tests (`npm i`, then `npm test`)
 
 ## Don't really like something?
