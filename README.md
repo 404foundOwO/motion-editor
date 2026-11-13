@@ -18,7 +18,7 @@ I'm trying to add features that most simple editors don't have some simple stuff
 anndd much mooreee ! (and will continue to add when i need)
 
 
-Frame-by-frame 60 fps export uses WebCodecs, so it needs a Chromium-based browser (Chrome, Edge, Brave). Editing and preview work anywhere.
+Frame-by-frame 60 fps export uses WebCodecs. The app checks what your browser supports instead of guessing by name: Chrome, Edge and Brave are known to work, recent Firefox and Safari may work depending on version and codecs, and the app falls back to real-time recording if they don't. Editing and preview work in any modern browser.
 
 ## Keybinds!
 Press `?` in the app for this list. On macOS use Cmd instead of Ctrl.
