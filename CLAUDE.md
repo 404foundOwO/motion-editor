@@ -22,7 +22,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 13-shortcuts | `?` cheat sheet (data in `KBD`) |
 | 14-blend-groups | blend modes (`blendDraw`), grouping, timeline drag into groups |
 | 15-render-safety | `safeDraw`, error isolation, GL recovery, main `tick` |
-| 16-viewport-export | aspect ratio, preview quality, audio + video export |
+| 16-viewport-export | aspect ratio, preview quality, audio + video export, project storage in IndexedDB (`saveNow`, `projOpen`, `projNew`, `projImport`, `restore`; keys `p:<id>`, `m:<id>`, `<id>:<layer>`, `last`) |
 | 17-project-media | save/load, media import, `ld()` loader for three.js |
 | 18-canvas-handles | canvas overlay handles, snapping, motion paths |
 | 19-view-layout | orbit view, layout, toolbar |
@@ -31,6 +31,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 22-mp4-convert | WebM to MP4 with ffmpeg.wasm, downloaded from a CDN on demand (never bundled: x264 is GPL) |
 | 23-ux | version label, empty-canvas hint, timeline name-column resize |
 | 24-timeline-clips | clip fade dots (`L.fi`/`L.fo`, applied by `fadeK`), cut-mode split preview, compact/comfortable density |
+| 25-projects | the Projects dialog (`#prj` top-bar button): switch, create, rename, duplicate, delete. Storage is in 16 |
 
 ## Conventions
 - Never hard-code 1920x1080 or device pixels. Shaders get `R` (project size) and `q` (render scale); canvas shadow/line sizes that ignore the transform must be multiplied by `Q`.
@@ -42,7 +43,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 - Lines are long (compact style). Use grep with `-o` and context, or read with offset/limit, rather than whole files.
 
 ## Verify before pushing
-`npm i && npm test` (headless jsdom, canvas via @napi-rs/canvas; WebGL is not available there). For anything that touches rendering also run `node tests/consistency.js` (Playwright Chromium with SwiftShader WebGL): every effect must look the same at full and 1/4 preview, after toggling effects, and through the WebGL read-back path. Also run `python3 tools/build.py` and open `dist/motion-editor.html` once. `dist/` is not committed.
+`npm i && npm test` (headless jsdom, canvas via @napi-rs/canvas; WebGL is not available there). For anything that touches saving or projects also run `node tests/projects.js` (Playwright Chromium, real IndexedDB). For anything that touches rendering also run `node tests/consistency.js` (Playwright Chromium with SwiftShader WebGL): every effect must look the same at full and 1/4 preview, after toggling effects, and through the WebGL read-back path. Also run `python3 tools/build.py` and open `dist/motion-editor.html` once. `dist/` is not committed.
 
 ## Deploy
 GitHub Pages serves `main` from the repo root. A push updates the site.

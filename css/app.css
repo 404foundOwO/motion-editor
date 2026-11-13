@@ -465,3 +465,17 @@ body.fddrag,body.fddrag *{cursor:ew-resize!important;user-select:none}
 /* add menu keeps one size; the item grid scrolls inside it */
 #menu .mscroll{flex:1 1 auto;min-height:0;overflow:auto}
 #menu .msw,#menu .mtabs{flex:none}
+
+/* projects manager */
+#prj .lbl{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#prm{position:fixed;inset:0;z-index:60;background:#000b;display:flex;align-items:center;justify-content:center;padding:12px;font:13px system-ui,sans-serif;color:#ddd}
+.prmb{background:#1b1b21;border:1px solid #3a3a45;border-radius:12px;padding:18px;width:780px;max-width:100%;max-height:100%;display:flex;flex-direction:column;min-height:0}
+.prmh{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}.prmh h3{margin:0;font-size:15px}.prmh .grow{flex:1}.prmu{color:#7d7d8a;font-size:11.5px}
+.prmb button{background:#24242c;color:#ddd;border:1px solid #3a3a45;border-radius:7px;padding:6px 12px;font:inherit;cursor:pointer}.prmb button:hover{border-color:#8b7bff}.prmb button:disabled{opacity:.5;cursor:default}.prmb button.pri{background:#6c5ce7;border-color:#6c5ce7;color:#fff}
+.prmg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;overflow:auto;padding:2px;min-height:0}
+.prmc{background:#0d0d10;border:1px solid #3a3a45;border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:5px;min-width:0}.prmc.cur{border-color:#8b7bff}
+.prmb .prmt{aspect-ratio:16/9;padding:0;overflow:hidden;background:#15151a;display:flex;align-items:center;justify-content:center;color:#6a6a74;font-size:11.5px;width:100%}.prmt img{width:100%;height:100%;object-fit:contain}
+.prmn{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}.prmn em{font-style:normal;font-weight:400;font-size:11px;color:#8b7bff;margin-left:4px}
+.prmc input{background:#15151a;color:#ddd;border:1px solid #8b7bff;border-radius:6px;padding:3px 6px;font:inherit;font-weight:600;width:100%;box-sizing:border-box}
+.prmm{font-size:11px;color:#9a9aa6}.prma{display:flex;gap:6px}.prmb .prma button{flex:1;padding:4px 6px;font-size:11.5px}
+.prmf{margin:12px 0 0;color:#7d7d8a;font-size:11.5px;line-height:1.45}

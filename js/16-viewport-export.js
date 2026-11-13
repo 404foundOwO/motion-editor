@@ -107,7 +107,6 @@ const MB={},STORED=new Set(),FB=[];let SAVEON=false,sTimer=0;
 const DB=new Promise(res=>{try{const r=indexedDB.open('motion-editor',1);r.onupgradeneeded=()=>{['proj','media','fonts'].forEach(n=>r.result.createObjectStore(n))};r.onsuccess=()=>res(r.result);r.onerror=r.onblocked=()=>res(null)}catch(e){res(null)}});
 const idb=(st,mode,fn)=>DB.then(d=>d?new Promise(res=>{try{const tx=d.transaction(st,mode);let q;try{q=fn(tx.objectStore(st))}catch(e){res(null);return}tx.oncomplete=()=>res(q&&q.result!==undefined?q.result:null);tx.onerror=tx.onabort=()=>res(null)}catch(e){res(null)}}):null);
 const setSv=m=>{const e=$('#sv');if(e)e.textContent=m};
-async function saveNow(){if(!SAVEON)return;try{await idb('proj','readwrite',q=>q.put({json:ser(),t:Date.now()},'cur'));for(const l of P.layers){const m=MB[l.id];if(m&&!STORED.has(l.id)){STORED.add(l.id);await idb('media','readwrite',q=>q.put(m,String(l.id)))}}setSv('Saved')}catch(e){setSv('Autosave unavailable')}}
 const saveSoon=()=>{if(!SAVEON)return;clearTimeout(sTimer);setSv('Saving\u2026');sTimer=setTimeout(saveNow,1200)};
 addEventListener('pagehide',()=>{if(SAVEON)saveNow()});
 const d2b=u=>{const[h,b]=u.split(','),m=/:(.*?);/.exec(h)[1],bin=atob(b),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type:m})};
@@ -119,14 +118,51 @@ async function attach(l,m){MB[l.id]=m;STORED.add(l.id);const u=URL.createObjectU
  else if(m.kind=='audio'){try{const b=await ac().decodeAudioData(await m.blob.arrayBuffer());l.buf=b;BUF[l.id]=b}catch(e){}}else if(m.kind=='blip'){try{const b=await ac().decodeAudioData(await m.blob.arrayBuffer());l.sbuf=b;BUF['b'+l.id]=b}catch(e){}}}
 async function regFont(n,blob){try{const ff=new FontFace(n,await blob.arrayBuffer(),{weight:'1 1000',stretch:'25% 200%',style:'oblique -90deg 90deg'});await ff.load();document.fonts.add(ff);if(!FONTS.includes(n))FONTS.push(n);if(!FB.some(f=>f.name==n))FB.push({name:n,blob})}catch(e){}}
 const fixP=()=>{P.layers.forEach(l=>{l.efx=l.efx||[];l.efa=[];l.efo=l.efo||[];l.font=l.font||'Roboto Flex'});P.bpm=P.bpm||120;P.bpb=P.bpb||4;P.sub=P.sub||1;id=Math.max(0,...P.layers.map(l=>l.id))+1;sel=null;ks=[];rep=null;$('#du').value=P.dur};
-async function restore(){let rec=null;try{rec=await idb('proj','readonly',q=>q.get('cur'))}catch(e){}
- if(!rec||!rec.json){SAVEON=true;setSv('Autosave on');return}
- const LD=loadingShow('Restoring your project','Reading your saved session…');
+/* ---- several projects in this browser. IndexedDB keys: 'p:<id>' project JSON, 'm:<id>' card info (name, time, thumbnail), '<id>:<layer id>' media, 'last' = the project to reopen. The manager dialog is in 25-projects.js ---- */
+let CURID=null,PNAME='Untitled',THUMB=null,THT=0,PBUSY=false,FONTSLD=false;
+const newPid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5),mkey=(p,l)=>p+':'+l,rng=pre=>IDBKeyRange.bound(pre,pre+'￿');
+const prjLbl=()=>{const e=document.querySelector('#prj .lbl');if(e)e.textContent=PNAME;const b=$('#prj');if(b)b.title='Projects (open: '+PNAME+')'};
+function projThumb(){try{const h=108,w=Math.max(1,Math.round(h*cv.width/cv.height)),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(cv,0,0,w,h);return c.toDataURL('image/jpeg',.6)}catch(e){return null}}
+async function saveNow(force){if(!SAVEON||!CURID)return;try{const id=CURID;if(force===true||!THUMB||Date.now()-THT>10000){THUMB=projThumb()||THUMB;THT=Date.now()}
+ await idb('proj','readwrite',q=>{q.put({json:ser(),t:Date.now()},'p:'+id);q.put({id,name:PNAME,t:Date.now(),thumb:THUMB,dur:P.dur,n:P.layers.length},'m:'+id);return q.put(id,'last')});
+ for(const l of P.layers){const m=MB[l.id];if(m&&!STORED.has(l.id)){STORED.add(l.id);await idb('media','readwrite',q=>q.put(m,mkey(id,l.id)))}}setSv('Saved')}catch(e){setSv('Autosave unavailable')}}
+const projFlush=()=>{clearTimeout(sTimer);return saveNow(true)};
+function projReset(){if(play)$('#pl').click();STORED.clear();for(const k in MB)delete MB[k];for(const k in ELS)delete ELS[k];for(const k in BUF)delete BUF[k];sel=null;ks=[];rep=null;t=0;HS=[];RD=[]}
+async function projList(){return((await idb('proj','readonly',q=>q.getAll(rng('m:'))))||[]).sort((a,b)=>b.t-a.t)}
+async function projNextName(){const s=new Set((await projList()).map(m=>m.name));let n=1;while(s.has('Untitled '+n))n++;return'Untitled '+n}
+async function projOpen(id,title){const was=SAVEON;SAVEON=false;clearTimeout(sTimer);const LD=loadingShow(title||'Opening project','Reading project…');let ok=false;
  try{LD.set(.05);await new Promise(r=>setTimeout(r,0));
-  const fl=await idb('fonts','readonly',q=>q.get('all'));for(const f of fl||[])await regFont(f.name,f.blob);
-  P=JSON.parse(rec.json);fixP();
+  const rec=await idb('proj','readonly',q=>q.get('p:'+id));if(!rec||!rec.json)throw new Error('project not found');const me=await idb('proj','readonly',q=>q.get('m:'+id)),np=JSON.parse(rec.json);
+  if(!FONTSLD){const fl=await idb('fonts','readonly',q=>q.get('all'));for(const f of fl||[])await regFont(f.name,f.blob);FONTSLD=true}
+  projReset();P=np;fixP();applyFmt(P.fmt||'16:9');CURID=id;PNAME=(me&&me.name)||'Untitled';THUMB=(me&&me.thumb)||null;prjLbl();
   const med=P.layers.filter(l=>l.type=='media'||l.type=='audio'||l.hasBlip);let k=0;
   for(const l of med){LD.set(.1+.85*k/med.length,'Loading media '+(k+1)+' of '+med.length+(l.name?': '+String(l.name).slice(0,24):'')+'…');
-   const m=await idb('media','readonly',q=>q.get(String(l.id)));if(m)await attach(l,m);k++}
-  LD.set(.98,'Almost there…');
-  HS=[];RD=[];c0=ser();all();setSv('Restored your last session')}catch(e){console.warn(e)}finally{LD.done()}SAVEON=true}
+   const m=await idb('media','readonly',q=>q.get(mkey(id,l.id)));if(m)await attach(l,m);k++}
+  LD.set(.98,'Almost there…');c0=ser();all();await idb('proj','readwrite',q=>q.put(id,'last'));ok=true}catch(e){console.warn(e)}finally{LD.done();SAVEON=was}
+ return ok}
+async function projSwitch(id){if(PBUSY||id==CURID)return false;PBUSY=true;try{await projFlush();return await projOpen(id,'Opening project')}finally{PBUSY=false}}
+async function projNew(name){if(PBUSY)return;PBUSY=true;try{await projFlush();projReset();P={dur:6,layers:[],bpm:120,boff:0,bpb:4,sub:1,grid:0,snap:0};fixP();mk('cam').name='Camera';sel=null;applyFmt('16:9');CURID=newPid();PNAME=name||await projNextName();THUMB=null;prjLbl();c0=ser();all();SAVEON=true;await saveNow(true)}finally{PBUSY=false}}
+async function projImport(pr,bundle,name){if(!pr||!Array.isArray(pr.layers))throw new Error('not a project');if(PBUSY)return;PBUSY=true;const LD=loadingShow('Opening project file','Reading…');try{await projFlush();SAVEON=false;
+  if(bundle)for(const f of bundle.fonts||[])await regFont(f.name,d2b(f.data));
+  projReset();P=pr;fixP();applyFmt(P.fmt||'16:9');CURID=newPid();PNAME=name||await projNextName();THUMB=null;prjLbl();
+  if(bundle&&bundle.media)for(const l of P.layers){const m=bundle.media[l.id];if(m){await attach(l,{blob:d2b(m.data),name:m.name,kind:m.kind});STORED.delete(l.id)}}
+  c0=ser();all();SAVEON=true;await saveNow(true)}finally{SAVEON=true;LD.done();PBUSY=false}}
+async function projDup(id){if(id==CURID)await projFlush();const rec=await idb('proj','readonly',q=>q.get('p:'+id)),me=await idb('proj','readonly',q=>q.get('m:'+id));if(!rec)return null;const nid=newPid(),keys=(await idb('media','readonly',q=>q.getAllKeys(rng(id+':'))))||[];
+ for(const k of keys){const m=await idb('media','readonly',q=>q.get(k));if(m)await idb('media','readwrite',q=>q.put(m,nid+k.slice(id.length)))}
+ await idb('proj','readwrite',q=>{q.put({...rec,t:Date.now()},'p:'+nid);return q.put({...(me||{}),id:nid,name:((me&&me.name)||'Untitled')+' copy',t:Date.now()},'m:'+nid)});return nid}
+async function projDel(id){const cur=id==CURID;if(cur){clearTimeout(sTimer);CURID=null}
+ await idb('media','readwrite',q=>q.delete(rng(id+':')));await idb('proj','readwrite',q=>{q.delete('p:'+id);return q.delete('m:'+id)});
+ if(cur){const l=await projList();if(!(l.length&&await projOpen(l[0].id,'Opening project')))await projNew()}}
+async function projRename(id,name){name=String(name||'').trim().slice(0,60);if(!name)return false;if(id==CURID){PNAME=name;prjLbl()}
+ const me=await idb('proj','readonly',q=>q.get('m:'+id));if(me)await idb('proj','readwrite',q=>q.put({...me,name},'m:'+id));else if(id==CURID)await saveNow(true);return true}
+/* projects saved by older versions lived under one 'cur' key; move them into the new layout once */
+async function projMigrate(){const rec=await idb('proj','readonly',q=>q.get('cur'));if(!rec||!rec.json)return null;const id=newPid(),keys=((await idb('media','readonly',q=>q.getAllKeys()))||[]).filter(k=>!String(k).includes(':'));
+ for(const k of keys){const m=await idb('media','readonly',q=>q.get(k));if(m)await idb('media','readwrite',q=>q.put(m,id+':'+k))}
+ let n=0,dur=6;try{const o=JSON.parse(rec.json);n=o.layers.length;dur=o.dur}catch(e){}
+ await idb('proj','readwrite',q=>{q.put({json:rec.json,t:rec.t||Date.now()},'p:'+id);q.put({id,name:'My project',t:rec.t||Date.now(),thumb:null,dur,n},'m:'+id);q.put(id,'last');return q.delete('cur')});
+ for(const k of keys)await idb('media','readwrite',q=>q.delete(k));return id}
+async function restore(){let last=await idb('proj','readonly',q=>q.get('last'));
+ if(!last)try{last=await projMigrate()}catch(e){console.warn(e)}
+ let ok=false;if(last)ok=await projOpen(last,'Restoring your project');
+ if(!ok){CURID=newPid();PNAME=await projNextName();prjLbl()}
+ SAVEON=true;setSv(ok?'Restored your last session':'Autosave on')}
