@@ -9,7 +9,7 @@ function cbgRun(src,L,t){const sn=GBP[66];if(!sn||sn.width!=src.width||sn.height
    The alpha is sampled in rings to get an inward direction, and the distance to the edge is found by stepping outward along it; at the rim the backdrop is pulled from outside the shape (refraction),
    split per colour channel (dispersion), frosted a little, tinted, and a light-facing specular edge is added. Needs WebGL; without it falls back to plain Copy background. */
 Object.assign(GLS,{lglass:`uniform sampler2D B;vec4 Bt(vec2 p){return texture2D(B,clamp(p,0.,1.));}
-vec4 sm(vec2 o,vec2 px){vec4 c=Bt(v+o);if(k4>.3){vec2 d=k4*px;float w=1.;c*=2.;w=2.;for(int i=0;i<8;i++){float an=float(i)*.785398;vec2 e=vec2(cos(an),sin(an))*d;c+=Bt(v+o+e);w+=1.;}c/=w+0.;}return c;}
+vec4 sm(vec2 o,vec2 px){return Bt(v+o);}
 void main(){vec2 px=1./R;float a=T(v).a;if(a<.004){gl_FragColor=vec4(0.);return;}
 float r=max(4.,k);vec2 g=vec2(0.);float n=1.;
 for(int ri=1;ri<=3;ri++){float rr=r*float(ri)/3.;for(int i=0;i<8;i++){float an=float(i)*.785398+float(ri)*.3;vec2 o=vec2(cos(an),sin(an))*rr;g+=o*T(v+o*px).a;n+=1.;}}
@@ -25,4 +25,6 @@ float ang=k6*.0174533;vec2 ld=vec2(sin(ang),cos(ang));float edge=pow(1.-d,5.)*li
 float sp=edge*(max(fc,0.)+max(-fc,0.)*.4+.1)*k5/100.*am;o4.rgb=min(o4.rgb+sp*a,vec3(1.));o4.a=max(o4.a,min(1.,sp*a));
 gl_FragColor=o4;}`});
 function lgRun(src,L,t){const sn=GBP[66];if(!sn||sn.width!=src.width||sn.height!=src.height)return src;const v=k=>val(L,k,t),am=Math.max(0,v('lglass')/100),c=v('lgc')||'#ffffff',col=[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)/255);
- let r=null;try{r=glRun('lglass',src,[v('lgt'),v('lgr'),v('lgd'),v('lgb'),v('lgh'),v('lga'),v('lgn'),0,am],[col],t,sn)}catch(e){}return r||cbgRun(src,L,t)}
+ /* frost: a real gaussian blur of the backdrop, done once in 2D before the shader (the sharp copy is drawn underneath so the canvas edges don't fade out) */
+ let bk=sn;const fr=Math.max(0,v('lgb')||0)*am;if(fr>.2){const f=gbCv(68,sn.width,sn.height),g=f.getContext('2d');g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;g.globalCompositeOperation='copy';g.filter='none';g.drawImage(sn,0,0);g.globalCompositeOperation='source-over';g.filter=`blur(${(fr*Q).toFixed(2)}px)`;g.drawImage(sn,0,0);g.filter='none';bk=f}
+ let r=null;try{r=glRun('lglass',src,[v('lgt'),v('lgr'),v('lgd'),0,v('lgh'),v('lga'),v('lgn'),0,am],[col],t,bk)}catch(e){}return r||cbgRun(src,L,t)}
