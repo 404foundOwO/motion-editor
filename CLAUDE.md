@@ -32,6 +32,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 23-ux | version label, empty-canvas hint, timeline name-column resize |
 | 24-timeline-clips | clip fade dots (`L.fi`/`L.fo`, applied by `fadeK`), cut-mode split preview, compact/comfortable density |
 | 25-projects | the Projects dialog (`#prj` top-bar button): switch, create, rename, duplicate, delete. Storage is in 16 |
+| 26-reveal-fx | GLSL for Shape reveal and Droplets. Droplets maps progress through `G()` so coverage follows progress; if you change its sizes or timing, re-measure with `node tests/droplets.js` |
 
 ## Conventions
 - Never hard-code 1920x1080 or device pixels. Shaders get `R` (project size) and `q` (render scale); canvas shadow/line sizes that ignore the transform must be multiplied by `Q`.
