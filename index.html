@@ -1,41 +1,41 @@
 <!DOCTYPE html>
 <html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Motion Editor</title><link rel=icon href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%238b7bff%27/%3E%3Cpath d=%27M11 9l12 7-12 7z%27 fill=%27%23fff%27/%3E%3C/svg%3E"><meta name=color-scheme content="dark light">
-<link rel=stylesheet href="css/fonts.css?v=0.46"><link rel=stylesheet href="css/app.css?v=0.46">
+<link rel=stylesheet href="css/fonts.css?v=0.47"><link rel=stylesheet href="css/app.css?v=0.47">
 </head>
 <body><div id=app>
 <div id=top>
 <button id=prj data-ic=folder data-lbl=Projects data-t=Projects title="Projects"></button><i class=sep></i><button id=m1 class=on data-ic=frame data-lbl=Comp data-t=Comp title="Composition view"></button><button id=m2 data-ic=box data-lbl=3D data-t="3D Preview" title="3D preview"></button><i class=sep></i><button id=fxg data-ic=sparkles data-t=Effects title="Effects: on"></button><button id=pvq data-ic=monitor data-t="Preview quality" title="Preview: full"></button><button id=bmn data-ic=music data-t="Beat grid" title="Beat grid"></button><i class=sep></i><span class=m id=lenic title="Length (seconds)" data-ic=timer></span><input id=du type=number value=6 step=0.5 style="width:64px" title="Length (seconds)"><button id=arb data-ic=ratio data-lbl="16:9" data-t="Aspect ratio" title="Aspect ratio / canvas size"></button><i class=grow></i><span id=ver></span><button id=exv class=pri data-ic=film data-lbl=Export data-t="Export video" title="Export video"></button><button id=exp data-ic=image data-t="PNG frame" title="Save current frame as PNG"></button><i class=sep></i><button id=exj data-ic=save data-t="Save project" title="Save project"></button><button id=exl data-ic=folder data-t="Load project" title="Load project"></button><button id=newp data-ic=filep data-t="New project" title="New project"></button><i class=sep></i><button id=notebtn data-ic=note data-t=Notes title=Notes></button><button id=kbb data-ic=help data-t="Keyboard shortcuts" title="Keyboard shortcuts (?)"></button><span id=exs class=m></span><span id=sv class=m></span></div>
 <div id=stage><canvas id=cv></canvas><canvas id=ov></canvas></div><div class=hs></div><div id=tl><div id=tb><button id=pl data-ic=play data-t="Play" title="Play / pause (Space)"></button><span id=tm style="width:118px">0.000s</span><i class=sep></i><button id=un data-ic=undo data-t="Undo" title="Undo"></button><button id=re data-ic=redo data-t="Redo" title="Redo"></button><i class=sep></i><button id=pk data-ic=kprev data-t="Previous keyframe" title="Previous keyframe (A)"></button><button id=nk data-ic=knext data-t="Next keyframe" title="Next keyframe (D)"></button><i class=sep></i><button id=tld data-ic=rows data-t="Density" title="Compact timeline (more rows)"></button><button id=zo data-ic=zout data-t="Zoom out" title="Zoom out"></button><button id=zi data-ic=zin data-t="Zoom in" title="Zoom in"></button><i class=sep></i><button id=sp data-ic=split data-t="Split" title="Split layer at playhead"></button><button id=cutb data-ic=scissors data-t="Cut tool" title="Cut tool (X)"></button><button id=mv data-ic=tonow data-t="Move to now" title="Move layer to playhead"></button><button id=del data-ic=trash data-t="Delete" title="Delete (Del)"></button><i class=sep></i><button id=cpb data-ic=copy data-t="Copy" title="Copy"></button><button id=pst data-ic=paste data-t="Paste" title="Paste"></button><button id=dup data-ic=dup data-t="Duplicate" title="Duplicate"></button><button id=grp data-ic=gplus data-t="Group" title="Group selected layer (Ctrl+G)"></button><button id=rpb data-ic=repeat data-t="Repeat…" title="Repeat…"></button><i class=sep></i><button id=lpi data-ic=loopin data-t="Loop in" title="Loop in (I)"></button><button id=lpo data-ic=loopout data-t="Loop out" title="Loop out (O)"></button><button id=lpl data-ic=infinity data-t="Loop" title="Loop (L)"></button><span id=lpt class=m></span><div id=trkhold style=display:none><button id=pthb style=display:none title="Select a text layer with Text on path (shape 2). Click canvas to add points, drag to move, Shift/Alt+click to delete">Path edit (P)</button><button id=pthc style=display:none>Clear path</button><button id=pthr style=display:none>Reverse path</button><button id=trkb style=display:none title="Select a video layer, press this, then click the point to follow">Track point</button><button id=trka style=display:none title="Select the object that should follow the tracked point">Attach to track</button><input id=trks type=number min=0 max=15 style="width:46px;display:none" title="Track smoothing in frames (0 = raw)"><button id=trku style=display:none>Unlink track</button><span id=trkt class=m></span></div></div><div id=tlin></div></div><div class=vs></div><div id=side></div><button id=fab data-ic=plus data-t=Add title="Add layer"></button><div id=menu hidden></div><div id=bpanel hidden><div class=r><label>BPM</label><input id=bpm type=number value=120 style="width:84px"></div><div class=r><label>Offset (s)</label><input id=bof type=number step=0.01 value=0 style="width:84px"></div><div class=r><label>Beats / bar</label><input id=bpb type=number value=4 style="width:84px"></div><div class=r><label>Snap to</label><select id=bsb><option value=1>Beat<option value=2>1/2 beat<option value=4>1/4 beat</select></div><div class=r><input type=checkbox id=bmt> Metronome</div><div class=r><label>Click volume</label><input type=range id=bmv min=0 max=1 step=.05 value=.5 style="width:90px"></div><div class=r><button id=bgd>Show grid</button><button id=bsn>Snap on</button></div></div><div id=notes hidden><div id=nth><span style="display:flex;align-items:center;gap:6px">Notes</span><span><button id=nmin data-ic=minus title=Minimize></button><button id=nclose data-ic=x title=Close></button></span></div><textarea id=ntx placeholder="Write notes here…"></textarea></div><input type=file id=fm accept="image/*,video/*" hidden><input type=file id=fg accept=".glb" hidden><input type=file id=ff accept=".ttf,.otf,.woff,.woff2" hidden><input type=file id=fj accept=.json hidden><input type=file id=fa accept="audio/*" hidden><input type=file id=fbp accept="audio/*" hidden></div>
 
-<script src="vendor/mp4-muxer.js?v=0.46"></script>
-<script src="vendor/webm-muxer.js?v=0.46"></script>
-<script src="js/00-version.js?v=0.46"></script>
-<script src="js/00-loading.js?v=0.46"></script>
-<script src="js/01-icons-state.js?v=0.46"></script>
-<script src="js/02-shapes.js?v=0.46"></script>
-<script src="js/03-model-layers.js?v=0.46"></script>
-<script src="js/04-text-physics.js?v=0.46"></script>
-<script src="js/05-audio-registry.js?v=0.46"></script>
-<script src="js/06-render-core.js?v=0.46"></script>
-<script src="js/07-panels-editing.js?v=0.46"></script>
-<script src="js/08-draw-text-lines-emitters.js?v=0.46"></script>
-<script src="js/09-scene-timeline-graph.js?v=0.46"></script>
-<script src="js/10-gradient-blur.js?v=0.46"></script>
-<script src="js/11-wipe.js?v=0.46"></script>
-<script src="js/12-bubble-shape.js?v=0.46"></script>
-<script src="js/13-shortcuts.js?v=0.46"></script>
-<script src="js/14-blend-groups.js?v=0.46"></script>
-<script src="js/15-render-safety.js?v=0.46"></script>
-<script src="js/16-viewport-export.js?v=0.46"></script>
-<script src="js/17-project-media.js?v=0.46"></script>
-<script src="js/18-canvas-handles.js?v=0.46"></script>
-<script src="js/19-view-layout.js?v=0.46"></script>
-<script src="js/20-audio-export.js?v=0.46"></script>
-<script src="js/21-export-dialog.js?v=0.46"></script>
-<script src="js/22-mp4-convert.js?v=0.46"></script>
-<script src="js/23-ux.js?v=0.46"></script>
-<script src="js/24-timeline-clips.js?v=0.46"></script>
-<script src="js/25-projects.js?v=0.46"></script>
-<script src="js/26-reveal-fx.js?v=0.46"></script>
-<script src="js/27-copy-bg.js?v=0.46"></script>
+<script src="vendor/mp4-muxer.js?v=0.47"></script>
+<script src="vendor/webm-muxer.js?v=0.47"></script>
+<script src="js/00-version.js?v=0.47"></script>
+<script src="js/00-loading.js?v=0.47"></script>
+<script src="js/01-icons-state.js?v=0.47"></script>
+<script src="js/02-shapes.js?v=0.47"></script>
+<script src="js/03-model-layers.js?v=0.47"></script>
+<script src="js/04-text-physics.js?v=0.47"></script>
+<script src="js/05-audio-registry.js?v=0.47"></script>
+<script src="js/06-render-core.js?v=0.47"></script>
+<script src="js/07-panels-editing.js?v=0.47"></script>
+<script src="js/08-draw-text-lines-emitters.js?v=0.47"></script>
+<script src="js/09-scene-timeline-graph.js?v=0.47"></script>
+<script src="js/10-gradient-blur.js?v=0.47"></script>
+<script src="js/11-wipe.js?v=0.47"></script>
+<script src="js/12-bubble-shape.js?v=0.47"></script>
+<script src="js/13-shortcuts.js?v=0.47"></script>
+<script src="js/14-blend-groups.js?v=0.47"></script>
+<script src="js/15-render-safety.js?v=0.47"></script>
+<script src="js/16-viewport-export.js?v=0.47"></script>
+<script src="js/17-project-media.js?v=0.47"></script>
+<script src="js/18-canvas-handles.js?v=0.47"></script>
+<script src="js/19-view-layout.js?v=0.47"></script>
+<script src="js/20-audio-export.js?v=0.47"></script>
+<script src="js/21-export-dialog.js?v=0.47"></script>
+<script src="js/22-mp4-convert.js?v=0.47"></script>
+<script src="js/23-ux.js?v=0.47"></script>
+<script src="js/24-timeline-clips.js?v=0.47"></script>
+<script src="js/25-projects.js?v=0.47"></script>
+<script src="js/26-reveal-fx.js?v=0.47"></script>
+<script src="js/27-copy-bg.js?v=0.47"></script>
 </body></html>
