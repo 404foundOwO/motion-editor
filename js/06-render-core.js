@@ -14,7 +14,7 @@ function one(L,t,c,al,X){const E=effOf(L,t),zz=X?mv(E.R,[0,0,X.zo*E.s]):[0,0,0],
  if(!X&&L.efa.includes('ext')){const d=Math.max(0,v('exd')),N=Math.min(20,Math.max(2,Math.round(d/12)));for(let i=N;i>=1;i--)one(L,t,c,al,{zo:d*i/N,sh:1-.6*i/N})}
  const bx=mv(E.R,[100*E.s,0,0]),by=mv(E.R,[0,100*E.s,0]),p1=proj(q[0]+bx[0],q[1]+bx[1],q[2]+bx[2],c),p2=proj(q[0]+by[0],q[1]+by[1],q[2]+by[2],c);if(!p1||!p2)return;
  let dofb=0,fa=1;if(mode!='3d'){const C=P.layers.find(l=>l.type=='cam');if(C){const dp=800/p.s,g=k=>val(C,k,t);if(C.efa.includes('dof'))dofb=Math.min(60,Math.max(0,g('dfa'))*Math.abs(dp-g('dff'))/dp*6);if(C.efa.includes('fog'))fa=1-Math.max(0,Math.min(1,g('fga')))*Math.max(0,Math.min(1,(dp-g('fgs'))/Math.max(1,g('fgr'))))}}
- const fl=L.efa.filter(e=>FS[e]).map(e=>FS[e](v(e)));if(dofb>.3)fl.push(`blur(${dofb.toFixed(1)}px)`);if(X)fl.push(`brightness(${X.sh.toFixed(2)})`);const fs=fl.join(' ');
+ const fl=L.efa.includes('cbg')?[]:L.efa.filter(e=>FS[e]).map(e=>FS[e](v(e)));if(dofb>.3)fl.push(`blur(${dofb.toFixed(1)}px)`);if(X)fl.push(`brightness(${X.sh.toFixed(2)})`);const fs=fl.join(' ');
  if(L.type=='emitter'&&v('p3d')>=.5){cx.save();cx.setTransform(Q,0,0,Q,0,0);cx.globalAlpha=Math.max(0,E.o)*al*fa;if(fs)cx.filter=fq(fs);const gl3=L.efa.includes('glow')?v('glow'):0;if(gl3>0){cx.shadowColor=v('c1');cx.shadowBlur=gl3*Q}drawEmitter(L,t,{c,E});cx.restore();return}
  const PS=Math.max(Math.abs(p1.s-p.s),Math.abs(p2.s-p.s))/p.s;if(PS>.004&&pone(L,t,c,E,q,p,fs,al*fa,v,PS))return;
  cx.save();cx.transform((p1.x-p.x)/100,(p1.y-p.y)/100,(p2.x-p.x)/100,(p2.y-p.y)/100,W/2+p.x,H/2+p.y);cx.globalAlpha=Math.max(0,E.o)*al*fa;
