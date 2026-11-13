@@ -1,13 +1,11 @@
-/* ---- audio-only export: WAV (always works), Ogg Opus / WebM Opus / M4A AAC (when the browser can encode them) ---- */
+/* ---- audio-only export encoders: WAV (always works), Ogg Opus, M4A AAC (when the browser can encode them). The dialog is in 21-export-dialog.js ---- */
 const AXF={
  wav16:{n:'WAV 16-bit (lossless, works everywhere)',ext:'wav',kind:'wav',bits:16},
  wav24:{n:'WAV 24-bit (lossless, studio)',ext:'wav',kind:'wav',bits:24},
  wav32:{n:'WAV 32-bit float (lossless)',ext:'wav',kind:'wav',bits:32},
  ogg:{n:'Opus in Ogg (.ogg, small, great quality)',ext:'ogg',kind:'opus',need:'opus',rate:48000},
- weba:{n:'Opus in WebM (.webm)',ext:'webm',kind:'opus',need:'opus',rate:48000},
  m4a:{n:'AAC in M4A (.m4a, plays on Apple devices)',ext:'m4a',kind:'aac',need:'aac'}
 };
-function axFormats(){return Object.keys(AXF).filter(k=>!AXF[k].need||OFFC[AXF[k].need])}
 function axHasAudio(){return P.layers.some(l=>(l.type=='audio'&&l.buf&&l.e>0)||(l.sbuf&&l.efx&&l.efx.includes('reveal')&&!(l.efo||[]).includes('reveal')))}
 
 /* planar channel data, scaled down only if the mix would clip */
@@ -81,30 +79,10 @@ async function startAudioExport(o){
    const ck=await axEncode(ch.c,SR,codec,o.kb,prog,()=>cancel);if(!ck)return;
    prog('Finishing…',1);
    if(F.ext=='ogg')blob=axOgg(ck,ch.c[0].length,SR);
-   else{const mux=F.kind=='aac'?new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),audio:{codec:'aac',numberOfChannels:2,sampleRate:SR},fastStart:'in-memory',firstTimestampBehavior:'offset'}):new WebMMuxer.Muxer({target:new WebMMuxer.ArrayBufferTarget(),audio:{codec:'A_OPUS',numberOfChannels:2,sampleRate:SR},firstTimestampBehavior:'offset'});
-    ck.forEach(x=>mux.addAudioChunk(x.c,x.m));mux.finalize();blob=new Blob([mux.target.buffer],{type:F.kind=='aac'?'audio/mp4':'audio/webm'})}}
+   else{const mux=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),audio:{codec:'aac',numberOfChannels:2,sampleRate:SR},fastStart:'in-memory',firstTimestampBehavior:'offset'});
+    ck.forEach(x=>mux.addAudioChunk(x.c,x.m));mux.finalize();blob=new Blob([mux.target.buffer],{type:'audio/mp4'})}}
   sv('motion-audio.'+F.ext,blob);
   if(ch.gain<1)alert('The mix was louder than 0 dB, so it was turned down by '+(-20*Math.log10(ch.gain)).toFixed(1)+' dB to avoid distortion.')
  }catch(e){console.error(e);alert('Audio export failed: '+(e&&e.message||e))}
  finally{ovl.remove();OFFX=0;play=0;if(p0)setIc($('#pl'),'play','Play / pause (Space)',1);dirty=1}
 }
-
-function audioMenu(){
- const old=$('#axm');if(old){old.remove();return}
- if(!axHasAudio()){alert('There is no audio in this project yet. Add an audio layer first.');return}
- const sty='style="background:#0d0d10;color:#ddd;border:1px solid #3a3a45;border-radius:6px;padding:5px 8px;font:inherit"',row=(n,h,id)=>`<div id=${id||''} style="display:flex;justify-content:space-between;align-items:center;margin:9px 0"><span>${n}</span>${h}</div>`;
- const d=document.createElement('div');d.id='axm';d.style.cssText='position:fixed;inset:0;background:#000b;z-index:60;display:flex;align-items:center;justify-content:center';
- d.innerHTML=`<div style="background:#1b1b21;border:1px solid #3a3a45;border-radius:10px;padding:18px;width:380px;max-width:92vw;color:#ddd;font:13px system-ui,sans-serif"><h3 style="margin:0 0 6px">Export audio</h3>`+
-  row('Format',`<select id=axf ${sty} style="max-width:250px">${axFormats().map(k=>`<option value=${k}>${AXF[k].n}`).join('')}</select>`)+
-  row('Sample rate',`<select id=axs ${sty}><option value=48000>48 kHz<option value=44100>44.1 kHz</select>`,'axrs')+
-  row('Bitrate',`<select id=axk ${sty}><option value=96>96 kbps<option value=128>128 kbps<option value=192 selected>192 kbps<option value=256>256 kbps<option value=320>320 kbps</select>`,'axrk')+
-  row('Prevent clipping',`<input id=axn type=checkbox checked>`)+
-  `<p id=axi style="margin:10px 0;color:#9a9aa6;font-size:12px"></p><div style="display:flex;gap:8px;justify-content:flex-end"><button id=axx ${sty}>Cancel</button><button id=axg ${sty.replace('#0d0d10','#6c5ce7')}>Export</button></div></div>`;
- document.body.appendChild(d);const g=i=>d.querySelector('#'+i);
- const info=()=>{const F=AXF[g('axf').value],sr=F.rate||+g('axs').value,kb=+g('axk').value;
-  g('axrs').style.display=F.rate?'none':'flex';g('axrk').style.display=F.kind=='wav'?'none':'flex';
-  const mb=F.kind=='wav'?P.dur*sr*2*F.bits/8/1e6:kb*P.dur/8/1e3;
-  g('axi').textContent='Whole project, '+P.dur.toFixed(1)+' s, stereo. About '+(mb<1?mb.toFixed(2):mb.toFixed(1))+' MB.'+(OFFC.opus||OFFC.aac?'':' Compressed formats are not available in this browser, WAV always works.')};
- g('axf').onchange=info;g('axs').onchange=info;g('axk').onchange=info;g('axx').onclick=()=>d.remove();
- g('axg').onclick=()=>{const o={f:g('axf').value,sr:+g('axs').value,kb:+g('axk').value,norm:g('axn').checked};d.remove();startAudioExport(o)};info()}
-$('#exa').onclick=audioMenu;
