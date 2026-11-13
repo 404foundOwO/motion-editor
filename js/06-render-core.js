@@ -52,7 +52,7 @@ function drawGroup0(G,t,cm,d3){const kids=P.layers.filter(l=>l.par==G.id);if(!is
  offEnd(A);const fs=G.efa.filter(e=>FS[e]).map(e=>FS[e](val(G,e,t))).join(' ');cx.save();cx.globalAlpha=Math.max(0,ge.o);cx.filter=fq(fs)||'none';
  if(G.bl&&G.bl!='normal')blendDraw(cx,src,G.bl);else cx.drawImage(src,0,0,W,H);cx.restore()}
 let RINST=null;
-function val(L,k,t){const x=val0(L,k,t);if(RINST&&RINST.m&&RINST.fam.has(L.id)){const m=RINST.m[k];if(m!==undefined&&typeof x=='number')return x*m}return x}
+function val(L,k,t){const x=clampV(k,val0(L,k,t));if(RINST&&RINST.m&&RINST.fam.has(L.id)){const m=RINST.m[k];if(m!==undefined&&typeof x=='number')return x*m}return x}
 const rmult=(rn,v)=>{const kw=1+rn(1)*(v('rrw')||0)/100,kh=v('rrl')>.5?kw:1+rn(2)*(v('rrh')||0)/100;return{w:kw,h:kh,sz:(kw+kh)/2}};
 const RPC=new Map();
 function rptTab(L,uMax){const sg=JSON.stringify([L.kf.rpb,L.kf.rpq,L.kf.rpt,L.p.rpb,L.p.rpq,L.p.rpt,L.s]);let c=RPC.get(L.id);if(!c||c.sg!==sg){c={sg,cum:[0]};RPC.set(L.id,c)}
