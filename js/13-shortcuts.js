@@ -1,0 +1,15 @@
+/* ---- keyboard shortcut cheat sheet ( ? ) ---- */
+const KBD=[['Playback & timeline',[['Space','Play / pause'],['← →','Step one frame'],['Shift ← →','Step 10 frames'],['A / D','Previous / next keyframe'],['I / O / L','Loop in / out / on-off'],['X','Cut tool'],['S / Esc','Select tool'],['Delete','Delete selection']]],
+['Edit',[['Ctrl Z','Undo'],['Ctrl Shift Z / Ctrl Y','Redo'],['Ctrl C / V','Copy / paste'],['Ctrl X / D','Cut / duplicate'],['Ctrl A','Select all keyframes of the layer'],['Ctrl G','Group the selected layer'],['Ctrl Shift G','Ungroup'],['P','Motion path edit mode']]],
+['Mouse',[['Shift + drag (canvas)','Box-select layers'],['Shift + drag (timeline)','Box-select keyframes (+Ctrl to add)'],['Alt + drag','Turn snapping off'],['Shift + drag a handle','Snap angle to 15°'],['Drag a property label','Scrub the value (Shift fine, Alt coarse)'],['Double-click keyframe','Open the graph editor'],['Double-click layer name','Rename the layer'],['Drag a layer onto a group row','Move it into the group'],['Drag a layer between rows','Reorder (and leave a group)'],['Right-click','Context menu']]],
+['3D orbit view',[['W / S','Fly forward / back'],['A / D','Move left / right'],['Q / E','Move up / down'],['Shift + move','3× faster'],['F','Frame the selected layer'],['Home','Reset the view'],['1 / 3 / 7','Front / side / top view']]],
+['Dialogs & menus',[['Esc','Close or cancel'],['Enter','Apply (graph editor, aspect size)'],['Enter in search','Add the first match'],['?','Show this list']]]];
+function closeKbd(){const m=document.getElementById('kbdo');if(m)m.remove()}
+function openKbd(){if(document.getElementById('kbdo')){closeKbd();return}const mac=/Mac|iPhone|iPad/.test(navigator.platform||''),mod=mac?'⌘':'Ctrl',o=document.createElement('div');o.id='kbdo';
+ const keys=k=>k.split(' / ').map(g=>g.split(' ').map(x=>/^(\+|Ctrl)$/.test(x)?(x=='Ctrl'?mod:x):x).map(x=>x=='+'?'+':`<kbd>${x}</kbd>`).join(' ')).join(' <i>or</i> ');
+ o.innerHTML=`<div class=kbox role=dialog aria-label="Keyboard shortcuts"><div class=kh><b>Keyboard shortcuts</b><button data-ib title=Close data-kx>${IC('x')}</button></div><div class=kgrid>${KBD.map(([t,r])=>`<div class=ksec><h4>${t}</h4>${r.map(([k,d])=>`<div class=krow><span>${d}</span><span class=kk>${keys(k)}</span></div>`).join('')}</div>`).join('')}</div><p class=m style="margin:12px 2px 0;font-size:11.5px">Shortcuts are ignored while you type in a text field.</p></div>`;
+ document.body.appendChild(o);o.addEventListener('pointerdown',e=>{if(e.target===o||e.target.closest('[data-kx]'))closeKbd()})}
+addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test((e.target||{}).tagName||''))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()=='g'){e.preventDefault();e.shiftKey?ungroup():groupLayer();return}if(e.key=='?'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();openKbd()}else if(e.key=='Escape'&&document.getElementById('kbdo')){e.preventDefault();e.stopImmediatePropagation();closeKbd()}},true);
+$('#kbb').onclick=openKbd;
+$('#tlin').addEventListener('scroll',e=>e.currentTarget.style.setProperty('--pht',e.currentTarget.scrollTop+'px'),{passive:true});
+
