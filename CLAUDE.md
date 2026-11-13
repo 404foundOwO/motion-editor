@@ -30,13 +30,15 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 22-mp4-convert | WebM to MP4 with ffmpeg.wasm, downloaded from a CDN on demand (never bundled: x264 is GPL) |
 
 ## Conventions
+- Never hard-code 1920x1080 or device pixels. Shaders get `R` (project size) and `q` (render scale); canvas shadow/line sizes that ignore the transform must be multiplied by `Q`.
+- WebGL results go through `glRun`, which reads pixels back (`GLRB`) on non-Chromium browsers. Don't draw a WebGL canvas into a 2D canvas anywhere else.
 - Effect parameters are `[key,label,default]` entries in `EP`; add the effect in `EF` and the draw code in the render path.
 - A render failure must never freeze the preview: new draw code is wrapped by the `layerDraw`/`postSrc` wrappers in 15-render-safety.
 - Files stay under about 30 KB. Split by topic when one grows.
 - Lines are long (compact style). Use grep with `-o` and context, or read with offset/limit, rather than whole files.
 
 ## Verify before pushing
-`npm i && npm test` (headless jsdom, canvas via @napi-rs/canvas; WebGL is not available there). Also run `python3 tools/build.py` and open `dist/motion-editor.html` once. `dist/` is not committed.
+`npm i && npm test` (headless jsdom, canvas via @napi-rs/canvas; WebGL is not available there). For anything that touches rendering also run `node tests/consistency.js` (Playwright Chromium with SwiftShader WebGL): every effect must look the same at full and 1/4 preview, after toggling effects, and through the WebGL read-back path. Also run `python3 tools/build.py` and open `dist/motion-editor.html` once. `dist/` is not committed.
 
 ## Deploy
 GitHub Pages serves `main` from the repo root. A push updates the site.
