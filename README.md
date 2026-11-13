@@ -13,7 +13,8 @@ I'm trying to add features that most simple editors don't have some simple stuff
 - 3D preview of canvas
 - Import 3D GLB Models (Experimental)
 - Text physics (not pixel accurate yet!)
-- Autosave and saving projects with the videos bundled
+- Autosave, several projects kept in the browser (Projects button, top left), and saving projects with the videos bundled
+- Reveal transitions: wipe, grid of growing shapes, and random growing droplets (reveal, hide, or fill with a color)
 - Ability to set preview to 1/4 res, and disabling effects temporarily
 anndd much mooreee ! (and will continue to add when i need)
 
