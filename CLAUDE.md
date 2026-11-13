@@ -24,6 +24,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 17-project-media | save/load, media import, `ld()` loader for three.js |
 | 18-canvas-handles | canvas overlay handles, snapping, motion paths |
 | 19-view-layout | orbit view, layout, toolbar |
+| 20-audio-export | audio-only export dialog and encoders (WAV, Ogg/WebM Opus, M4A AAC) |
 
 ## Conventions
 - Effect parameters are `[key,label,default]` entries in `EP`; add the effect in `EF` and the draw code in the render path.

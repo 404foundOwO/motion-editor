@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "python3 tools/build.py",
-    "test": "node tests/blend-groups.js && node tests/stress.js"
+    "test": "node tests/blend-groups.js && node tests/stress.js && node tests/audio-export.js"
   },
   "devDependencies": { "jsdom": "^26.0.0", "@napi-rs/canvas": "^0.1.65" }
 }
