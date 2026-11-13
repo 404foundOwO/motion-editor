@@ -17,20 +17,26 @@ function drBox(src){const aw=192,ah=Math.max(8,Math.round(192*src.height/src.wid
 const DRBK=(()=>{const a=[];for(let k=0;k<=64;k++){const y=k/64;let x=1;for(let i=0;i<=256;i++){const u=i/256-1;if(1+2.70158*u*u*u+1.70158*u*u>=y){x=i/256;break}}a.push(x)}return a})();
 const drInv=(g,y)=>{y=Math.max(0,Math.min(1,y));if(g==1){const k=y*64,i=Math.min(63,Math.floor(k));return DRBK[i]+(DRBK[i+1]-DRBK[i])*(k-i)}return g==2?1-Math.sqrt(1-y):g==3?1-Math.pow(1-y,1/1.35):1-Math.sqrt(1-y*y)};
 const DRC=new WeakMap();
-function drList(L,tt,bb,p){
- let ax=W/2,ay=H/2,sc=1,rot=0;
+/* where the layer sits on screen: its anchor, scale and rotation. Manual points are stored relative to this, so they follow the layer */
+function drAnchor(L,tt){let ax=W/2,ay=H/2,sc=1,rot=0;
  if(L.type!='cam'){try{const E=effOf(L,tt),q=proj(E.p[0],E.p[1],E.p[2],camAt(tt));if(q){ax=W/2+q.x;ay=H/2+q.y;sc=Math.max(.01,Math.abs(E.s*q.s))}rot=(val(L,'rz',tt)||0)*Math.PI/180}catch(e){}}
+ return{ax,ay,sc,rot}}
+function drList(L,tt,bb,p){
+ const{ax,ay,sc,rot}=drAnchor(L,tt),man=Math.round(val(L,'dpt',tt)||0)==1&&L.dpts&&L.dpts.length>0;
  const vary=Math.max(0,Math.min(1,val(L,'dpv',tt)||0)),sp=Math.max(0,val(L,'dpd',tt)||0),st=sp/(1+sp),seed=Math.round(val(L,'dpz',tt)||0),grow=Math.round(val(L,'dpg',tt)||0),ord=Math.round(val(L,'dpo',tt)||0),soft=Math.max(0,val(L,'dpf',tt)||0);
- let s=Math.max(24,val(L,'dps',tt)||260)*sc;const key=[bb[0],bb[1],bb[2],bb[3],ax.toFixed(2),ay.toFixed(2),s.toFixed(3),rot.toFixed(4),vary,sp,seed,grow,ord,W,H].join(),hit=DRC.get(L),fin2=(D,T)=>{const pe=p*T;D.forEach(o=>{const x=Math.max(0,Math.min(1,(pe-o.d*st)/(1-st))),u=x-1,y=grow==1?1+2.70158*u*u*u+1.70158*u*u:grow==2?1-u*u:grow==3?1-Math.pow(1-x,1.35):Math.sqrt(Math.max(0,1-u*u));o.r=x<=0?0:y*o.rc*s+soft});return{D,soft}};
+ const base=Math.max(24,val(L,'dps',tt)||260);let s=base*sc;const key=[man?JSON.stringify(L.dpts):'',bb[0],bb[1],bb[2],bb[3],ax.toFixed(2),ay.toFixed(2),s.toFixed(3),rot.toFixed(4),vary,sp,seed,grow,ord,W,H].join(),hit=DRC.get(L),fin2=(D,T)=>{const pe=p*T;D.forEach(o=>{const x=Math.max(0,Math.min(1,(pe-o.d*st)/(1-st))),u=x-1,y=grow==1?1+2.70158*u*u*u+1.70158*u*u:grow==2?1-u*u:grow==3?1-Math.pow(1-x,1.35):Math.sqrt(Math.max(0,1-u*u));o.r=x<=0?0:y*o.rc*s+soft});return{D,soft}};
  if(hit&&hit.key==key)return fin2(hit.D,hit.T);const cs=Math.cos(rot),sn=Math.sin(rot),bw=Math.max(1,bb[2]-bb[0]),bh=Math.max(1,bb[3]-bb[1]);
- let i0,i1,j0,j1,a,b,c,d;for(let k=0;k<8;k++){a=1e9;b=-1e9;c=1e9;d=-1e9;[[bb[0],bb[1]],[bb[2],bb[1]],[bb[0],bb[3]],[bb[2],bb[3]]].forEach(([x,y])=>{const dx=x-ax,dy=y-ay,lx=(dx*cs+dy*sn)/s,ly=(-dx*sn+dy*cs)/s;a=Math.min(a,lx);b=Math.max(b,lx);c=Math.min(c,ly);d=Math.max(d,ly)});
+ let i0,i1,j0,j1,a,b,c,d;for(let k=0;k<(man?1:8);k++){a=1e9;b=-1e9;c=1e9;d=-1e9;[[bb[0],bb[1]],[bb[2],bb[1]],[bb[0],bb[3]],[bb[2],bb[3]]].forEach(([x,y])=>{const dx=x-ax,dy=y-ay,lx=(dx*cs+dy*sn)/s,ly=(-dx*sn+dy*cs)/s;a=Math.min(a,lx);b=Math.max(b,lx);c=Math.min(c,ly);d=Math.max(d,ly)});
   i0=Math.round(a);i1=Math.round(b);j0=Math.round(c);j1=Math.round(d);if((i1-i0+1)*(j1-j0+1)<=600)break;s*=1.5}
  const D=[],nx=i1-i0+1,at=(i,j)=>i<i0||i>i1||j<j0||j>j1?null:D[(j-j0)*nx+i-i0];
- for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++){const jx=(drH(i,j,seed,1)-.5)*.5,jy=(drH(i,j,seed,2)-.5)*.5,h3=drH(i,j,seed,3),h4=drH(i,j,seed,4),lx=i+jx,ly=j+jy,X=ax+(lx*cs-ly*sn)*s,Y=ay+(lx*sn+ly*cs)*s,ux=(X-bb[0])/bw,uy=(Y-bb[1])/bh;
+ if(man)L.dpts.slice(0,60).forEach(([u,v],k,arr)=>{const lx=u/base,ly=v/base,X=ax+(lx*cs-ly*sn)*s,Y=ay+(lx*sn+ly*cs)*s,ux=(X-bb[0])/bw,uy=(Y-bb[1])/bh,h3=drH(k,7,seed,3),h4=drH(k,7,seed,4);
+  let dl=arr.length>1?k/(arr.length-1):0;if(ord==1)dl=ux;else if(ord==2)dl=uy;else if(ord==3)dl=(ux+uy)/2;else if(ord==4)dl=Math.hypot((ux-.5)*bw,(uy-.5)*bh)/(.5*Math.hypot(bw,bh));if(ord)dl=dl*.9+h3*.1;
+  D.push({X,Y,lx,ly,d:dl,ins:bb.has(X,Y),rc:.35*(1+vary*h4*.6)})});
+ else for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++){const jx=(drH(i,j,seed,1)-.5)*.5,jy=(drH(i,j,seed,2)-.5)*.5,h3=drH(i,j,seed,3),h4=drH(i,j,seed,4),lx=i+jx,ly=j+jy,X=ax+(lx*cs-ly*sn)*s,Y=ay+(lx*sn+ly*cs)*s,ux=(X-bb[0])/bw,uy=(Y-bb[1])/bh;
   let dl=h3;if(ord==1)dl=ux;else if(ord==2)dl=uy;else if(ord==3)dl=(ux+uy)/2;else if(ord==4)dl=Math.hypot((ux-.5)*bw,(uy-.5)*bh)/(.5*Math.hypot(bw,bh));if(ord)dl=dl*.9+h3*.1;
   D.push({X,Y,lx,ly,d:dl,ins:bb.has(X,Y),rc:Math.hypot(.5+Math.abs(jx),.5+Math.abs(jy))*(1+vary*h4*.6)})}
  const I=D.filter(o=>o.ins),U=I.length?I:D;
- if(!ord){U.slice().sort((x,y)=>x.d-y.d).forEach((o,k,l)=>{o.d=l.length>1?k/(l.length-1):0})}
+ if(man&&!ord){}else if(!ord){U.slice().sort((x,y)=>x.d-y.d).forEach((o,k,l)=>{o.d=l.length>1?k/(l.length-1):0})}
  else{let lo=1e9,hi=-1e9;U.forEach(o=>{lo=Math.min(lo,o.d);hi=Math.max(hi,o.d)});const w=hi-lo||1;D.forEach(o=>{o.d=(o.d-lo)/w})}
  D.forEach(o=>{o.d=Math.max(0,Math.min(1,o.d))});
  /* when does the last gap inside the layer's box close? sample a lattice in layer space, take the earliest circle to reach each point, and stretch time so the latest of those lands on 100% */
@@ -55,3 +61,28 @@ function drRun(src,L,tt){
  const C=gbCv(65,w,h),cg=rs(C),col=val(L,'dpc',tt);cg.fillStyle=typeof col=='string'?col:'#000';cg.fillRect(0,0,w,h);cg.globalCompositeOperation='destination-in';cg.drawImage(src,0,0,w,h);cg.globalCompositeOperation='source-over';
  mc.globalCompositeOperation='source-in';mc.drawImage(mode==2?C:src,0,0,w,h);mc.globalCompositeOperation='source-over';
  rg.drawImage(mode==2?src:C,0,0,w,h);rg.drawImage(M,0,0);return R}
+
+/* ---- Droplets, manual placement: pick the points where circles start ---- */
+let DRED=0,DRLAST={};
+const drPts=L=>L.dpts||(L.dpts=[]);
+const drToLocal=(L,c)=>{const A=drAnchor(L,t),cs=Math.cos(A.rot),sn=Math.sin(A.rot),dx=c.x-A.ax,dy=c.y-A.ay;return[+((dx*cs+dy*sn)/A.sc).toFixed(1),+((-dx*sn+dy*cs)/A.sc).toFixed(1)]};
+const drToWorld=(L,p)=>{const A=drAnchor(L,t),cs=Math.cos(A.rot),sn=Math.sin(A.rot);return[A.ax+(p[0]*cs-p[1]*sn)*A.sc,A.ay+(p[0]*sn+p[1]*cs)*A.sc]};
+const drOn=L=>L&&L.efa&&L.efa.includes('drop')&&Math.round(val(L,'dpt',t)||0)==1;
+const drEditing=L=>!!(DRED&&L&&DRED==L.id&&drOn(L));
+function drHit(L,c){const th=14/c.s,P=drPts(L);for(let i=P.length-1;i>=0;i--){const w=drToWorld(L,P[i]);if(Math.hypot(w[0]-c.x,w[1]-c.y)<th)return i}return -1}
+const drChanged=L=>{dirty=1;ovd=1;try{commit()}catch(e){}all()};
+function drDown(L,c,e){
+ if(!drEditing(L))return false;const i=drHit(L,c),P=drPts(L);
+ if(i>=0){const now=performance.now();if(DRLAST.id==L.id&&DRLAST.i==i&&now-DRLAST.t<450){P.splice(i,1);DRLAST={};drChanged(L);return true}DRLAST={id:L.id,i,t:now};
+  cv.style.cursor='grabbing';cv.onpointermove=m=>{P[i]=drToLocal(L,cpos(m));dirty=1;ovd=1};cv.onpointerup=()=>{cv.onpointermove=hoverMove;cv.onpointerup=null;cv.style.cursor='grab';drChanged(L)};return true}
+ DRLAST={};if(P.length<60){P.push(drToLocal(L,c));drChanged(L)}return true}
+function drOv(L,u){
+ if(!drOn(L))return;const P=drPts(L),ed=drEditing(L);if(!P.length&&!ed)return;ox.save();ox.setLineDash([]);
+ P.forEach((p,i)=>{const w=drToWorld(L,p);ox.beginPath();ox.arc(w[0],w[1],(ed?12:7)*u,0,6.2832);ox.fillStyle='#fff';ox.fill();ox.lineWidth=2.6*u;ox.strokeStyle='#ffcf4a';ox.stroke();
+  if(ed){ox.font=`600 ${12*u}px system-ui,sans-serif`;ox.textAlign='center';ox.textBaseline='middle';ox.fillStyle='#1a1a20';ox.fillText(String(i+1),w[0],w[1]+.5*u)}});
+ ox.restore()}
+const DRUI=L=>{if(Math.round(L.p.dpt||0)!=1)return'';const n=(L.dpts||[]).length,ed=DRED==L.id;
+ return`<div class=r><button data-dre=1 class="${ed?'on':''}">${IC('plus')}${ed?'Done placing':'Place points'}</button><button data-drundo=1 ${n?'':'disabled'}>Undo</button><button data-drclr=1 ${n?'':'disabled'}>Clear</button></div><p class=m style="margin:6px 0 0">${n?n+' point'+(n==1?'':'s')+(ed?'. Click the canvas to add, drag to move, double-click a point to remove.':'. Circles start from these points, in the order you placed them (Order: Random).'):'No points yet, so circles are placed automatically. Press Place points, then click on the canvas.'}</p>`};
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-dre],[data-drundo],[data-drclr]');if(!b)return;const L=cur();if(!L)return;
+ if(b.dataset.dre){DRED=DRED==L.id?0:L.id;ovd=1;all()}else if(b.dataset.drundo){drPts(L).pop();drChanged(L)}else if(b.dataset.drclr){L.dpts=[];drChanged(L)}});
+document.addEventListener('keydown',e=>{if(e.key=='Escape'&&DRED&&!/INPUT|SELECT|TEXTAREA/.test((e.target||{}).tagName||'')){DRED=0;ovd=1;all()}});
