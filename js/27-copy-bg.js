@@ -15,7 +15,7 @@ float r=max(4.,k);vec2 g=vec2(0.);float n=1.;
 for(int ri=1;ri<=3;ri++){float rr=r*float(ri)/3.;for(int i=0;i<8;i++){float an=float(i)*.785398+float(ri)*.3;vec2 o=vec2(cos(an),sin(an))*rr;g+=o*T(v+o*px).a;n+=1.;}}
 g/=n;float gl=length(g);vec2 dir=g/(gl+1e-4);
 /* distance to the shape edge, found by stepping outward along -dir (so corners get a round-ish band, not a blob) */
-float x=r;for(int i=1;i<=12;i++){float t=r*float(i)/12.;if(T(v-dir*t*px).a<.5){x=t-r/24.;break;}}
+float x=r;float t0=0.;for(int i=1;i<=12;i++){float t1=r*float(i)/12.;if(T(v-dir*t1*px).a<.5){float lo=t0,hi=t1;for(int j=0;j<5;j++){float m=.5*(lo+hi);if(T(v-dir*m*px).a<.5)hi=m;else lo=m;}x=.5*(lo+hi);break;}t0=t1;}
 float d=clamp(x/r,0.,1.);float live=smoothstep(0.,r*.04,gl)+step(r*.04,gl)*0.;live=clamp(live,0.,1.);
 float rim=pow(1.-d,2.)*live;float am=k9;
 vec2 off=-dir*rim*(k2/100.)*r*1.5*am*px;float ds=k3/100.*am;
