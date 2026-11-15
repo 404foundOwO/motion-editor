@@ -27,6 +27,7 @@ const r1=await drag(await rowSel(),'long.webm');const a=await state();
 ok('dragging a pool clip onto a timeline clip is accepted and highlights the row',r1.allowed&&r1.marked&&r1.cleared);
 ok('the clip now plays long.webm ('+a.file+') with its slot, fades, keyframes and effects kept',a.file=='long.webm'&&a.s==base.s&&a.e==base.e&&a.fi==1&&a.fo==1&&a.kf==base.kf&&a.efx==base.efx&&a.el!==base.el);
 ok('the new media starts from its beginning, not the old zone ('+base.off+' -> '+a.off+')',a.off===0);
+ok('the Media tab opens so another part of the new clip can be chosen',await pg.evaluate(()=>tab=='Media'&&!!document.querySelector('#side .mdz')));
 ok('its linked audio follows ('+JSON.stringify(a.audio)+')',a.audio.length>=1&&a.audio.every(x=>x.name=='long.webm audio'&&x.off===0&&Math.abs(x.dur-10)<.3));
 const toast=await pg.evaluate(()=>document.getElementById('toast').textContent);ok('it says how the media fits the slot ('+toast.slice(0,120)+')',/Using 0:00\.0–0:04\.0 of the new clip/.test(toast));
 // 2) Shift keeps the old zone

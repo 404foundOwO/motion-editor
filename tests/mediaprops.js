@@ -14,7 +14,7 @@ await pg.evaluate(()=>{P.dur=20;const L=P.layers.find(l=>l.vid);L.s=1;L.e=5;L.of
 const tabs=await pg.evaluate(()=>[...document.querySelectorAll('#side [data-tab]')].map(b=>b.dataset.tab));ok('video layers have a Media tab ('+tabs.join(',')+')',tabs.includes('Media'));
 const txt=await pg.evaluate(()=>document.querySelector('#side').innerText);
 ok('it shows the file name, type, size, dimensions and duration',/A\.webm/.test(txt)&&/Video\s*·\s*WEBM/.test(txt)&&/640×360 px/.test(txt)&&/Duration 0:06\.0/.test(txt));
-ok('and which part of the file is used ('+(txt.match(/Using [^\n]*/)||[''])[0]+')',/Using 0:02\.0–0:06\.0 of the file/.test(txt));
+ok('and which part of the media is used ('+(txt.match(/Using [^\n]*/)||[''])[0]+')',/Using 0:02\.0–0:06\.0 of 0:06\.0/.test(txt));
 ok('"Where it is used" lists this layer once',/Where it is used \(1\)/i.test(txt)&&/this layer/.test(txt));
 // copy + paste, then replace the media in the copy
 const snap=()=>pg.evaluate(()=>{const o=P.layers.filter(l=>l.vid).map(l=>({id:l.id,name:l.name,s:l.s,e:l.e,off:l.off,fi:l.fi,fo:l.fo,kf:JSON.stringify(l.kf.x),efx:l.efx.join(),w:l.p.w,h:l.p.h,file:MB[l.id]&&MB[l.id].name,lk:l.lk||null,el:l.el.currentSrc||l.el.src}));return{video:o,audio:P.layers.filter(l=>l.type=='audio').map(l=>({id:l.id,lk:l.lk||null,dur:+l.buf.duration.toFixed(1),name:MB[l.id]&&MB[l.id].name}))}});
