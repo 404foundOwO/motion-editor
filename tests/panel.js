@@ -35,4 +35,13 @@ ok('bubble and emitter have no second Fill colour',dupFill.length==0);
 await pg.evaluate(()=>{P.layers.length=0;id=1;mk('cam');const L=mk('rect');sel=L.id;addFx(L,'asc');tab='Effects';all()});
 await pg.check('input[data-k="ascm"]');const g1=await pg.evaluate(()=>cur().p.ascm);await pg.uncheck('input[data-k="ascm"]');const g0=await pg.evaluate(()=>cur().p.ascm);
 ok('checkbox sets 1 then 0 ('+g1+','+g0+')',g1===1&&g0===0);
+// the text box is tall by default and remembers a dragged height
+await pg.evaluate(()=>{localStorage.removeItem('ui-txh');P.layers.length=0;id=1;mk('cam');const L=mk('text');L.text='a\nb';sel=L.id;tab='Font';all()});
+const h0=await pg.evaluate(()=>document.querySelector('#side textarea[data-s=text]').offsetHeight);
+await pg.evaluate(()=>{document.querySelector('#side textarea[data-s=text]').style.height='320px'});
+await pg.mouse.click(5,5);await pg.evaluate(()=>{dispatchEvent(new Event('pointerup'));side()});
+const h1=await pg.evaluate(()=>document.querySelector('#side textarea[data-s=text]').offsetHeight);
+await pg.reload();await pg.waitForTimeout(1500);await pg.evaluate(()=>{P.layers.length=0;id=1;mk('cam');const L=mk('text');sel=L.id;tab='Font';all()});
+const h2=await pg.evaluate(()=>document.querySelector('#side textarea[data-s=text]').offsetHeight);
+ok(`text box default ${h0}px, kept after resize ${h1}px, and after a reload ${h2}px`,h0>=150&&h1==320&&h2==320);
 console.log('errs',errs,'FAILS',F+errs.length);await br.close();process.exit(F||errs.length?1:0)})();

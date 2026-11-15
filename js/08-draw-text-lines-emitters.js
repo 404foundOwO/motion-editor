@@ -102,7 +102,10 @@ function drawEmitter(L,t,D3){const age0=t-L.s;if(age0<0)return;const e0=L.s,w0=k
   if(S){const c=Math.max(.01,w('pcs')/100)*scl;cx.scale(c,c);body(S,S.s+a,S.col)}else{cx.fillStyle=col;cx.strokeStyle=col;pdraw(sh,Math.max(.5,w('psz')*scl/2))}
   cx.restore()}
  if(D3&&buf.length){buf.sort((p,q)=>p.s-q.s);for(const b of buf){cx.save();cx.setTransform(Q,0,0,Q,0,0);cx.translate(b.x,b.y);cx.rotate(b.rot);cx.globalAlpha=ga*b.al;if(S){const c=Math.max(.01,b.pcs/100)*b.scl*b.k;cx.scale(c,c);body(S,S.s+b.a,S.col)}else{cx.fillStyle=b.col;cx.strokeStyle=b.col;pdraw(sh,Math.max(.5,b.sz*b.k))}cx.restore()}}}
-const TXTUI=L=>`<div class=r><label>Text</label><textarea data-s=text rows=3 style="width:170px">${esc(L.text)}</textarea></div>${L.efa.includes('srccap')?CAPG:''}`;
+/* the text box is full width; its dragged height is remembered (localStorage 'ui-txh') */
+const txH=()=>{try{return Math.max(60,+localStorage.getItem('ui-txh')||160)}catch(e){return 160}};
+addEventListener('pointerup',()=>{const e=$('#side textarea[data-s=text]');if(e&&e.offsetHeight>=60&&e.offsetHeight!=txH())try{localStorage.setItem('ui-txh',String(e.offsetHeight))}catch(x){}});
+const TXTUI=L=>`<div class=r><label style="flex:1 1 100%">Text</label><textarea data-s=text style="flex:1 1 100%;width:100%;box-sizing:border-box;height:${txH()}px;min-height:60px;resize:vertical">${esc(L.text)}</textarea></div>${L.efa.includes('srccap')?CAPG:''}`;
 /* text alignment buttons (Font tab): set 'tal', 0 left, .5 centre, 1 right; lines align inside the widest line, or inside the Box width when set; source caption aligns inside its box */
 const ALIGNUI=L=>{const a=val(L,'tal',t)||0;return`<div class=seg2 role=group aria-label="Text align">${[['Left',0],['Center',.5],['Right',1]].map(([n,x])=>`<button data-tal=${x} class="${Math.abs(a-x)<.01?'on':''}" title="Align text ${n.toLowerCase()}">${n}</button>`).join('')}</div>`};
 $('#side').addEventListener('click',e=>{const b=e.target.closest('button[data-tal]'),L=cur();if(!b||!L)return;setV(L,'tal',+b.dataset.tal);dirty=1;commit();side()});
