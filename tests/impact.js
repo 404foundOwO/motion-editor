@@ -2,7 +2,7 @@
 const {chromium}=require('playwright'),path=require('path');
 (async()=>{const br=await chromium.launch(),pg=await (await br.newContext({viewport:{width:1280,height:800}})).newPage(),errs=[];pg.on('pageerror',e=>errs.push(e.message));
 await pg.goto('file://'+path.resolve(__dirname,'../index.html'));await pg.waitForTimeout(1500);let F=0;const ok=(n,c)=>{console.log(c?'PASS':'FAIL',n);if(!c)F++};
-const setup=p=>pg.evaluate(p=>{P.layers.length=0;id=1;const C=mk('cam');C.name='Camera';sel=C.id;addFx(C,'impact');C.efa=['impact'];Object.assign(C.p,{ixt:1,ixs:60,ixd:1.2,ixf:7,ixr:4,ixz:80,ixa:90,ixw:0,ixp:0,ixn:0,ixe:1},p||{});return C.id},p);
+const setup=p=>pg.evaluate(p=>{P.layers.length=0;id=1;const C=mk('cam');C.name='Camera';sel=C.id;addFx(C,'impact');C.efa=['impact'];Object.assign(C.p,{ixt:1,ixs:60,ixd:1.2,ixf:7,ixr:4,ixz:80,ix3:3,ixa:90,ixw:0,ixp:0,ixn:0,ixe:1},p||{});return C.id},p);
 const at=t=>pg.evaluate(t=>{const c=camAt(t);return{x:c.x,y:c.y,z:c.z,rz:c.rz,m:Math.hypot(c.x,c.y)}},t);
 const series=(a,b,n)=>pg.evaluate(([a,b,n])=>{const o=[];for(let i=0;i<=n;i++){const t=a+(b-a)*i/n,c=camAt(t);o.push([t,c.x,c.y,c.z,c.rz])}return o},[a,b,n]);
 await setup();
@@ -19,6 +19,16 @@ await setup({ixw:0,ixa:0});const h=await series(1,1.4,100);ok('direction 0 shake
 await setup({ixa:90});const v=await series(1,1.4,100);ok('direction 90 shakes mostly up and down',Math.max(...v.map(r=>Math.abs(r[2])))>1.6*Math.max(...v.map(r=>Math.abs(r[1]))));
 await setup({ixs:0,ixr:0,ixz:0});ok('zero strength, roll and zoom does nothing',(await at(1.05)).m==0&&(await at(1.05)).rz==0&&(await at(1.05)).z==0);
 await setup({ixw:35,ixe:1});const d1=await at(1.03);await setup({ixw:35,ixe:2});const d2=await at(1.03);ok('seed changes the direction',d1.x!==d2.x||d1.y!==d2.y);
+// 3D tilt: the view pitches and yaws, which is what gives depth
+await setup({ixw:0,ixa:90});const pv=await series(1,1.4,100).then(a=>0);
+const tilt=async p=>{await setup(p);return pg.evaluate(()=>{let rx=0,ry=0;for(let i=0;i<=100;i++){const c=camAt(1+i*.004);rx=Math.max(rx,Math.abs(c.rx));ry=Math.max(ry,Math.abs(c.ry))}return{rx,ry}})};
+const tv=await tilt({ixw:0,ixa:90}),th=await tilt({ixw:0,ixa:0}),t0=await tilt({ix3:0});
+ok('3D tilt follows the kick: up/down pitches ('+tv.rx.toFixed(1)+'° vs '+tv.ry.toFixed(1)+'°), left/right yaws ('+th.ry.toFixed(1)+'° vs '+th.rx.toFixed(1)+'°)',tv.rx>1.5*tv.ry&&th.ry>1.5*th.rx&&tv.rx>1.5);
+ok('3D tilt 0 keeps the camera level',t0.rx==0&&t0.ry==0);
+await setup({ix3:0,ixr:0,ixz:0});const flat=(await at(1.03)).m;
+await pg.evaluate(()=>{const c=P.layers.find(l=>l.type=='cam');c.p.ix3=8});
+const depth=await pg.evaluate(()=>{P.layers.length=0;id=1;const C=mk('cam');C.name='Camera';const A=mk('rect');A.p.w=200;A.p.h=200;A.p.z=0;A.p.x=-200;const B=mk('rect');B.p.w=200;B.p.h=200;B.p.z=900;B.p.x=-200;sel=C.id;addFx(C,'impact');C.efa=['impact'];Object.assign(C.p,{ixt:1,ixs:0,ixr:0,ixz:0,ix3:8,ixa:0,ixw:0});const cam=camAt(1.02);const pa=proj(-200,0,0,cam),pb=proj(-200,0,900,cam),p0a=proj(-200,0,0,camAt(.5)),p0b=proj(-200,0,900,camAt(.5));return{near:pa.x-p0a.x,far:pb.x-p0b.x}});
+ok('the tilt moves near and far objects by different amounts, which is the depth ('+depth.near.toFixed(1)+' vs '+depth.far.toFixed(1)+' px)',Math.abs(depth.near)>1&&Math.abs(depth.near-depth.far)>1);
 // the picture really moves, then returns exactly
 await pg.evaluate(()=>{P.layers.length=0;id=1;const C=mk('cam');C.name='Camera';const R=mk('rect');R.p.c1='#ff2020';R.p.w=300;R.p.h=300;sel=C.id;addFx(C,'impact');C.efa=['impact'];C.p.ixt=1;PV=0});
 const shots=await pg.evaluate(()=>{const g=t=>{window.t=t;dirty=1;draw(t);draw(t);const d=MAINCX.getImageData(0,0,W,H).data,o=new Uint8ClampedArray(d);return o},m=(a,b)=>{let s=0;for(let i=0;i<a.length;i+=4)s+=Math.abs(a[i]-b[i])+Math.abs(a[i+1]-b[i+1])+Math.abs(a[i+2]-b[i+2]);return s/(a.length/4)/3};const rest=g(.5),hit=g(1.03),after=g(5);return{move:m(rest,hit),back:m(rest,after)}});
