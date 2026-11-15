@@ -6,6 +6,7 @@ $('#ntx').oninput=()=>{nt().txt=$('#ntx').value};
 let nd=null;$('#nth').onpointerdown=e=>{if(e.target.tagName=='BUTTON')return;const r=$('#notes').getBoundingClientRect();nd={ox:e.clientX-r.left,oy:e.clientY-r.top}};
 addEventListener('pointermove',e=>{if(!nd)return;const n=nt(),x=Math.max(0,Math.min(innerWidth-60,e.clientX-nd.ox)),y=Math.max(0,Math.min(innerHeight-30,e.clientY-nd.oy));n.x=x;n.y=y;const w=$('#notes');w.style.left=x+'px';w.style.top=y+'px'});
 addEventListener('pointerup',()=>{nd=null});
+addEventListener('resize',()=>{const n=P.nt;if(!n||n.x==null)return;const x=Math.max(0,Math.min(innerWidth-60,n.x)),y=Math.max(0,Math.min(innerHeight-30,n.y));if(x!==n.x||y!==n.y){n.x=x;n.y=y;syncNotes()}});
 new ResizeObserver(()=>{const n=P.nt,w=$('#notes');if(n&&n.open&&!n.min&&w.offsetWidth>40){n.w=w.offsetWidth;n.h=w.offsetHeight}}).observe($('#notes'));
 Object.assign(KA,{rvv:.05,rvq:1,rvb:5,rvg:5});
 function BLIPUI(L){return `<div class=r><button data-blip=load>Load blip sound\u2026</button>${L.sbuf?`<span class=m>${esc(L.blipName||'sound')}</span><button data-ib data-blip=play title=Preview>${IC('play')}</button><button data-blip=clear>Clear</button>`:'<span class=m>no sound yet</span>'}</div>`+(L.sbuf?'':'<p class=m>Load a short sound and every typed letter plays it with a slightly random pitch, like a character voice.</p>')}
