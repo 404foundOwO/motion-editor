@@ -53,6 +53,12 @@ ok('a group and one of its children selected together are copied once, with the 
 // single clip copy is unchanged
 await build();await pg.evaluate(()=>{MS.clear();sel=P.layers.find(l=>l.name=='A').id;t=2;all()});await pg.keyboard.press('Control+c');await pg.keyboard.press('Control+v');await pg.waitForTimeout(250);
 ok('copying one clip still works as before: one copy at the playhead, selected ('+await names()+')',(await pg.evaluate(()=>P.layers.filter(l=>/ copy$/.test(l.name)).length))==1&&(await pg.evaluate(()=>P.layers.find(l=>l.id==sel).name))=='A copy'&&(await pg.evaluate(()=>MS.size))==0&&(await pg.evaluate(()=>P.layers.find(l=>l.name=='A copy').s))==2);
+// dragging one selected clip moves them all
+await build();await pg.evaluate(()=>{MS.clear();const A=P.layers.find(l=>l.name=='A'),B=P.layers.find(l=>l.name=='B');MS.add(A.id);MS.add(B.id);sel=A.id;all()});
+{const b=await bar('A');await pg.mouse.move(b.x,b.y);await pg.mouse.down();await pg.mouse.move(b.x+40,b.y,{steps:6});await pg.mouse.up();await pg.waitForTimeout(200);
+ const r=await pg.evaluate(()=>['A','B','C'].map(n=>{const l=P.layers.find(x=>x.name==n);return+l.s.toFixed(2)+'-'+(+l.e.toFixed(2))}).join());const [a,bb,c]=r.split(',');
+ ok('dragging a selected clip moves every selected clip by the same amount ('+r+')',+a.split('-')[0]>0&&Math.abs(+bb.split('-')[0]-4-(+a.split('-')[0]))<.02&&c=='8-11');
+ ok('the panel says several clips are selected',await pg.evaluate(()=>!!document.querySelector('#side .msn')));}
 // lanes view
 await build();await pg.evaluate(()=>setLanes(true,false));await pg.waitForTimeout(300);
 {const s=await spot('B',3.5),e=await spot('C',11.8);await pg.keyboard.down('Shift');await pg.mouse.move(s.x,s.top);await pg.mouse.down();await pg.mouse.move((s.x+e.x)/2,(s.top+e.bot)/2,{steps:6});await pg.mouse.move(e.x,e.bot,{steps:6});await pg.mouse.up();await pg.keyboard.up('Shift');await pg.waitForTimeout(250);

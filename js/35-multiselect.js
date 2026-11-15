@@ -9,3 +9,8 @@ function startClipMq(e){const A=$('#tlin'),ra=A.getBoundingClientRect(),x0=e.cli
   A.querySelectorAll('.row[data-id]').forEach(row=>{const bar=row.querySelector('.bar'),L=P.layers.find(x=>x.id==+row.dataset.id);if(!bar||!L||L.type=='cam')return;const b=bar.getBoundingClientRect();if(b.right>=l&&b.left<=r&&b.bottom>=t0&&b.top<=b0)ids.push(L.id)});
   if(!ev.ctrlKey&&!ev.metaKey)MS.clear();ids.forEach(i=>MS.add(i));ks=[];if(ids.length)sel=ids.includes(sel)?sel:ids[0];if(MS.size<2)MS.clear();side();tl();ovd=1;dirty=1};
  addEventListener('pointermove',f);addEventListener('pointerup',u)}
+
+/* true when a parent group of l is also selected (so it moves with that group) */
+function msUp(l){for(let p=P.layers.find(x=>x.id==l.par),n=0;p&&n<50;p=P.layers.find(x=>x.id==p.par),n++)if(MS.has(p.id))return true;return false}
+/* panel note: the properties below belong to the current clip only */
+{const s0=side;side=function(){s0.apply(this,arguments);const S=$('#side');if(!S||MS.size<2)return;const d=document.createElement('div');d.className='msn m';d.textContent=MS.size+' clips selected. Drag, copy, duplicate, cut and delete act on all of them. The properties below are for '+LN(cur())+' only.';S.insertBefore(d,S.firstChild)}}

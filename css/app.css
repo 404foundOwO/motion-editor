@@ -545,3 +545,4 @@ body.fddrag,body.fddrag *{cursor:ew-resize!important;user-select:none}
 #tlin .row.dz-lb{box-shadow:inset 0 -3px 0 var(--a)}
 #tlin .row.ms .bar{box-shadow:0 0 0 2px var(--a) inset;border-color:var(--a)}
 #tlin .row.ms .nm{background:color-mix(in srgb,var(--a) 16%,var(--p))}
+#side .msn{padding:7px 10px;margin:6px;border-radius:8px;background:color-mix(in srgb,var(--a) 16%,var(--p));font-size:12px}
