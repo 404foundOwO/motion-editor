@@ -532,3 +532,14 @@ body.fddrag,body.fddrag *{cursor:ew-resize!important;user-select:none}
 #app:not(.kfall) .row:not(.on):not(:hover) .kf{scale:.6;opacity:.45}
 #app:not(.kfall) .row:not(.on):not(:hover) .fd{opacity:0;pointer-events:none}
 .kf{transition:opacity .12s,scale .12s}
+/* lanes view: rows of one lane share a grid cell; only the clips and handles of the extra rows take the mouse */
+#tlin.lanes{display:grid;grid-template-columns:max-content;align-content:start}
+#tlin.lanes>.row{grid-column:1}
+#tlin.lanes>.row:first-child{grid-row:1}
+#tlin .row.lnx{pointer-events:none;background:none!important;border-bottom-color:transparent}
+#tlin .row.lnx .nm{visibility:hidden}
+#tlin .row.lnx .tr{background:none!important}
+#tlin .row.lnx .bar,#tlin .row.lnx .kf,#tlin .row.lnx .hd,#tlin .row.lnx .fd{pointer-events:auto}
+#tlin .row.dz-lane{outline:2px dashed var(--a);outline-offset:-2px}
+#tlin .row.dz-lt{box-shadow:inset 0 3px 0 var(--a)}
+#tlin .row.dz-lb{box-shadow:inset 0 -3px 0 var(--a)}

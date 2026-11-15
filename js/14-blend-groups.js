@@ -30,7 +30,10 @@ function dropHint(e){
  const R=P.layers.find(l=>l.id==id),L=P.layers.find(l=>l.id==rd);if(!R||!L||desc(L).has(R.id)){DROP=null;return}
  const rb=row.getBoundingClientRect(),y=(e.clientY-rb.top)/rb.height;let zone=R.type=='group'?(y<.28?'before':y>.72?'after':'into'):(y<.5?'before':'after');
  DROP={id,zone};row.classList.add('dz-'+zone)}
-function moveInto(L,hit){const a=P.layers;a.splice(a.indexOf(L),1);
+function moveInto(L,hit){if(typeof lnOn=='function'&&lnOn()){const R=hit.id&&P.layers.find(l=>l.id==hit.id);
+ if(hit.root){L.par=null;L.ln=undefined;const o=lnSibs(L).filter(x=>x!==L&&lnHas(x));if(o.length)lnMoveTo(L,{below:Math.max(...o.map(x=>x.ln))});else lnNorm(L);sel=L.id;return}
+ if(R&&R.type!='cam'&&!(hit.zone=='into'&&R.type=='group')&&lnKey(R)==lnKey(L)&&lnHas(R)){lnMoveTo(L,hit.zone=='before'?{above:R.ln}:{below:R.ln});sel=L.id;return}}
+ const a=P.layers;a.splice(a.indexOf(L),1);
  if(hit.root){L.par=null;a.splice(a[0]&&a[0].type=='cam'?1:0,0,L)}
  else{const R=a.find(l=>l.id==hit.id);if(hit.zone=='into'&&R.type=='group'){L.par=R.id;R.col=false;const kids=a.filter(x=>x.par==R.id);a.splice(kids.length?a.indexOf(kids[kids.length-1])+1:a.indexOf(R)+1,0,L)}else{L.par=R.par||null;const j=a.indexOf(R);a.splice(hit.zone=='before'?j+1:j,0,L)}}
  sel=L.id}
