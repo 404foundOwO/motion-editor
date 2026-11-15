@@ -44,4 +44,8 @@ const h1=await pg.evaluate(()=>document.querySelector('#side textarea[data-s=tex
 await pg.reload();await pg.waitForTimeout(1500);await pg.evaluate(()=>{P.layers.length=0;id=1;mk('cam');const L=mk('text');sel=L.id;tab='Font';all()});
 const h2=await pg.evaluate(()=>document.querySelector('#side textarea[data-s=text]').offsetHeight);
 ok(`text box default ${h0}px, kept after resize ${h1}px, and after a reload ${h2}px`,h0>=150&&h1==320&&h2==320);
+// the bubble's Message box shares the remembered height
+await pg.evaluate(()=>{localStorage.setItem('ui-txh','240');P.layers.length=0;id=1;mk('cam');const L=mk('bubble');sel=L.id;tab='Shape';all()});
+const hb=await pg.evaluate(()=>document.querySelector('#side textarea[data-s=text]').offsetHeight);
+ok('bubble Message box uses the saved height ('+hb+'px)',hb==240);
 console.log('errs',errs,'FAILS',F+errs.length);await br.close();process.exit(F||errs.length?1:0)})();

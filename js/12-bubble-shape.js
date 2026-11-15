@@ -19,7 +19,7 @@ function drawBubble(L,t,col,v){
  const tc=val(L,'btc',t);cx.fillStyle=typeof tc=='string'?tc:'#fff';cx.font=`500 ${g.sz}px "${L.font||'Roboto Flex'}",system-ui,sans-serif`;cx.textAlign='left';cx.textBaseline='middle';
  g.lines.forEach((ln,i)=>cx.fillText(ln,x0+g.pd,y0+g.pd+g.lh*.5+i*g.lh-(g.lh-g.sz)*.2));cx.textAlign='start';cx.textBaseline='alphabetic'}
 const BBUI=L=>{const sd=Math.round(L.p.btl||0),sg=(l,i)=>`<button data-btl=${i} class="${sd==i?'on':''}">${l}</button>`;
- return `<div class=r><label>Message</label><textarea data-s=text rows=3 style="width:100%;max-width:190px">${esc(L.text)}</textarea></div>`
+ return `<div class=r><label style="flex:1 1 100%">Message</label><textarea data-s=text style="flex:1 1 100%;width:100%;box-sizing:border-box;height:${txH()}px;min-height:60px;resize:vertical">${esc(L.text)}</textarea></div>`
  +`<div class=seg2>${sg('No tail',0)}${sg('Left',1)}${sg('Right',2)}</div>`
  +`<div class=seg2><button data-bbp=0>${IC('msg')}Sent</button><button data-bbp=1>${IC('msg')}Received</button></div>`
  +row(L,'bw','Max width')+row(L,'bsz','Text size')+row(L,'bpd','Padding')+row(L,'brd','Corner radius')+(sd?row(L,'bts','Tail size'):'')
