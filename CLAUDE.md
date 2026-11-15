@@ -17,7 +17,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 08-draw-text-lines-emitters | captions, lines, shapes, particle emitters. Properties panel: tabs are built in `side()` (09); one home per property (Text + Font size in Font via `TXTUI`, Fill in Color, Background in Flags), effect reset is `fxReset` (05); run `node tests/panel.js` after changing it. Text alignment: `tal` (0 left, .5 centre, 1 right), buttons from `ALIGNUI` in the Font tab, applied by `txLay` (18) and `srcCap`; run `node tests/textalign.js` after changing it. Source caption (`srcCap`) defaults come from `W`/`H` in `addFx`, and its box is clamped to the canvas width; caption tags (`<b> <i> <c:..> <stay:N> <p:N>`) are parsed by `capLine`/`capStarts`; after changing it run `node tests/srccap.js` |
 | 09-scene-timeline-graph | `draw`, side panel, timeline, easing graph editor |
 | 10-gradient-blur | gradient/corner blur engine and handles |
-| 11-wipe | wipe effect and handles |
+| 11-wipe | wipe effect and handles. A second wipe (wipe out, params `wqp` progress / `wqd` from the other end or the same end) is a second `wpPass` over the same line and style in `wpRun`; run `node tests/wipe2.js` after changing it |
 | 12-bubble-shape | message bubble |
 | 13-shortcuts | `?` cheat sheet (data in `KBD`) |
 | 14-blend-groups | blend modes (`blendDraw`), grouping, timeline drag into groups |
