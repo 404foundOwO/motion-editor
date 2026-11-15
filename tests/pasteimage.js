@@ -17,4 +17,10 @@ ok('with the Media tab open the paste replaces the media and keeps the slot ('+J
 await pg.evaluate(()=>{P.layers.length=0;const L=mk('rect');L.name='R';sel=L.id;t=1;all()});
 await pg.keyboard.press('Control+c');await pg.keyboard.press('Control+v');await pg.waitForTimeout(300);
 ok('the editor\'s own copy and paste still works',(await pg.evaluate(()=>P.layers.filter(l=>/ copy$/.test(l.name)).length))==1);
+// the clipboard still holds the image, then an object is copied in the editor: paste must give the object back
+await pg.evaluate(()=>{P.layers.length=0;const L=mk('rect');L.name='Q';sel=L.id;t=1;all()});
+const same=()=>pg.evaluate(async()=>{const dt=new DataTransfer();dt.items.add(new File([new Uint8Array(500)],'image.png',{type:'image/png',lastModified:111}));document.body.dispatchEvent(new ClipboardEvent('paste',{clipboardData:dt,bubbles:true,cancelable:true}))});
+await same();await pg.waitForTimeout(500);const n1=await pg.evaluate(()=>P.layers.filter(l=>l.type=='media').length);
+await pg.evaluate(()=>{sel=P.layers.find(l=>l.name=='Q').id;tab='Move';all()});await pg.keyboard.press('Control+c');await same();await pg.waitForTimeout(500);
+ok('after copying an object the stale clipboard image is not pasted again; the object is ('+n1+' image, '+await pg.evaluate(()=>P.layers.map(l=>l.name).join())+')',n1==1&&(await pg.evaluate(()=>P.layers.filter(l=>l.type=='media').length))==1&&(await pg.evaluate(()=>P.layers.filter(l=>l.name=='Q copy').length))==1);
 console.log('errs',errs,'FAILS',F+errs.length);await br.close();process.exit(F||errs.length?1:0)})();
