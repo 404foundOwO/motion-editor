@@ -23,3 +23,6 @@ $('#tlin').addEventListener('pointermove',cutLine);$('#tlin').addEventListener('
 function setTLC(on,save){app.classList.toggle('tlc',!!on);const b=$('#tld');if(b){b.classList.toggle('on',!!on);b.title=on?'Comfortable timeline (bigger clips)':'Compact timeline (more rows)'}if(save)try{localStorage.setItem('meTLC',on?'1':'0')}catch(e){}tl()}
 {let on=false;try{on=localStorage.getItem('meTLC')=='1'}catch(e){}setTLC(on)}
 {const b=$('#tld');if(b)b.onclick=()=>setTLC(!app.classList.contains('tlc'),true)}
+/* calmer timeline: keyframe markers and fade handles are quiet on layers you are not working on (selected or hovered layers show them in full); the diamond button in the timeline bar shows every keyframe again */
+function setKFA(on,save){app.classList.toggle('kfall',!!on);const b=$('#tlk');if(b){b.classList.toggle('on',!!on);b.title=on?'Showing every keyframe. Click to show them only on the selected or hovered layer':'Keyframes show on the selected or hovered layer. Click to show all'}if(save)try{localStorage.setItem('meKFA',on?'1':'0')}catch(e){}}
+{const b=$('#tlk');if(b)b.onclick=()=>setKFA(!app.classList.contains('kfall'),true);let v=null;try{v=localStorage.getItem('meKFA')}catch(e){}setKFA(v=='1',false)}
