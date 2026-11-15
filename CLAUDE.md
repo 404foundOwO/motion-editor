@@ -23,7 +23,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 14-blend-groups | blend modes (`blendDraw`), grouping, timeline drag into groups |
 | 15-render-safety | `safeDraw`, error isolation, GL recovery, main `tick` |
 | 16-viewport-export | aspect ratio, preview quality, audio + video export, project storage in IndexedDB (`saveNow`, `projOpen`, `projNew`, `projImport`, `restore`; keys `p:<id>`, `m:<id>`, `<id>:<layer>`, `pool:<id>` + `<id>:pool<n>` (media pool, see 29), `last`) |
-| 17-project-media | save/load, media import, `ld()` loader for three.js |
+| 17-project-media | Save project to file is streamed (`projFileBlob`: 3 MB base64 slices appended to a Blob, progress + Cancel, same format; pool via `poolRaw` in 29); run `node tests/savefile.js`; save/load, media import, `ld()` loader for three.js |
 | 18-canvas-handles | canvas overlay handles, snapping, motion paths |
 | 19-view-layout | orbit view, layout, toolbar |
 | 20-audio-export | audio-only encoders (WAV, Ogg Opus, M4A AAC) |

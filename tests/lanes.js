@@ -1,7 +1,7 @@
 // Lanes view: clips that do not overlap share a row; existing projects are untouched; drag a clip to another lane, or drop a pool clip on a lane. Needs Playwright Chromium (the pool-drop part also needs ffmpeg).
 const {chromium}=require('playwright'),path=require('path'),fs=require('fs'),os=require('os'),cp=require('child_process');
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),'lanes-'));let vid=null;try{vid=path.join(dir,'two.webm');cp.execSync(`ffmpeg -y -loglevel error -f lavfi -i testsrc=duration=2:size=320x180:rate=30 -c:v libvpx -b:v 500k ${vid}`)}catch(e){vid=null}
-(async()=>{const br=await chromium.launch({args:['--autoplay-policy=no-user-gesture-required']}),pg=await (await br.newContext({viewport:{width:1300,height:1000}})).newPage(),errs=[];pg.on('pageerror',e=>errs.push(e.message));
+(async()=>{const br=await chromium.launch({args:['--autoplay-policy=no-user-gesture-required']}),pg=await (await br.newContext({viewport:{width:1300,height:1000}})).newPage(),errs=[];pg.on('pageerror',e=>errs.push(e.message+' @'+(e.stack||'').split('\n').slice(1,4).join('|')));
 await pg.goto('file://'+path.resolve(__dirname,'../index.html'));await pg.waitForTimeout(1500);let F=0;const ok=(n,c)=>{console.log(c?'PASS':'FAIL',n);if(!c)F++};
 const build=()=>pg.evaluate(()=>{for(const el of [document.documentElement,document.querySelector('#app')])el.style.setProperty('--th','430px');P.layers.length=0;id=1;P.dur=12;mk('cam');
  const add=(n,ty,s,e,c)=>{const l=mk(ty);l.name=n;l.s=s;l.e=e;if(c)l.p.c1=c;l.p.w=240;l.p.h=140;return l};

@@ -1,5 +1,5 @@
 /* Media pool: floating window (like Notes) so it takes no layout space. Clicking a tile adds it to the timeline at the playhead. With 'Keep in project' on, the pool is saved per project: IndexedDB 'pool:<id>' (list) + media '<id>:pool<n>' (files), and in the exported project .json as `pool`. */
-let poolReset,poolLoad,poolImport,poolBundle;
+let poolReset,poolLoad,poolImport,poolBundle,poolRaw;
 (()=>{
 let items=[],seq=1,keep=true,pq=Promise.resolve(),POOLD=null;window.poolDragItem=()=>POOLD&&{file:POOLD.file,kind:POOLD.kind,name:POOLD.name};const K='mp-win';
 let S={open:0,min:0,x:16,y:64,w:320,h:300};try{Object.assign(S,JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){}
@@ -61,6 +61,7 @@ poolLoad=()=>pq=pq.then(async()=>{const id=CURID;if(!id||typeof idb!='function')
  if(id!=CURID)return;clear();items=L;seq=n;keep=!meta||meta.keep!==0;sync()}).catch(()=>{});
 poolImport=async b=>{clear();keep=b.keep!==0;for(const o of b.items||[]){const bl=d2b(o.data),f=new File([bl],o.name,{type:bl.type}),k=kind(f)||o.kind;if(k)items.push(mkItem(f,k,seq++,0))}sync();await persist()};
 window.poolItems=()=>items.map(i=>({id:i.id,name:i.name,kind:i.kind,file:i.file}));
+poolRaw=()=>keep&&items.length?{items:items.map(it=>({name:it.name,kind:it.kind,file:it.file}))}:null;
 poolBundle=async()=>keep&&items.length?{keep:1,items:await Promise.all(items.map(async it=>({name:it.name,kind:it.kind,data:await b64(it.file)})))}:null;
 render();place();if(typeof CURID!='undefined'&&CURID)poolLoad();
 })();
