@@ -36,6 +36,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 27-copy-bg | Liquid glass (`lglass`, `lgRun`, WebGL, backdrop passed to `glRun` as 2nd texture `B`) and Copy background effect (`cbg`): snapshot of the canvas before the layer (`cbgSnap`, called in `layerDraw0`), layer shape masks it (`cbgRun`, in `postSrc0`); CSS-filter effects apply to the copy |
 | 28-claude-api | `window.CLAUDE`: full outside-the-page API (state, catalog, layers, keyframes, effects, project/beat settings, group, undo, play, screenshot, `audioInfo` envelope/onsets, projects) built on the UI's own functions, for Claude in Chrome via `Runtime.evaluate` |
 | 29-media-pool | Floating Media pool window (`#mp`, top-bar `#mpbtn`): per-project file list (checkbox Keep in project; saved in IndexedDB and the exported project .json as `pool`); clicking a clip adds it at the playhead via `addMediaFile`/`addAudioFile` (in 17). Window position in localStorage, re-clamped on resize |
+| 30-expressions | Property expressions: `L.xp={key:'formula'}`, evaluated by `exprEval` from `val()` (06). Own parser `xpParse` (never eval: project files are untrusted), time-only so paused = playing. UI is the Expressions box in the Flags tab (`XPUI`); API `CLAUDE.setExpression`. Add functions in `XF`, names in `XV`. Run `node tests/expressions.js` after changes |
 
 ## Conventions
 - Never hard-code 1920x1080 or device pixels. Shaders get `R` (project size) and `q` (render scale); canvas shadow/line sizes that ignore the transform must be multiplied by `Q`.

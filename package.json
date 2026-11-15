@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "python3 tools/build.py",
-    "test": "node tests/blend-groups.js && node tests/stress.js && node tests/audio-export.js && node tests/ux.js",
+    "test": "node tests/blend-groups.js && node tests/stress.js && node tests/audio-export.js && node tests/ux.js && node tests/expressions.js",
     "test:projects": "node tests/projects.js",
     "test:droplets": "node tests/droplets.js"
   },

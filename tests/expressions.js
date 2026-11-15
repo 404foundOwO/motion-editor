@@ -1,0 +1,17 @@
+const h=require('./harness');(async()=>{const errs=[];const d=await h.load('MF:'+require('path').resolve(__dirname,'../index.html'),errs);const w=d.window,ev=s=>w.eval(s);let F=0;const ok=(n,c)=>{console.log(c?'PASS':'FAIL',n);if(!c)F++};
+const C=w.CLAUDE,id=C.addLayer('rect');
+const v=(f,t=1)=>{const r=C.setExpression(id,'sc',f);if(r!==true)return'ERR:'+r;return+ev(`val(P.layers.find(l=>l.id==${id}),'sc',${t})`).toFixed(4)};
+ok('arithmetic',v('1+2*3')==7);ok('precedence ^ and unary',v('-2^2')==-4&&v('2^3^2')==512);ok('t and sin',Math.abs(v('sin(t)',1)-Math.sin(1))<1e-3);
+ok('ternary/compare',v('t>2?10:20',3)==10&&v('t>2?10:20',1)==20);ok('clamp/lerp/linear',v('clamp(5,0,2)')==2&&v('lerp(0,10,.5)')==5&&v('linear(t,0,2,0,100)',1)==50);
+ok('ease/bounce ends',v('ease(1)')==1&&v('bounce(1)')==1&&v('bounce(0)')==0);
+C.setProp(id,'sc',3);C.setExpression(id,'sc','value*2');ok('value',v('value*2')==6);
+ok('wiggle deterministic',v('wiggle(2,.5)',1.3)===v('wiggle(2,.5)',1.3));ok('wiggle bounded',Math.abs(v('wiggle(2,.5)',1.3)-3)<=.5001);
+C.setExpression(id,'sc',null);C.setKeyframe(id,'sc',0,0,'lin');C.setKeyframe(id,'sc',1,10,'lin');ok('loop',Math.abs(v('loop(1)',1.5)-5)<.01);
+const id2=C.addLayer('circle');C.setLayer(id2,{name:'Dot'});C.setProp(id2,'op',.25);ok('link',(()=>{C.setExpression(id,'sc',"link('Dot','op')*4");return Math.abs(+ev(`val(P.layers.find(l=>l.id==${id}),'sc',1)`)-1)<1e-6})());
+ok('link cycle does not hang',(()=>{C.setExpression(id,'sc',"link('Dot','sc')");C.setExpression(id2,'sc',"link('Rectangle','sc')+1");const r=+ev(`val(P.layers.find(l=>l.id==${id}),'sc',1)`);return isFinite(r)})());
+ok('errors reported',typeof C.setExpression(id,'sc','1+')=='string'&&typeof C.setExpression(id,'sc','foo(1)')=='string'&&typeof C.setExpression(id,'sc','constructor(1)')=='string'&&typeof C.setExpression(id,'sc','1 $ 2')=='string');
+ok('bad formula falls back',(()=>{C.setExpression(id,'sc',null);const L=ev(`P.layers.find(l=>l.id==${id})`);L.xp={sc:'1+'};return Number.isFinite(+ev(`val(P.layers.find(l=>l.id==${id}),'sc',1)`))})());
+ok('no code execution',(()=>{w.__x=0;C.setExpression(id,'sc','(function(){window.__x=1})()');return w.__x===0})());
+C.setExpression(id,'sc','1+t');ok('survives save/undo roundtrip',JSON.parse(ev('ser()')).layers.find(l=>l.id==id).xp.sc=='1+t');
+C.setExpression(id,'sc',null);ok('cleared',!C.state().layers.find(l=>l.id==id).xp);
+console.log('errs',errs,'FAILS',F);process.exit(F?1:0)})();
