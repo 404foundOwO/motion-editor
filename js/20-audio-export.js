@@ -68,7 +68,7 @@ async function startAudioExport(o){
  const p0=play;OFFX=1;play=0;if(AON)aStop();
  try{
   await new Promise(r=>setTimeout(r,0));
-  const ab=await renderAudioOffline(P.dur,SR);
+  let ab=await renderAudioOffline(o.zone?o.zone.b:P.dur,SR);if(ab&&o.zone)ab=sliceAudio(ab,o.zone.a,SR);
   if(!ab){alert('There is no audio in this project yet.');return}
   if(cancel)return;
   const ch=axChannels(ab,o.norm);let blob;

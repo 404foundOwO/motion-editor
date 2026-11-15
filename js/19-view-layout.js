@@ -12,7 +12,7 @@ if(h){e.preventDefault();dirty=1}});
 addEventListener('keydown',e=>{const ty=!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName);if(e.code=='Space'&&ty){e.preventDefault();$('#pl').click()}if(e.code=='Delete'&&ty)$('#del').click();if((e.code=='ArrowRight'||e.code=='ArrowLeft')&&ty){e.preventDefault();seek(Math.round(t*FPS)/FPS+(e.code=='ArrowRight'?1:-1)*(e.shiftKey?10:1)/FPS)}if((e.ctrlKey||e.metaKey)&&ty&&e.code=='KeyZ'){e.preventDefault();e.shiftKey?redo():undo()}if((e.ctrlKey||e.metaKey)&&ty&&e.code=='KeyY'){e.preventDefault();redo()}});
 let last=0,sa=0,WASPLAY=false;function tick0(ts){if(OFFX){last=ts;return}const d=Math.min(.1,(ts-last)/1000);last=ts;refx();const hasA=P.layers.some(l=>l.type=='audio'&&l.buf);
  if(play&&hasA&&AON&&Math.abs(t-LT)>.002)aStart();
- if(play){t=AON&&AC.state=='running'?A0.t+(AC.currentTime-A0.c):t+d;const lp=!exp&&P.lp&&P.lp.on?P.lp:null;if(lp&&t>=Math.min(lp.b,P.dur)){t=lp.a;if(AON)aStart()}else if(t>=P.dur){if(exp){exp=0;play=0;t=P.dur;rec.stop()}else{t=0;if(AON)aStart()}}dirty=1;ph();if(ts-sa>100){sa=ts;sideLive()}}
+ if(play){t=AON&&AC.state=='running'?A0.t+(AC.currentTime-A0.c):t+d;const lp=!exp&&P.lp&&P.lp.on?P.lp:null;if(lp&&t>=Math.min(lp.b,P.dur)){t=lp.a;if(AON)aStart()}else if(t>=P.dur||(exp&&EXZ&&t>=EXZ.b)){if(exp){exp=0;play=0;t=EXZ?EXZ.a:P.dur;rec.stop()}else{t=0;if(AON)aStart()}}dirty=1;ph();if(ts-sa>100){sa=ts;sideLive()}}
  if(WASPLAY&&!play)side();WASPLAY=!!play;
  if(play&&hasA){if(!AON||sig()!=ASIG)aStart();else aUpd()}else if(AON)aStop();
  metTick();blipTick();LT=t;if(dirty){dirty=0;safeDraw(t);ovd=1}if(ovd){ovd=0;try{drawOverlay()}catch(e){console.error('[overlay]',e)}}}
@@ -39,7 +39,11 @@ function openAr(btn){
  setTimeout(()=>{addEventListener('pointerdown',arOut,true);addEventListener('keydown',arKey,true)},0)}
 $('#arb').onclick=e=>openAr(e.currentTarget);arUi();if(PV)pvApply();
 
-const LP=()=>P.lp||(P.lp={on:0,a:0,b:P.dur});function lpUi(){const l=LP();$('#lpl').className=l.on?'on':'';$('#lpt').textContent=l.on?`${l.a.toFixed(2)}\u2013${Math.min(l.b,P.dur).toFixed(2)}s`:''}
+/* the selected zone is the in/out range (I, O); exports can be limited to it */
+const LP=()=>P.lp||(P.lp={on:0,a:0,b:P.dur});
+function zoneGet(){const l=P.lp;if(!l)return null;const a=Math.max(0,+l.a||0),b=Math.min(l.b==null?P.dur:+l.b,P.dur);return b>a+.04&&(l.on||a>0||b<P.dur-.001)?{a,b}:null}
+function zoneForget(){P.lp={on:0,a:0,b:P.dur};lpUi();lpDraw();try{commit()}catch(e){}}
+function lpUi(){const l=LP();$('#lpl').className=l.on?'on':'';$('#lpt').textContent=l.on?`${l.a.toFixed(2)}\u2013${Math.min(l.b,P.dur).toFixed(2)}s`:''}
 $('#lpi').onclick=()=>{const l=LP();l.a=Math.max(0,Math.min(t,l.b-.05));lpUi()};$('#lpo').onclick=()=>{const l=LP();l.b=Math.max(t,l.a+.05);l.on=1;lpUi()};$('#lpl').onclick=()=>{const l=LP();l.on=l.on?0:1;if(l.b<=l.a||l.b>P.dur)l.b=P.dur;lpUi()};
 addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.ctrlKey||e.metaKey)return;if(e.code=='KeyI')$('#lpi').click();else if(e.code=='KeyO')$('#lpo').click();else if(e.code=='KeyL')$('#lpl').click();else if(e.code=='KeyP')$('#pthb').click()});
 const PVC=new Map();function pv(L){if(L.type!='audio'&&L.type!='media')return'';const s=L.type=='audio'?L.buf:L.glb?null:L.el;if(!s)return'';let c=PVC.get(L.id);if(!c||c.s!==s){c={s,u:''};try{const k=document.createElement('canvas'),g=k.getContext('2d');k.height=18;if(L.type=='audio'){const d=s.getChannelData(0),n=k.width=600,st=Math.max(1,Math.floor(d.length/n));g.fillStyle='rgba(255,255,255,.55)';for(let x=0;x<n;x++){let m=0;for(let j=0;j<st;j+=Math.ceil(st/40))m=Math.max(m,Math.abs(d[x*st+j]||0));const h=Math.max(1,Math.min(1,m)*18);g.fillRect(x,9-h/2,1,h)}}else{const w=s.videoWidth||s.naturalWidth,h=s.videoHeight||s.naturalHeight;if(!w||!h||(L.vid&&s.readyState<2)||(!L.vid&&!s.complete))return'';k.width=Math.max(8,Math.round(18*w/h));g.drawImage(s,0,0,k.width,18)}c.u=k.toDataURL();PVC.set(L.id,c)}catch(er){return''}}return c.u?`background-image:url(${c.u});background-size:${L.type=='audio'?'100% var(--wvh,100%)':'auto var(--wvh,100%)'};background-repeat:${L.type=='audio'?'no-repeat':'repeat-x'}`:''}

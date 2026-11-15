@@ -27,7 +27,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 18-canvas-handles | canvas overlay handles, snapping, motion paths |
 | 19-view-layout | orbit view, layout, toolbar |
 | 20-audio-export | audio-only encoders (WAV, Ogg Opus, M4A AAC) |
-| 21-export-dialog | the Export dialog: format list + settings (video and audio) |
+| 21-export-dialog | the Export dialog: format list + settings (video and audio). Selected zone export: the in/out range `P.lp` (I, O keys) via `zoneGet`/`zoneForget` (19); `o.zone` is honoured by `startOffline`, `startExport` (`EXZ`) and `startAudioExport`, audio is rendered to the zone end then cut with `sliceAudio` (16). Run `node tests/zoneexport.js` after changing it |
 | 22-mp4-convert | WebM to MP4 with ffmpeg.wasm, downloaded from a CDN on demand (never bundled: x264 is GPL) |
 | 23-ux | version label, empty-canvas hint, timeline name-column resize |
 | 24-timeline-clips | clip fade dots (`L.fi`/`L.fo`, applied by `fadeK`), cut-mode split preview, compact/comfortable density |
