@@ -35,6 +35,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 26-reveal-fx | Shape reveal shader (`srev`) and Droplets (`drRun`, Canvas 2D, Placement Manual: `L.dpts` points in layer space, edited on canvas by `drDown`/`drOv`; a few circles in the layer's own space grow until it is covered; timing is stretched so the last gap closes at 100%). After changing Droplets run `node tests/droplets.js` |
 | 27-copy-bg | Liquid glass (`lglass`, `lgRun`, WebGL, backdrop passed to `glRun` as 2nd texture `B`) and Copy background effect (`cbg`): snapshot of the canvas before the layer (`cbgSnap`, called in `layerDraw0`), layer shape masks it (`cbgRun`, in `postSrc0`); CSS-filter effects apply to the copy |
 | 28-claude-api | `window.CLAUDE`: full outside-the-page API (state, catalog, layers, keyframes, effects, project/beat settings, group, undo, play, screenshot, `audioInfo` envelope/onsets, projects) built on the UI's own functions, for Claude in Chrome via `Runtime.evaluate` |
+| 29-media-pool | Floating Media pool window (`#mp`, top-bar `#mpbtn`): session-only file list; clicking a clip adds it at the playhead via `addMediaFile`/`addAudioFile` (in 17). Position in localStorage, re-clamped on resize |
 
 ## Conventions
 - Never hard-code 1920x1080 or device pixels. Shaders get `R` (project size) and `q` (render scale); canvas shadow/line sizes that ignore the transform must be multiplied by `Q`.
