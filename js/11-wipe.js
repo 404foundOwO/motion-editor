@@ -58,7 +58,7 @@ const WPST=[['Hard','<path d="M14 2V18" stroke-width="2.4"/>'],['Gradient','<pat
 const WPUI=L=>{const m=(L.p.wpm||0)>=.5?1:0,st=Math.round(L.p.wps===undefined?1:L.p.wps),hd=(L.p.wpv||0)>=.5?1:0,sg=(a,b,l1,l2,key,v)=>`<div class=seg2><button data-${key}=0 class="${v?'':'on'}">${l1}</button><button data-${key}=1 class="${v?'on':''}">${l2}</button></div>`;
  return sg(0,0,IC('gline')+'Linear',IC('gradial')+'Radial','wpm',m)
  +`<div class=wst>${WPST.map(([n,ic],i)=>`<button data-wps=${i} class="${st==i?'on':''}" title="${n}"><svg viewBox="0 0 28 20" class=eg>${ic}</svg><span>${n}</span></button>`).join('')}</div>`
- +row(L,'wpp','Progress %')+(st?row(L,'wpf','Softness (px)'):'')+(st>=2?row(L,'wpa','Wave height (px)')+row(L,'wpw','Wavelength (px)')+row(L,'wpt','Wave speed (cycles/s)'):'')
+ +row(L,'wpp','Progress (%)')+(st?row(L,'wpf','Softness (px)'):'')+(st>=2?row(L,'wpa','Wave height (px)')+row(L,'wpw','Wavelength (px)')+row(L,'wpt','Wave speed (cycles/s)'):'')
  +row(L,'wpl','Edge line (px, 0 = off)')+((L.p.wpl||0)>0?row(L,'wpc','Edge line color'):'')
  +sg(0,0,'Reveal','Hide','wpv',hd)
  +`<p class=m style="margin:6px 2px 0;font-size:11.5px;line-height:1.5">Drag the purple and green handles on the canvas. Drag the yellow diamond or the edge to scrub progress. 0% is fully hidden at the purple handle, 100% is fully shown at the green one. Hold Shift to snap the angle.</p>`

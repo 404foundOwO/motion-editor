@@ -21,7 +21,7 @@ function val0(L,k,t){const a=L.kf[k];if(!a||!a.length)return L.p[k];if(t<=a[0].t
 const ins=(a,f)=>{a.push(f);a.sort((x,y)=>x.t-y.t)};
 /* allowed range per parameter: values are clamped when typed/dragged (setV) and when read (val), so keyframe easing overshoot can't push e.g. opacity below 0 either */
 const RNG=(()=>{const o={},s=(r,ks)=>ks.split(' ').forEach(k=>o[k]=r);
- s([0,1],'op pan gr inv sepia noise flick dpv fga dmx blt scl rvv rpo mho mvo lbo fks fkd fkm rev echo');s([0,4],'vol');s([0,100],'cbg dpp srp wpp rvp cbs lgd lgb lgn rvq rro bobi tpb tpe twp1 twp2');
+ s([0,1],'op pan gr inv sepia noise flick dpv fga dmx blt scl rvv rpo mho mvo lbo fks fkd fkm rev echo rrl lkf tlm tlh tlv ascm ascb prb cpo a1p a2p a3p');s([0,100],'cpt');s([0,60],'avm cps cpf');s([0,1000],'cpr');s([0,4],'vol');s([0,100],'cbg dpp srp wpp rvp cbs lgd lgb lgn rvq rro bobi tpb tpe twp1 twp2');
  s([0,200],'lglass');s([0,300],'lgh lgr');s([4,400],'lgt');s([24,2000],'dps');s([8,2000],'srs');s([0,10],'dpd srd mb br con sa eg sh');s([0,400],'dpf srf blur glow shb stw blr');s([0,2000],'wpf exd');s([0,200],'wpl cbb gb1 gb2 chroma');
  s([4,5000],'wpw');s([0,100],'dfa');s([0,1e5],'dff fgs');s([1,1e5],'fgr tpw tpl');s([-2,2],'fish');s([0,2],'rad vig');s([0,1000],'dd shk');s([0,5],'gl bla pla flash');s([1,64],'kn');s([2,64],'po');s([2,400],'hf');s([1,200],'scs');s([1,400],'pix');
  s([1,120],'lofps wbf');s([10,22000],'lpf hpf');s([1,16],'crush');s([0,50],'rvf');s([1,1000],'rvb');s([0,60000],'rvg rpt rrt lkn lkm');s([0,60],'oaf wgf plf ors lks lkh lke');s([0,240],'rsf');s([0,120],'fkr');

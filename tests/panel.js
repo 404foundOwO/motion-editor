@@ -18,4 +18,21 @@ await pg.evaluate(()=>{const t=P.layers.find(l=>l.type=='text');sel=t.id;addFx(t
 await pg.click('button[data-rst="flick"]');await pg.waitForTimeout(150);
 const r=await pg.evaluate(()=>{const t=cur();return{fkr:t.p.fkr,kf:!!t.kf.fks,fl:t.p.flick,has:t.efx.includes('flick')}});
 ok('reset restores defaults, clears keyframes, keeps the effect',r.fkr==12&&!r.kf&&r.fl==.8&&r.has);
+// consistency across every layer type and tab
+const audit=await pg.evaluate(()=>{const bad=[],types=['text','rect','circle','tri','poly','star','ring','line','bubble','mshape','media','group','emitter','cam','audio'];
+ for(const ty of types){P.layers.length=0;id=1;const L=mk(ty);sel=L.id;if(ty!='cam')try{addFx(L,'blur')}catch(e){}tab='Move';side();const tl=[...document.querySelectorAll('#side [data-tab]')].map(b=>b.dataset.tab);
+  for(const tb of tl){tab=tb;side();const rows=[...document.querySelectorAll('#side .r')];
+   rows.forEach(r=>{const lab=r.querySelector('label'),n=r.querySelector('[data-k],[data-s]'),txt=(lab?lab.firstChild.textContent:'').trim();
+    if(lab&&n&&(n.dataset.k||n.dataset.s)==txt)bad.push(ty+'/'+tb+': raw key label '+txt);
+    if(/ (px|%|\u00b0)$/.test(txt))bad.push(ty+'/'+tb+': unit style '+txt);
+    if(/\(0\/1/.test(r.textContent))bad.push(ty+'/'+tb+': 0/1 field '+txt)});
+   const texts=[...document.querySelectorAll('#side textarea[data-s=text]')].length;if(texts>1)bad.push(ty+'/'+tb+': '+texts+' text boxes')}}
+ return bad});
+ok('no raw keys, bare units, 0/1 fields or duplicate text boxes in any tab: '+JSON.stringify(audit),audit.length==0);
+const dupFill=await pg.evaluate(()=>{const out=[];for(const ty of ['bubble','emitter']){P.layers.length=0;id=1;const L=mk(ty);sel=L.id;tab='Color';side();if(/Fill/.test(document.querySelector('#side').textContent))out.push(ty)}return out});
+ok('bubble and emitter have no second Fill colour',dupFill.length==0);
+// a 0/1 effect option is a checkbox that writes 0 or 1
+await pg.evaluate(()=>{P.layers.length=0;id=1;mk('cam');const L=mk('rect');sel=L.id;addFx(L,'asc');tab='Effects';all()});
+await pg.check('input[data-k="ascm"]');const g1=await pg.evaluate(()=>cur().p.ascm);await pg.uncheck('input[data-k="ascm"]');const g0=await pg.evaluate(()=>cur().p.ascm);
+ok('checkbox sets 1 then 0 ('+g1+','+g0+')',g1===1&&g0===0);
 console.log('errs',errs,'FAILS',F+errs.length);await br.close();process.exit(F||errs.length?1:0)})();
