@@ -10,7 +10,7 @@ window.CLAUDE={
   const L=mk(type);sel=L.id;all();commit();return L.id},
  removeLayer(id){const L=lay(id);if(!L)return false;P.layers.forEach(c=>{if(c.par==id)c.par=L.par});P.layers=P.layers.filter(l=>l.id!=id);if(sel==id){sel=null;ks=[]}return done()},
  duplicate(id){if(!lay(id))return null;sel=id;ks=[];copyAny();pasteAny();commit();return sel},
- reorder(id,index){const L=lay(id);if(!L)return false;const a=P.layers;a.splice(a.indexOf(L),1);a.splice(Math.max(0,Math.min(a.length,index)),0,L);return done()},
+ reorder(id,index){/* index is the stack position: 0 = bottom (the last row in the timeline) */const L=lay(id);if(!L)return false;const a=P.layers;a.splice(a.indexOf(L),1);a.splice(Math.max(0,Math.min(a.length,index)),0,L);return done()},
  group(id){if(!lay(id))return null;sel=id;ks=[];groupLayer();return sel},
  ungroup(id){const G=lay(id);if(!G||G.type!='group')return false;sel=id;ks=[];ungroup();return true},
  select(id){if(id!=null&&!lay(id))return false;sel=id;ks=[];all();return true},
@@ -31,6 +31,7 @@ Create: addLayer(type) addText(text,props,tracks) duplicate(id) group(id)
 Animate: animate(id,{key:[[time,value,ease?],...]}) setKeyframe(id,key,time,value,ease) removeKeyframe toggleKeyframe
 Edit: setProp(id,key,value) setLayer(id,{name,text,s,e,...}) setProject({dur,bpm,boff,bpb,sub}) addEffect(id,key) reorder removeLayer select seek(s) play(on) undo redo
 Expressions: setExpression(id,key,'1+0.1*sin(t*6)') (returns true or an error; null clears). Names t value beat bpm dur index; wiggle(f,a) loop(p) link('Layer','key') ease bounce elastic linear noise sin cos abs min max clamp lerp
+Layer order: state().layers and reorder() use the stack order (index 0 = bottom, drawn first); the timeline lists the top of the stack first.
 Many at once: batch([['setProp',id,'x',10],['addEffect',id,'blur']])
 Example, text that scales up: CLAUDE.addText('Hello',{sz:200},{sc:[[0,0,'ease'],[1,1]]})
 Keys: sc scale, op opacity, x y z, rx ry rz rotation, sz text size, blur glow. Easings: lin ease cin cout hold.`},

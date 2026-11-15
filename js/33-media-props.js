@@ -1,6 +1,6 @@
 /* Media tab for video, photo and audio layers: file details, Replace media (keeps position, size, fades, keyframes, effects and timing, so copy + paste + replace keeps a transition), and where the same media is used. Undo does not bring back the old file. */
 const mdSame=(a,b)=>a===b||(a&&b&&a.blob&&b.blob&&a.name==b.name&&a.blob.size==b.blob.size);
-function mediaUses(L){const m=MB[L.id];if(!m)return[L];return P.layers.filter(l=>l.type==L.type&&!l.glb&&MB[l.id]&&mdSame(MB[l.id],m))}
+function mediaUses(L){const m=MB[L.id];if(!m)return[L];const o=treeOrder().map(x=>x[0].id);return P.layers.filter(l=>l.type==L.type&&!l.glb&&MB[l.id]&&mdSame(MB[l.id],m)).sort((a,b)=>o.indexOf(a.id)-o.indexOf(b.id))}
 const mdT=s=>{const m=Math.floor(s/60);return m+':'+(s-m*60).toFixed(1).padStart(4,'0')},mdSz=n=>n>=1e9?(n/1e9).toFixed(2)+' GB':n>=1e6?(n/1e6).toFixed(1)+' MB':n>=1e3?Math.round(n/1e3)+' KB':n+' B';
 function MEDUI(L){const m=MB[L.id],el=L.el,uses=mediaUses(L),au=L.type=='audio',pool=typeof poolItems=='function'?poolItems().filter(i=>au?i.kind=='audio':i.kind!='audio'):[];
  const ext=m?((m.name.match(/\.([^.]+)$/)||[])[1]||'').toUpperCase():'',dim=!au&&el?(L.vid?[el.videoWidth,el.videoHeight]:[el.naturalWidth,el.naturalHeight]):null,dur=au?(L.buf&&L.buf.duration):(L.vid&&el&&isFinite(el.duration)?el.duration:0);
