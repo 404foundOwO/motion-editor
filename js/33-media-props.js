@@ -16,23 +16,38 @@ function mdLoad(f){return new Promise((ok,no)=>{const vid=/^video/.test(f.type)|
  if(vid){el.muted=true;el.playsInline=true;el.preload='auto';el.onloadedmetadata=()=>ok({el,vid:1,w:el.videoWidth,h:el.videoHeight});el.onerror=()=>no(new Error('This video cannot be opened'))}
  else{el.onload=()=>{imgPrep(el);ok({el,vid:0,w:el.naturalWidth,h:el.naturalHeight})};el.onerror=()=>no(new Error('This image cannot be opened'))}el.src=URL.createObjectURL(f)})}
 async function mdAudio(f){try{return await ac().decodeAudioData(await f.arrayBuffer())}catch(e){return null}}
-async function mdReplaceOne(L,f,ids){const old=MB[L.id];let note='';
- if(L.type=='audio'){const b=await mdAudio(f);if(!b)throw new Error('This audio file cannot be decoded');L.buf=b;BUF[L.id]=b;MB[L.id]={blob:f,name:f.name,kind:'audio'};STORED.delete(L.id);if(old&&L.name==String(old.name).slice(0,14))L.name=f.name.slice(0,14);return note}
+let mdShift=false;addEventListener('pointerdown',e=>{mdShift=e.shiftKey},true);
+/* returns {note, fit}: fit describes how the new media sits in the clip's slot (the clip keeps its in/out; the new media starts from its beginning unless keepZone) */
+async function mdReplaceOne(L,f,ids,keepZone){const old=MB[L.id];let note='',fit='',dur=0;
+ if(L.type=='audio'){const b=await mdAudio(f);if(!b)throw new Error('This audio file cannot be decoded');L.buf=b;BUF[L.id]=b;MB[L.id]={blob:f,name:f.name,kind:'audio'};STORED.delete(L.id);if(old&&L.name==String(old.name).slice(0,14))L.name=f.name.slice(0,14);if(!keepZone)L.off=0;return{note,fit:mdFit(L,b.duration)}}
  const m=await mdLoad(f);m.el.__own=L.id;L.el=m.el;ELS[L.id]=m.el;L.vid=!!m.vid;MB[L.id]={blob:f,name:f.name,kind:m.vid?'video':'image'};STORED.delete(L.id);
  if(m.w&&m.h){const s=Math.min(L.p.w/m.w,L.p.h/m.h);if(isFinite(s)&&s>0){L.p.w=Math.round(m.w*s);L.p.h=Math.round(m.h*s)}}
  if(old&&L.name==String(old.name).slice(0,14))L.name=f.name.slice(0,14);
  /* a pasted copy shares its link tag (and so its audio) with the original: it must not change the original's sound, so it detaches and gets its own */
+ if(!keepZone)L.off=0;
  const lk=L.lk?P.layers.filter(a=>a.type=='audio'&&a.lk==L.lk):[],shared=!!L.lk&&P.layers.some(x=>x.id!=L.id&&x.type=='media'&&x.lk==L.lk&&!ids.has(x.id)),buf=m.vid?await mdAudio(f):null;
  if(shared)L.lk=undefined;
- if(buf&&lk.length&&!shared)lk.forEach(a=>{a.buf=buf;BUF[a.id]=buf;MB[a.id]={blob:f,name:f.name+' audio',kind:'audio'};STORED.delete(a.id)});
+ if(buf&&lk.length&&!shared)lk.forEach(a=>{a.buf=buf;BUF[a.id]=buf;MB[a.id]={blob:f,name:f.name+' audio',kind:'audio'};STORED.delete(a.id);if(!keepZone)a.off=0});
  else if(buf){const A=addAudio(buf,f.name+' audio',f);A.lk=L.lk='av'+A.id;A.s=L.s;A.off=L.off||0;A.e=A.s+buf.duration;sel=L.id}
  else if(lk.length&&!shared)note=m.vid?'The new video has no sound, so the old linked audio is still there.':'The old linked audio is still there.';
- return note}
-async function mdReplace(L,f,everywhere){const st=m=>{const e=$('#mst');if(e)e.textContent=m},ids=everywhere?mediaUses(L).map(l=>l.id):[L.id];st('Replacing…');let note='';
- const set=new Set(ids);try{for(const id of ids){const l=P.layers.find(x=>x.id==id);if(l)note=await mdReplaceOne(l,f,set)||note}}catch(e){st('Could not replace: '+e.message);return}
- sel=L.id;dirty=1;all();commit();st('Replaced with '+f.name+(ids.length>1?' in '+ids.length+' places':'')+'.'+(note?' '+note:''))}
+ return{note,fit:m.vid?mdFit(L,m.el.duration):''}}
+function mdFit(L,dur){if(!isFinite(dur)||dur<=0)return'';const slot=(L.e<1e9?Math.min(L.e,P.dur):P.dur)-L.s,off=L.off||0,avail=dur-off;if(slot<=.05)return'';return avail>slot+.05?`Using ${mdT(off)}\u2013${mdT(off+slot)} of the new clip (${mdT(dur)} long).`:avail<slot-.05?`The new clip is shorter than the slot (${mdT(avail)} against ${mdT(slot)}), so it holds its last frame at the end.`:'It fits the slot exactly.'}
+async function mdReplace(L,f,everywhere,keepZone){const st=m=>{const e=$('#mst');if(e)e.textContent=m},ids=everywhere?mediaUses(L).map(l=>l.id):[L.id];st('Replacing…');let note='';
+ let fit='';const set=new Set(ids),was=(MB[L.id]&&MB[L.id].name)||L.name;try{for(const id of ids){const l=P.layers.find(x=>x.id==id);if(l){const r=await mdReplaceOne(l,f,set,keepZone);note=r.note||note;if(l.id==L.id)fit=r.fit}}}catch(e){st('Could not replace: '+e.message);toast('Could not replace: '+e.message);return}
+ sel=L.id;dirty=1;all();commit();const msg='Replaced '+was+' with '+f.name+(ids.length>1?' in '+ids.length+' places':'')+'. '+(fit?fit+(keepZone?'':' Hold Shift to keep the old zone.')+' ':'')+note;st(msg.trim());toast(msg.trim())}
 const mdIn=document.createElement('input');mdIn.type='file';mdIn.id='mrf';mdIn.hidden=true;document.body.appendChild(mdIn);
-mdIn.onchange=()=>{const f=mdIn.files[0],L=cur();mdIn.value='';if(f&&L)mdReplace(L,f,!!($('#mall')&&$('#mall').checked))};
+mdIn.onchange=()=>{const f=mdIn.files[0],L=cur();mdIn.value='';if(f&&L)mdReplace(L,f,!!($('#mall')&&$('#mall').checked),mdShift)};
 $('#side').addEventListener('click',e=>{const L=cur();if(e.target.closest('[data-mrep]')&&L){mdIn.accept=L.type=='audio'?'audio/*':'image/*,video/*';mdIn.click();return}
  const g=e.target.closest('[data-mgo]');if(g){const l=P.layers.find(x=>x.id==+g.dataset.mgo);if(l){sel=l.id;ks=[];t=Math.max(0,Math.min(P.dur,l.s));dirty=1;all()}}});
-$('#side').addEventListener('change',e=>{const s=e.target.closest&&e.target.closest('select[data-mpool]');if(!s||!s.value)return;const L=cur(),it=typeof poolItems=='function'?poolItems().find(i=>i.id==+s.value):null;if(L&&it)mdReplace(L,it.file,!!($('#mall')&&$('#mall').checked))});
+$('#side').addEventListener('change',e=>{const s=e.target.closest&&e.target.closest('select[data-mpool]');if(!s||!s.value)return;const L=cur(),it=typeof poolItems=='function'?poolItems().find(i=>i.id==+s.value):null;if(L&&it)mdReplace(L,it.file,!!($('#mall')&&$('#mall').checked),mdShift)});
+/* drag a clip from the media pool, or a file from the computer, onto a clip in the timeline or onto a layer on the canvas to replace its media */
+const mdKind=(type,name)=>/^video/.test(type)||/\.(mp4|webm|mov|m4v|mkv)$/i.test(name||'')?'video':/^audio/.test(type)||/\.(mp3|wav|ogg|m4a|aac|flac|opus)$/i.test(name||'')?'audio':/^image/.test(type)||/\.(png|jpe?g|gif|webp|svg|avif)$/i.test(name||'')?'image':null;
+const mdCompat=(L,k)=>!!L&&!!k&&(L.type=='audio'?k=='audio':L.type=='media'&&!L.glb?k!='audio':false);
+function mdDragSrc(e){const dt=e.dataTransfer;if(!dt)return null;const ty=[...dt.types];if(ty.includes('text/x-pool')&&typeof poolDragItem=='function')return poolDragItem();if(ty.includes('Files')){const it=dt.items&&dt.items[0];return{file:null,kind:mdKind(it&&it.type,''),name:''}}return null}
+const mdTip=document.createElement('div');mdTip.id='mpdrop';mdTip.hidden=true;document.body.appendChild(mdTip);
+const mdClear=()=>{document.querySelectorAll('#tlin .row.dz-rep').forEach(r=>r.classList.remove('dz-rep'));mdTip.hidden=true};
+function mdTarget(e,src){const row=e.target.closest&&e.target.closest('#tlin .row[data-id]');if(row)return{L:P.layers.find(l=>l.id==+row.dataset.id),row};if(e.target.closest&&e.target.closest('#stage')){const c=cpos(e),L=hit(c.x,c.y);return{L}}return{L:null}}
+function mdOver(e){const src=mdDragSrc(e);if(!src)return;const{L,row}=mdTarget(e,src);mdClear();if(!mdCompat(L,src.kind))return;e.preventDefault();e.dataTransfer.dropEffect='copy';if(row)row.classList.add('dz-rep');else{mdTip.textContent='Replace '+LN(L);mdTip.style.left=Math.min(innerWidth-220,e.clientX+14)+'px';mdTip.style.top=(e.clientY+16)+'px';mdTip.hidden=false}}
+async function mdDrop(e){const src=mdDragSrc(e);if(!src)return;const{L}=mdTarget(e,src);mdClear();if(!mdCompat(L,src.kind))return;e.preventDefault();const f=src.file||(e.dataTransfer.files&&e.dataTransfer.files[0]);if(!f)return;await mdReplace(L,f,false,e.shiftKey)}
+['#tlin','#stage'].forEach(s=>{const el=$(s);if(!el)return;el.addEventListener('dragover',mdOver);el.addEventListener('drop',mdDrop);el.addEventListener('dragleave',e=>{if(!e.relatedTarget||!el.contains(e.relatedTarget))mdClear()})});
+addEventListener('dragend',mdClear);

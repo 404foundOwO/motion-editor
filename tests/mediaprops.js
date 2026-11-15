@@ -24,10 +24,10 @@ const pasted=await pg.evaluate(()=>cur().id);
 const pastedBefore=(await snap()).video.find(v=>v.id==pasted);
 await pg.evaluate(()=>{tab='Media';all()});
 ok('after pasting, the media is used in 2 places',/Where it is used \(2\)/i.test(await pg.evaluate(()=>document.querySelector('#side').innerText)));
-await pg.setInputFiles('#mrf',F_('B.webm'));await pg.waitForFunction(()=>/Replaced with/.test(document.querySelector('#mst')?.textContent||''),null,{timeout:15000});
+await pg.setInputFiles('#mrf',F_('B.webm'));await pg.waitForFunction(()=>/Replaced .+ with /.test(document.querySelector('#mst')?.textContent||''),null,{timeout:15000});
 const after=await snap();const orig=after.video.find(v=>v.id==before.video[0].id),copy=after.video.find(v=>v.id==pasted),b0=before.video[0];
 ok('the copy now plays B.webm, the original still plays A.webm ('+copy.file+' / '+orig.file+')',copy.file=='B.webm'&&orig.file=='A.webm'&&copy.el!==orig.el);
-ok('the copy keeps its fades, keyframes, effects, in/out points and zone',copy.fi==1&&copy.fo==1&&copy.kf==pastedBefore.kf&&copy.efx==b0.efx&&copy.s==pastedBefore.s&&copy.e==pastedBefore.e&&copy.off==b0.off&&copy.e-copy.s==b0.e-b0.s);
+ok('the copy keeps its fades, keyframes, effects and in/out points, and the new media starts from its beginning',copy.fi==1&&copy.fo==1&&copy.kf==pastedBefore.kf&&copy.efx==b0.efx&&copy.s==pastedBefore.s&&copy.e==pastedBefore.e&&copy.off===0&&copy.e-copy.s==b0.e-b0.s);
 ok('the new 16:9 video fits the old box ('+copy.w+'x'+copy.h+' vs '+b0.w+'x'+b0.h+')',Math.abs(copy.w-b0.w)<=1&&Math.abs(copy.h-b0.h)<=1);
 ok('the original is untouched',orig.s==b0.s&&orig.e==b0.e&&orig.fi==1&&orig.w==b0.w);
 const ca=after.audio,origAudio=ca.find(a=>a.lk==b0.lk&&a.id==before.audio[0].id);
@@ -40,7 +40,7 @@ ok('the list has a row per place with its time range',await pg.evaluate(()=>docu
 await pg.click('#side [data-mgo]:not(.on)');const jumped=await pg.evaluate(()=>({t,sel,s:cur().s}));ok('clicking a row selects that layer and jumps to its start ('+JSON.stringify(jumped)+')',jumped.s==14&&Math.abs(jumped.t-14)<.01);
 // replace in all places
 await pg.evaluate(()=>{const G=P.layers.find(l=>l.vid&&MB[l.id].name=='A.webm');sel=G.id;tab='Media';all()});
-await pg.check('#mall');await pg.setInputFiles('#mrf',F_('C.webm'));await pg.waitForFunction(()=>/Replaced with C/.test(document.querySelector('#mst')?.textContent||''),null,{timeout:15000});
+await pg.check('#mall');await pg.setInputFiles('#mrf',F_('C.webm'));await pg.waitForFunction(()=>/Replaced .+ with C\.webm/.test(document.querySelector('#mst')?.textContent||''),null,{timeout:15000});
 const all2=await snap();const cs=all2.video.filter(v=>v.file=='C.webm');
 ok('"Replace in all places" changed both ('+cs.length+' clips now use C.webm)',cs.length==2&&!all2.video.some(v=>v.file=='A.webm'));
 ok('and their shared audio was swapped in place, not duplicated',all2.audio.filter(a=>a.name=='C.webm audio').length==1&&all2.audio.find(a=>a.name=='C.webm audio').dur==4);
@@ -48,23 +48,23 @@ ok('and their shared audio was swapped in place, not duplicated',all2.audio.filt
 await pg.evaluate(()=>{P.layers.length=0;id=1;mk('cam');all()});
 await pg.setInputFiles('#fm',F_('p1.png'));await pg.waitForTimeout(1500);
 const p0=await pg.evaluate(()=>{const L=cur();L.p.w=800;L.p.h=600;L.fi=.5;tab='Media';all();return{w:L.p.w,h:L.p.h}});
-await pg.setInputFiles('#mrf',F_('p2.png'));await pg.waitForFunction(()=>/Replaced with/.test(document.querySelector('#mst')?.textContent||''),null,{timeout:10000});
+await pg.setInputFiles('#mrf',F_('p2.png'));await pg.waitForFunction(()=>/Replaced .+ with /.test(document.querySelector('#mst')?.textContent||''),null,{timeout:10000});
 const p1=await pg.evaluate(()=>{const L=cur();return{w:L.p.w,h:L.p.h,fi:L.fi,file:MB[L.id].name,nat:L.el.naturalWidth}});
 ok('a photo swapped for a square one fits inside the old box without stretching ('+p1.w+'x'+p1.h+') and keeps its fade',p1.file=='p2.png'&&p1.w==p1.h&&p1.w<=800&&p1.h<=600&&p1.fi==.5&&p1.nat==1000);
 // replace from the media pool
 await pg.click('#mpbtn');await pg.setInputFiles('#mpf',F_('p1.png'));await pg.waitForTimeout(800);
-await pg.evaluate(()=>{tab='Media';all()});await pg.selectOption('select[data-mpool]',{index:1});await pg.waitForFunction(()=>/Replaced with p1/.test(document.querySelector('#mst')?.textContent||''),null,{timeout:10000});
+await pg.evaluate(()=>{tab='Media';all()});await pg.selectOption('select[data-mpool]',{index:1});await pg.waitForFunction(()=>/Replaced .+ with p1\.png/.test(document.querySelector('#mst')?.textContent||''),null,{timeout:10000});
 ok('a clip can be chosen from the media pool',(await pg.evaluate(()=>MB[cur().id].name))=='p1.png');
 // audio layer
 await pg.evaluate(()=>{P.layers.length=0;id=1;mk('cam');all()});
 await pg.evaluate(async()=>{const c=new AudioContext(),b=c.createBuffer(1,48000*3,48000);addAudio(b,'old tone');const L=cur();L.p.vol=.5;L.s=2;tab='Media';all()});
-await pg.setInputFiles('#mrf',F_('tone.wav'));await pg.waitForFunction(()=>/Replaced with/.test(document.querySelector('#mst')?.textContent||''),null,{timeout:10000});
+await pg.setInputFiles('#mrf',F_('tone.wav'));await pg.waitForFunction(()=>/Replaced .+ with /.test(document.querySelector('#mst')?.textContent||''),null,{timeout:10000});
 const au=await pg.evaluate(()=>{const L=cur();return{name:MB[L.id].name,dur:+L.buf.duration.toFixed(1),vol:L.p.vol,s:L.s,tabs:[...document.querySelectorAll('#side [data-tab]')].map(b=>b.dataset.tab).join()}});
 ok('an audio layer can be replaced too and keeps its volume and start ('+JSON.stringify(au)+')',au.name=='tone.wav'&&au.dur==2&&au.vol==.5&&au.s==2&&/Media/.test(au.tabs));
 // it is saved with the project
 await pg.evaluate(()=>{P.layers.length=0;id=1;mk('cam');all()});
 await pg.setInputFiles('#fm',F_('p1.png'));await pg.waitForTimeout(1500);
-await pg.evaluate(()=>{tab='Media';all()});await pg.setInputFiles('#mrf',F_('p2.png'));await pg.waitForFunction(()=>/Replaced with/.test(document.querySelector('#mst')?.textContent||''),null,{timeout:10000});
+await pg.evaluate(()=>{tab='Media';all()});await pg.setInputFiles('#mrf',F_('p2.png'));await pg.waitForFunction(()=>/Replaced .+ with /.test(document.querySelector('#mst')?.textContent||''),null,{timeout:10000});
 await pg.evaluate(()=>saveNow(true));await pg.waitForTimeout(800);await pg.reload();await pg.waitForTimeout(2500);
 const re=await pg.evaluate(()=>{const L=P.layers.find(l=>l.type=='media');return L?{file:MB[L.id]&&MB[L.id].name,nat:L.el&&L.el.naturalWidth}:null});
 ok('the replacement survives a reload ('+JSON.stringify(re)+')',re&&re.file=='p2.png'&&re.nat==1000);

@@ -519,3 +519,6 @@ body.fddrag,body.fddrag *{cursor:ew-resize!important;user-select:none}
 #side .mdu:hover{border-color:var(--a)}
 #side .mdu.on{background:var(--p2);border-color:var(--a)}
 #side .mdu span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#tlin .row.dz-rep{outline:2px dashed var(--a);outline-offset:-2px;background:color-mix(in srgb,var(--a) 14%,transparent)}
+#mpdrop{position:fixed;z-index:30;padding:5px 10px;background:var(--a);color:#fff;border-radius:8px;font-size:12px;font-weight:600;pointer-events:none;box-shadow:0 6px 18px #0006;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mpdrop[hidden]{display:none}

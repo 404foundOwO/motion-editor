@@ -1,7 +1,7 @@
 /* Media pool: floating window (like Notes) so it takes no layout space. Clicking a tile adds it to the timeline at the playhead. With 'Keep in project' on, the pool is saved per project: IndexedDB 'pool:<id>' (list) + media '<id>:pool<n>' (files), and in the exported project .json as `pool`. */
 let poolReset,poolLoad,poolImport,poolBundle;
 (()=>{
-let items=[],seq=1,keep=true,pq=Promise.resolve();const K='mp-win';
+let items=[],seq=1,keep=true,pq=Promise.resolve(),POOLD=null;window.poolDragItem=()=>POOLD&&{file:POOLD.file,kind:POOLD.kind,name:POOLD.name};const K='mp-win';
 let S={open:0,min:0,x:16,y:64,w:320,h:300};try{Object.assign(S,JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){}
 const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
 const w=document.createElement('div');w.id='mp';w.hidden=true;
@@ -40,8 +40,8 @@ function showTip(it){const m=it.meta,ext=((it.name.match(/\.([^.]+)$/)||[])[1]||
 function hideTip(){clearTimeout(tipTimer);tip.hidden=true;tipFor=null;tipTile=null}
 const sync=()=>{$('#mpkeep').checked=keep;render()};
 const render=()=>{const g=$('#mpg');g.innerHTML=items.length?'':'<p class=m>Drop files here or press + to add images, video and audio. Click a clip to put it on the timeline at the playhead.</p>';
- items.forEach(it=>{const d=document.createElement('div');d.className='mpt';d.setAttribute('aria-label',it.name);d.onpointerenter=()=>{clearTimeout(tipTimer);tipTimer=setTimeout(()=>{tipTile=d;showTip(it)},220)};d.onpointerleave=hideTip;
-  const th=it.kind=='audio'?`<div class=mpa>${IC('wave')}</div>`:it.kind=='video'?`<video src="${it.url}#t=0.1" preload=metadata muted playsinline></video>`:`<img src="${it.url}" alt="">`;
+ items.forEach(it=>{const d=document.createElement('div');d.className='mpt';d.setAttribute('aria-label',it.name);d.draggable=true;d.ondragstart=e=>{hideTip();POOLD=it;e.dataTransfer.effectAllowed='copy';e.dataTransfer.setData('text/x-pool',String(it.id));e.dataTransfer.setData('text/plain',it.name)};d.ondragend=()=>{POOLD=null};d.onpointerenter=()=>{clearTimeout(tipTimer);tipTimer=setTimeout(()=>{tipTile=d;showTip(it)},220)};d.onpointerleave=hideTip;
+  const th=it.kind=='audio'?`<div class=mpa>${IC('wave')}</div>`:it.kind=='video'?`<video src="${it.url}#t=0.1" preload=metadata muted playsinline></video>`:`<img src="${it.url}" alt="" draggable=false>`;
   d.innerHTML=th+`<span>${it.name.replace(/[<>&]/g,'')}</span><button title=Remove aria-label=Remove>${IC('x')}</button>`;
   d.onclick=e=>{hideTip();if(e.target.closest('button')){URL.revokeObjectURL(it.url);items.splice(items.indexOf(it),1);render();persist();return}
    if(it.kind=='audio')addAudioFile(it.file,t);else addMediaFile(it.file,t)};g.appendChild(d)})};
