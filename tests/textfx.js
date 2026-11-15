@@ -28,8 +28,24 @@ await set({rzc:0,rzd:0});const a=await mod(1);await set({rzd:5});ok('seed change
 await mk('Hello World','trand',{rzp:0,rzs:0});
 const widths=await pg.evaluate(()=>{const L=cur(),w=t=>glyphs(L,t).map(g=>Math.round(g.w)).join();const a=w(1),b=w(1.3);L.p.rzp=100;return[a,b,w(1)]});
 ok('letter widths stay those of the real text',widths[0]==widths[2]&&widths[1]==widths[2]);
+// zigzag reveal
+await mk('AB CD','zzrev',{zzp:0,zzs:0,zzm:0,zzx:300,zzy:200,zzw:0,zze:3,zzu:0});
+const an=(i,p)=>pg.evaluate(([i,p])=>{const L=cur();delete L.kf.zzp;L.p.zzp=p;const o=animG(L,1,i,5);return{dx:Math.round(o.dx),dy:Math.round(o.dy),op:+o.op.toFixed(2)}},[i,p]);
+const a0=[await an(0,0),await an(1,0),await an(2,0),await an(3,0)];
+ok('start: hidden and offset, x and y alternate: '+JSON.stringify(a0.slice(0,2)),a0.every(o=>o.op==0)&&a0[0].dx==-300&&a0[0].dy==0&&a0[1].dx==0&&a0[1].dy==-200&&a0[2].dx==300&&a0[3].dy==200);
+const a1=[await an(0,100),await an(1,100),await an(4,100)];
+ok('end: every letter in place and fully visible',a1.every(o=>o.dx==0&&o.dy==0&&o.op==1));
+const half=await an(0,50),q=await an(0,25);ok('letters travel in: offset shrinks with progress ('+q.dx+' to '+half.dx+')',Math.abs(q.dx)>Math.abs(half.dx)&&half.dx!=0);
+await set({zzs:100,zzp:40});const st=[await an(0,40),await an(4,40)];ok('stagger: first letter ahead of the last ('+st[0].op+' vs '+st[1].op+')',st[0].op>st[1].op);
+await set({zzs:0,zzm:1});ok('diagonal zigzag: opposite corners',(await an(0,0)).dx==-(await an(1,0)).dx&&(await an(0,0)).dy==-(await an(1,0)).dy&&(await an(0,0)).dy!=0);
+await set({zzm:4});const c4=[await an(0,0),await an(1,0),await an(2,0),await an(3,0)];ok('four corners in turn',new Set(c4.map(o=>o.dx+','+o.dy)).size==4);
+await set({zzm:0,zzu:1});ok('words: letters of one word move together',JSON.stringify(await an(0,30))==JSON.stringify(await an(1,30))&&JSON.stringify(await an(0,30))!=JSON.stringify(await an(3,30)));
+await set({zzu:0,zzm:2,zzy:0,zzw:0});const nw=await an(0,40);await set({zzw:80,zzf:3});const ww=await an(0,40);ok('zigzag width adds sideways motion ('+nw.dy+' vs '+ww.dy+')',nw.dy==0&&ww.dy!=0);
+await set({zzp:100,zzw:80});ok('zigzag settles to exactly zero at the end',(await an(0,100)).dy==0);
+await pg.evaluate(()=>{P.layers.length=0;id=1;mk('cam');const L=mk('text');L.text='ZIGZAG MOTION';L.p.sz=150;sel=L.id;addFx(L,'zzrev');tab='Effects';all();t=.55;dirty=1;draw(t)});
+await pg.screenshot({path:'/tmp/claude-0/zz.png'});
 // effect is offered, draws, and is text-only
-const info=await pg.evaluate(()=>{P.layers.length=0;id=1;mk('cam');const T=mk('text');const R=mk('rect');const cat=CLAUDE.catalog().effects.map(e=>e.key);return{cat:cat.includes('trand')&&cat.includes('tcount'),textOnly:['trand','tcount'].every(k=>okfx(T,k)&&!okfx(R,k))}}).catch(e=>({err:String(e)}));
+const info=await pg.evaluate(()=>{P.layers.length=0;id=1;mk('cam');const T=mk('text');const R=mk('rect');const cat=CLAUDE.catalog().effects.map(e=>e.key);return{cat:cat.includes('trand')&&cat.includes('tcount')&&cat.includes('zzrev'),textOnly:['trand','tcount','zzrev'].every(k=>okfx(T,k)&&!okfx(R,k))}}).catch(e=>({err:String(e)}));
 ok('both effects exist in the catalog',info.cat===true);ok('text-only: offered for text, not for shapes',info.textOnly===true);
 await pg.evaluate(()=>{P.layers.length=0;id=1;mk('cam');const L=mk('text');L.text='Total 12,480 users';L.p.sz=120;sel=L.id;addFx(L,'tcount');addFx(L,'trand');tab='Effects';all();t=.8;dirty=1;draw(t)});
 await pg.screenshot({path:'/tmp/claude-0/textfx.png'});
