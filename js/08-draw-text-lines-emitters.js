@@ -34,7 +34,7 @@ function srcCap(L,t){const v=k=>val(L,k,t),sz=v('sz'),fd=Math.max(.001,v('cpf'))
  cx.globalAlpha=ga*mx;cx.fillStyle=`rgba(0,0,0,${Math.max(0,Math.min(1,v('cpo')))})`;rr(cx,-bw/2,-h,bw,h,v('cpr'));cx.fill();
  cx.textAlign='left';cx.textBaseline='middle';const tal=Math.max(0,Math.min(1,v('tal')||0));let cy=-h+padY*mx;rows.forEach(o=>{const rh=lh*o.hs;cx.globalAlpha=ga*o.al;cx.fillStyle=o.ln.col||bx;cx.font=fo(o.ln.b,o.ln.i);cx.fillText(o.r,-bw/2+padX+(tal?(maxW-cx.measureText(o.r).width)*tal:0),cy+rh/2);cy+=rh});cx.globalAlpha=ga}
 const SHP=['tri','poly','star','ring','line','mshape'],LMODES=['Plain line','Audio waveform','Audio bars','Heartbeat (BPM)','Heartbeat sweep (monitor)'];
-const shapeKeys=L=>L.type=='bubble'?[]:L.type=='text'?['sz']:L.type=='rect'?['w','h','cr']:L.type=='poly'?['w','h','sn']:L.type=='star'?['w','h','sn','ir']:L.type=='ring'?['w','h','lw']:L.type=='tri'?['w','h']:L.glb?['w','h','mry','mrx','mzm']:['w','h'];
+const shapeKeys=L=>L.type=='bubble'?[]:L.type=='text'?[]:L.type=='rect'?['w','h','cr']:L.type=='poly'?['w','h','sn']:L.type=='star'?['w','h','sn','ir']:L.type=='ring'?['w','h','lw']:L.type=='tri'?['w','h']:L.glb?['w','h','mry','mrx','mzm']:['w','h'];
 function LINEUI(L){const m=L.lm||0,auds=P.layers.filter(l=>l.type=='audio');
  let h=`<div class=r><label>Mode</label><select data-s=lm>${LMODES.map((n,i)=>`<option value=${i} ${m==i?'selected':''}>${n}`).join('')}</select></div>`;
  if(m==1||m==2)h+=`<div class=r><label>Audio</label><select data-s=lsrc><option value=0>All audio layers${auds.map(a=>`<option value=${a.id} ${L.lsrc==a.id?'selected':''}>${esc(a.name)}`).join('')}</select></div>`;
@@ -99,6 +99,7 @@ function drawEmitter(L,t,D3){const age0=t-L.s;if(age0<0)return;const e0=L.s,w0=k
   if(S){const c=Math.max(.01,w('pcs')/100)*scl;cx.scale(c,c);body(S,S.s+a,S.col)}else{cx.fillStyle=col;cx.strokeStyle=col;pdraw(sh,Math.max(.5,w('psz')*scl/2))}
   cx.restore()}
  if(D3&&buf.length){buf.sort((p,q)=>p.s-q.s);for(const b of buf){cx.save();cx.setTransform(Q,0,0,Q,0,0);cx.translate(b.x,b.y);cx.rotate(b.rot);cx.globalAlpha=ga*b.al;if(S){const c=Math.max(.01,b.pcs/100)*b.scl*b.k;cx.scale(c,c);body(S,S.s+b.a,S.col)}else{cx.fillStyle=b.col;cx.strokeStyle=b.col;pdraw(sh,Math.max(.5,b.sz*b.k))}cx.restore()}}}
+const TXTUI=L=>`<div class=r><label>Text</label><textarea data-s=text rows=3 style="width:170px">${esc(L.text)}</textarea></div>${L.efa.includes('srccap')?CAPG:''}`;
 /* text alignment buttons (Font tab): set 'tal', 0 left, .5 centre, 1 right; lines align inside the widest line, or inside the Box width when set; source caption aligns inside its box */
 const ALIGNUI=L=>{const a=val(L,'tal',t)||0;return`<div class=seg2 role=group aria-label="Text align">${[['Left',0],['Center',.5],['Right',1]].map(([n,x])=>`<button data-tal=${x} class="${Math.abs(a-x)<.01?'on':''}" title="Align text ${n.toLowerCase()}">${n}</button>`).join('')}</div>`};
 $('#side').addEventListener('click',e=>{const b=e.target.closest('button[data-tal]'),L=cur();if(!b||!L)return;setV(L,'tal',+b.dataset.tal);dirty=1;commit();side()});
