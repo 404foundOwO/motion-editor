@@ -22,6 +22,17 @@ window.CLAUDE={
  toggleKeyframe(id,key){const L=lay(id);if(!L)return false;tog(L,key);return done()},
  addEffect(id,key){const L=lay(id);if(!L||!EF[key]||L.efx.includes(key))return false;addFx(L,key);return done()},
  removeEffect(id,key){const L=lay(id);if(!L)return false;const i=L.efx.indexOf(key);if(i<0)return false;L.efx.splice(i,1);return done()},
+ animate(id,tracks){const L=lay(id);if(!L)return false;for(const k in tracks){const a=L.kf[k]=L.kf[k]||[];for(const[time,v,e]of tracks[k]){const f=a.find(f=>Math.abs(f.t-time)<.008),cv=clampV(k,v);if(f){f.v=cv;if(e)f.e=e}else ins(a,{t:time,v:cv,e:e||'ease'})}}return done()},
+ addText(text,props,tracks){const id=this.addLayer('text'),L=lay(id);L.text=text;for(const k in props||{})L.p[k]=clampV(k,props[k]);if(tracks)this.animate(id,tracks);else done();return id},
+ batch(ops){return ops.map(([m,...a])=>{try{return this[m](...a)}catch(e){return'error: '+e.message}})},
+ help(){return`CLAUDE API (one call each; all edits go through the UI's own paths).
+Read: state() catalog() audioInfo(id) screenshot()
+Create: addLayer(type) addText(text,props,tracks) duplicate(id) group(id)
+Animate: animate(id,{key:[[time,value,ease?],...]}) setKeyframe(id,key,time,value,ease) removeKeyframe toggleKeyframe
+Edit: setProp(id,key,value) setLayer(id,{name,text,s,e,...}) setProject({dur,bpm,boff,bpb,sub}) addEffect(id,key) reorder removeLayer select seek(s) play(on) undo redo
+Many at once: batch([['setProp',id,'x',10],['addEffect',id,'blur']])
+Example, text that scales up: CLAUDE.addText('Hello',{sz:200},{sc:[[0,0,'ease'],[1,1]]})
+Keys: sc scale, op opacity, x y z, rx ry rz rotation, sz text size, blur glow. Easings: lin ease cin cout hold.`},
  seek(s){t=Math.max(0,Math.min(P.dur,+s||0));dirty=1;all();return t},
  play(on){if(!!on!=!!play)$('#pl').click();return !!play},
  undo(){undo();all();return true},redo(){redo();all();return true},save(){commit();return true},
