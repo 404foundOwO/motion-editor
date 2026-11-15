@@ -14,7 +14,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 05-audio-registry | audio, effect registries `EF`/`EP`, `effOf`, layer hierarchy |
 | 06-render-core | offscreen pools, `postSrc0`, `layerDraw0`, `drawGroup0`, repeat/tile, `glRun` (WebGL effects) |
 | 07-panels-editing | effect UI, context menu, copy/paste, tools |
-| 08-draw-text-lines-emitters | captions, lines, shapes, particle emitters. Source caption (`srcCap`) defaults come from `W`/`H` in `addFx`, and its box is clamped to the canvas width; after changing it run `node tests/srccap.js` |
+| 08-draw-text-lines-emitters | captions, lines, shapes, particle emitters. Text alignment: `tal` (0 left, .5 centre, 1 right), buttons from `ALIGNUI` in the Font tab, applied by `txLay` (18) and `srcCap`; run `node tests/textalign.js` after changing it. Source caption (`srcCap`) defaults come from `W`/`H` in `addFx`, and its box is clamped to the canvas width; after changing it run `node tests/srccap.js` |
 | 09-scene-timeline-graph | `draw`, side panel, timeline, easing graph editor |
 | 10-gradient-blur | gradient/corner blur engine and handles |
 | 11-wipe | wipe effect and handles |
