@@ -14,4 +14,11 @@ const bytes=Buffer.from(m.data.slice(m.data.indexOf(',')+1),'base64'),h=crypto.c
 await pg.evaluate(()=>{P.layers.length=0;all()});await pg.setInputFiles('#fj',f);await pg.waitForTimeout(3000);
 const r=await pg.evaluate(()=>{const L=P.layers.find(l=>l.type=='media');return L?{w:L.el.naturalWidth,name:MB[L.id].name,size:MB[L.id].blob.size}:null});
 ok('Load brings it back ('+JSON.stringify(r)+')',r&&r.w==1400&&r.size==info.size);
+// big projects: binary .mep file (forced here by lowering the threshold), media intact, loads by slicing
+await pg.evaluate(()=>{BIGSAVE=1});
+const [d2]=await Promise.all([pg.waitForEvent('download'),pg.click('#exj')]);const f2=path.join(os.tmpdir(),'sf2-'+Date.now()+'.mep');await d2.saveAs(f2);
+const bin=fs.readFileSync(f2);ok('big projects are saved as a binary .mep file ('+d2.suggestedFilename()+', '+(bin.length/1e6).toFixed(1)+' MB, no base64 growth)',/\.mep$/.test(d2.suggestedFilename())&&bin.slice(0,4).toString()=='MEP1'&&bin.length<info.size*1.05+200000);
+await pg.evaluate(()=>{P.layers.length=0;all()});await pg.setInputFiles('#fj',f2);await pg.waitForTimeout(3000);
+const r2=await pg.evaluate(async()=>{const L=P.layers.find(l=>l.type=='media');if(!L)return null;const h=new Uint8Array(await crypto.subtle.digest('SHA-256',await MB[L.id].blob.arrayBuffer()));return{w:L.el.naturalWidth,size:MB[L.id].blob.size,hash:[...h].map(v=>v.toString(16).padStart(2,'0')).join('')}});
+ok('opening the .mep brings the media back byte for byte',r2&&r2.w==1400&&r2.size==info.size&&r2.hash==info.hash);
 console.log('errs',errs,'FAILS',F+errs.length);await br.close();process.exit(F||errs.length?1:0)})();

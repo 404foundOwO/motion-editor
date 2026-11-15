@@ -110,7 +110,7 @@ const idb=(st,mode,fn)=>DB.then(d=>d?new Promise(res=>{try{const tx=d.transactio
 const setSv=m=>{const e=$('#sv');if(e)e.textContent=m};
 const saveSoon=()=>{if(!SAVEON)return;clearTimeout(sTimer);setSv('Saving\u2026');sTimer=setTimeout(saveNow,1200)};
 addEventListener('pagehide',()=>{if(SAVEON)saveNow()});
-const d2b=u=>{const[h,b]=u.split(','),m=/:(.*?);/.exec(h)[1],bin=atob(b),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type:m})};
+const d2b=u=>{if(u instanceof Blob)return u;const[h,b]=u.split(','),m=/:(.*?);/.exec(h)[1],bin=atob(b),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type:m})};
 const b64=blob=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(blob)});
 async function attach(l,m){MB[l.id]=m;STORED.add(l.id);const u=URL.createObjectURL(m.blob);
  if(m.kind=='glb'){await glbAttach(l,m.blob)}
