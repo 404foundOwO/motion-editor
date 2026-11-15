@@ -1,7 +1,7 @@
 $('#side').onchange=e=>{const L=cur(),d=e.target.dataset;if(d.mir&&L){L.p[d.mir]=+e.target.value;dirty=1;all();return}if('addfx' in d&&e.target.value&&L){const k=e.target.value;addFx(L,k);all();return}if(d.e&&L){const f=L.kf[d.e].find(f=>Math.abs(f.t-t)<.008);const prev={e:f.e,b:f.b?[...f.b]:null};f.e=e.target.value;if(f.e=='bez'){if(!f.b)f.b=[...EASEB.ease];all();openGraph(f,LBL[d.e]||d.e,prev)}else all()}else if(d.k)all()};
 document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const ty=b.dataset.add;if(ty=='cam'){const ex=P.layers.find(l=>l.type=='cam');if(ex)sel=ex.id;else{const C=mk('cam');C.name='Camera';P.layers.unshift(P.layers.pop());sel=C.id}}else if(ty.indexOf('ms:')==0){const m=mk('mshape');m.mk=ty.slice(3);m.name=MSH[m.mk]?MSH[m.mk][0]:'Shape';const ar=msPts(m.mk).ar;m.p.w=ar>=1?340:Math.round(340*ar);m.p.h=ar>=1?Math.round(340/ar):340;sel=m.id}else sel=mk(ty).id;$('#menu').hidden=1;all()});$('#fab').onclick=()=>{$('[data-add=cam]').style.display=P.layers.some(l=>l.type=='cam')?'none':'';$('#menu').hidden=!$('#menu').hidden;if(!$('#menu').hidden){const i=$('#msr');i.value='';i.dispatchEvent(new Event('input'));if(!matchMedia('(pointer:coarse)').matches)setTimeout(()=>i.focus(),0)}};
 $('#del').onclick=()=>{const L=cur();if(ks.length&&L){Object.keys(L.kf).forEach(k=>{const a=L.kf[k],v0=val(L,k,t),r=a.filter(f=>!ks.includes(f));if(r.length!=a.length){if(r.length)L.kf[k]=r;else{(FK.includes(k)?L:L.p)[k]=v0;delete L.kf[k]}}});ks=[];all();return}if(L){const many=MS.size>1&&MS.has(L.id)?P.layers.filter(l=>MS.has(l.id)&&l.type!='cam'):[L],dd=[...new Set(many.flatMap(l=>[l,...lkOf(l)]))];dd.forEach(D=>P.layers.forEach(c=>{if(c.par==D.id&&!dd.includes(c))c.par=D.par}));P.layers=P.layers.filter(l=>!dd.includes(l));sel=null;MS.clear();all()}};
-$('#sp').onclick=()=>{const L=cur();if(!L||t<=L.s||t>=L.e)return;if(!SPG){SPG=1;SPLK='lk'+Date.now();try{lkOf(L).filter(o=>t>o.s&&t<o.e).forEach(o=>{sel=o.id;$('#sp').onclick()});sel=L.id}finally{SPG=0}}const C=JSON.parse(JSON.stringify(L,(k,v)=>k=='el'||k=='buf'||k=='sbuf'||k=='efa'?undefined:v));C.el=L.el;C.buf=L.buf;C.sbuf=L.sbuf;C.vid=L.vid;C.off=(L.off||0)+t-L.s;C.id=id++;if(L.el){if(L.vid){if(L.el.__own===undefined)L.el.__own=L.id;C.el=vdup(L.el,C.id)}ELS[C.id]=C.el}if(L.buf)BUF[C.id]=L.buf;if(L.sbuf)BUF['b'+C.id]=L.sbuf;if(MB[L.id])MB[C.id]=MB[L.id];C.name=L.name+' b';C.fi=0;L.fo=0;if(L.lk&&SPLK)C.lk=SPLK;C.s=t;L.e=t;P.layers.splice(P.layers.indexOf(L)+1,0,C);sel=C.id;all();if(!SPG)SPLK=null};
+$('#sp').onclick=()=>{const L=cur();if(!L||t<=L.s||t>=L.e)return;if(!SPG){SPG=1;SPLK='lk'+Date.now();try{lkOf(L).filter(o=>t>o.s&&t<o.e).forEach(o=>{sel=o.id;$('#sp').onclick()});sel=L.id}finally{SPG=0}}const C=JSON.parse(JSON.stringify(L,(k,v)=>k=='el'||k=='buf'||k=='sbuf'||k=='efa'?undefined:v));C.el=L.el;C.buf=L.buf;C.sbuf=L.sbuf;C.vid=L.vid;C.off=(L.off||0)+(t-L.s)*spdOf(L);C.id=id++;if(L.el){if(L.vid){if(L.el.__own===undefined)L.el.__own=L.id;C.el=vdup(L.el,C.id)}ELS[C.id]=C.el}if(L.buf)BUF[C.id]=L.buf;if(L.sbuf)BUF['b'+C.id]=L.sbuf;if(MB[L.id])MB[C.id]=MB[L.id];C.name=L.name+' b';C.fi=0;L.fo=0;if(L.lk&&SPLK)C.lk=SPLK;C.s=t;L.e=t;P.layers.splice(P.layers.indexOf(L)+1,0,C);sel=C.id;all();if(!SPG)SPLK=null};
 $('#mv').onclick=()=>{const L=cur();if(!L)return;const d=t-L.s;shift(L,d);lkOf(L).forEach(o=>shift(o,d));all()};
 const kts=()=>{const L=cur();return L?[...new Set(Object.entries(L.kf).filter(([k])=>!fp||k==fp).flatMap(([k,a])=>a.map(f=>+f.t.toFixed(4))))].sort((a,b)=>a-b):[]};
 $('#pk').onclick=()=>{const a=kts().filter(x=>x<t-.01);if(a.length){t=a[a.length-1];all();dirty=1}};
@@ -28,8 +28,8 @@ async function renderAudioOffline(dur,SR,onP){
   auds.forEach(L=>{const g=oc.createGain(),pn=oc.createStereoPanner();g.connect(pn);let node=pn;
    const st=L.efa.filter(k=>AUDK.includes(k)).map(k=>({k,s:mkStage(k)}));st.forEach(x=>{node.connect(x.s.i);node=x.s.o});
    node.connect(gin(P.layers.find(l=>l.id==L.par&&l.type=='group'),GC));
-   const src=oc.createBufferSource();src.buffer=L.buf;src.connect(g);const into=Math.max(0,-L.s),off=into+(L.off||0);
-   if(off<L.buf.duration)src.start(Math.max(0,L.s),off,Math.max(.001,Math.min(L.buf.duration-off,L.e-L.s-into)));
+   const src=oc.createBufferSource();src.buffer=L.buf;src.connect(g);const sp=spdOf(L),into=Math.max(0,-L.s),off=into*sp+(L.off||0);src.playbackRate.value=sp;
+   if(off<L.buf.duration)src.start(Math.max(0,L.s),off,Math.max(.001,Math.min(L.buf.duration-off,(L.e-L.s-into)*sp)));
    AS2.push({L,g,pn,st})});
   const step=1/60,nS=Math.ceil(dur/step);
   for(let f=0;f<=nS;f++){const tt=Math.min(dur,f*step);SMO=tt;
@@ -80,7 +80,7 @@ async function startOffline(o){
   venc=new VideoEncoder({output:(c,m)=>{flushA(c.timestamp);mux.addVideoChunk(c,m)},error:e=>{err=e}});venc.configure(vcfg);
   const ec=(ow!=W||oh!=H)?document.createElement('canvas'):null,eg=ec?(ec.width=ow,ec.height=oh,ec.getContext('2d')):null;
   const vids=P.layers.filter(l=>l.vid&&l.el);
-  const seekV=tt=>Promise.all(vids.map(L=>{if(tt<L.s||tt>L.e)return;const v=L.el,d=(L.off||0)+tt-L.s;if(!v.paused)v.pause();v.__q=d;if(Math.abs(v.currentTime-d)<.0005&&!v.seeking)return;
+  const seekV=tt=>Promise.all(vids.map(L=>{if(tt<L.s||tt>L.e)return;const v=L.el,d=(L.off||0)+(tt-L.s)*spdOf(L);if(!v.paused)v.pause();v.__q=d;if(Math.abs(v.currentTime-d)<.0005&&!v.seeking)return;
    return new Promise(res=>{const done=()=>{v.removeEventListener('seeked',done);res()};v.addEventListener('seeked',done);setTimeout(done,2000);v.currentTime=d})}));
   const t1=performance.now();
   for(let i=0;i<N;i++){

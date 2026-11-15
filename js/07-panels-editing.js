@@ -79,9 +79,9 @@ $('#side').addEventListener('pointerdown',e=>{if(rep&&e.target.id=='tapb'){const
 $('#side').addEventListener('input',e=>{const d=e.target.dataset;if(!rep||!d.rp)return;const k=d.rp,v=e.target;if(k=='mode'||k=='target'){rep[k]=v.value;if(k=='target')rep.count=v.value=='obj'?0:4;side()}else if(k=='prev')rep.prev=v.checked;else if(k=='real')rep.real=v.checked;else if(['bpm','ms','beats','count'].includes(k))rep[k]=parseFloat(v.value)||0});
 $('#fxg').onclick=()=>{FXOFF=!FXOFF;setIc($('#fxg'),FXOFF?'sparklesoff':'sparkles',FXOFF?'Effects: off':'Effects: on');$('#fxg').className=FXOFF?'on':'';dirty=1};
 function trimDrag(e){const L=th.L,dt=(e.clientX-th.x0)/th.w*P.dur,fr=snapT,md=L.buf?L.buf.duration:L.vid&&L.el?L.el.duration:Infinity;if(Math.abs(e.clientX-th.x0)>1)th.moved=1;if(!th.moved)return;if(!th.P)th.P=lkOf(L).map(o=>({o,s:o.s,e:Math.min(o.e,P.dur),f:o.off||0}));
- if(th.side=='l'){let ns=fr(th.s0+dt);ns=Math.max(ns,isFinite(md)?th.s0-th.o0:0,0);ns=Math.min(ns,th.e0-1/FPS);L.s=ns;if(isFinite(md))L.off=th.o0+(ns-th.s0)}
- else{let ne=fr(th.e0+dt);if(Math.abs(ne-t)<.03)ne=t;ne=Math.max(ne,L.s+1/FPS);if(isFinite(md))ne=Math.min(ne,L.s+md-(L.off||0));L.e=ne}
- if(th.P)th.P.forEach(q=>{const ds=L.s-th.s0;if(th.side=='l'){q.o.s=q.s+ds;if(q.o.el||q.o.buf)q.o.off=q.f+ds}else q.o.e=q.e+(L.e-th.e0)});tl();dirty=1}
+ if(th.side=='l'){let ns=fr(th.s0+dt);ns=Math.max(ns,isFinite(md)?th.s0-th.o0/spdOf(L):0,0);ns=Math.min(ns,th.e0-1/FPS);L.s=ns;if(isFinite(md))L.off=th.o0+(ns-th.s0)*spdOf(L)}
+ else{let ne=fr(th.e0+dt);if(Math.abs(ne-t)<.03)ne=t;ne=Math.max(ne,L.s+1/FPS);if(isFinite(md))ne=Math.min(ne,L.s+(md-(L.off||0))/spdOf(L));L.e=ne}
+ if(th.P)th.P.forEach(q=>{const ds=L.s-th.s0;if(th.side=='l'){q.o.s=q.s+ds;if(q.o.el||q.o.buf)q.o.off=q.f+ds*spdOf(q.o)}else q.o.e=q.e+(L.e-th.e0)});tl();dirty=1}
 function ainf(L,t,j,u){const p='a'+j,v=k=>val(L,p+k,t),S=v('s')+v('o'),E=v('e')+v('o'),F=Math.max(0,v('f'));if(F<.001)return u>=S&&u<=E?1:0;const r=Math.min(1,Math.max(0,(u-(S-F/2))/F)),f=Math.min(1,Math.max(0,((E+F/2)-u)/F)),m=Math.min(r,f);return m*m*(3-2*m)}
 function animT(L,t,u){let w=0;for(let j=1;j<=3;j++)if(L.efa.includes('an'+j))w+=(val(L,'a'+j+'t',t)||0)*ainf(L,t,j,u);return w}
 const WI=new Map();function wordIdx(s){let r=WI.get(s);if(!r){r=[];let w=0,inw=0;for(const c of [...s]){if(/\s/.test(c)){if(inw){w++;inw=0}r.push(w)}else{inw=1;r.push(w)}}WI.set(s,r)}return r}

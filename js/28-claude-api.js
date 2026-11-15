@@ -29,12 +29,13 @@ window.CLAUDE={
 Read: state() catalog() audioInfo(id) screenshot()
 Create: addLayer(type) addText(text,props,tracks) duplicate(id) group(id)
 Animate: animate(id,{key:[[time,value,ease?],...]}) setKeyframe(id,key,time,value,ease) removeKeyframe toggleKeyframe
-Edit: setProp(id,key,value) setLayer(id,{name,text,s,e,...}) setProject({dur,bpm,boff,bpb,sub}) addEffect(id,key) reorder removeLayer select seek(s) play(on) undo redo
+Edit: setSpeed(id,x) (video/audio clip speed, 1 = normal; linked audio follows) setProp(id,key,value) setLayer(id,{name,text,s,e,...}) setProject({dur,bpm,boff,bpb,sub}) addEffect(id,key) reorder removeLayer select seek(s) play(on) undo redo
 Expressions: setExpression(id,key,'1+0.1*sin(t*6)') (returns true or an error; null clears). Names t value beat bpm dur index; wiggle(f,a) loop(p) link('Layer','key') ease bounce elastic linear noise sin cos abs min max clamp lerp
 Layer order: state().layers and reorder() use the stack order (index 0 = bottom, drawn first); the timeline lists the top of the stack first.
 Many at once: batch([['setProp',id,'x',10],['addEffect',id,'blur']])
 Example, text that scales up: CLAUDE.addText('Hello',{sz:200},{sc:[[0,0,'ease'],[1,1]]})
 Keys: sc scale, op opacity, x y z, rx ry rz rotation, sz text size, blur glow. Easings: lin ease cin cout hold.`},
+ setSpeed(id,sp){const L=lay(id);if(!L||!(L.vid||L.type=='audio'))return false;setSpeed(L,sp);return spdOf(L)},
  setExpression(id,key,formula){const L=lay(id);if(!L)return'no such layer';const r=xpSet(L,key,formula);if(r)return r;done();return true},
  seek(s){t=Math.max(0,Math.min(P.dur,+s||0));dirty=1;all();return t},
  play(on){if(!!on!=!!play)$('#pl').click();return !!play},

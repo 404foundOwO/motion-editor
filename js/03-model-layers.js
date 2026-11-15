@@ -18,6 +18,7 @@ const E={lin:p=>p,ease:p=>p*p*(3-2*p),cin:p=>1-Math.sqrt(1-p*p),cout:p=>Math.sqr
 function bez(b,x){let lo=0,hi=1,m=.5;const c=(a,b2,u)=>3*(1-u)*(1-u)*u*a+3*(1-u)*u*u*b2+u*u*u;for(let i=0;i<20;i++){m=(lo+hi)/2;c(b[0],b[2],m)<x?lo=m:hi=m}return c(b[1],b[3],m)}
 function val0(L,k,t){const a=L.kf[k];if(!a||!a.length)return L.p[k];if(t<=a[0].t)return a[0].v;
  for(let i=0;i<a.length;i++){if(i==a.length-1)return a[i].v;const n=a[i+1];if(t<n.t){const p=(t-a[i].t)/(n.t-a[i].t),e=a[i].e;const q=e=='bez'?bez(a[i].b,p):E[e](p);return typeof a[i].v=='string'?mix(a[i].v,n.v,q):a[i].v+(n.v-a[i].v)*q}}}
+const spdOf=L=>L&&L.spd>0?L.spd:1;/* clip playback speed (optional L.spd, default 1): media time = off + (t - s) * speed */
 const kfLo=L=>L.s,kfHi=L=>Math.min(L.e,P.dur),kfOk=(L,tm)=>tm>=L.s-.008&&tm<=Math.min(L.e,P.dur)+.008,kfC=(L,tm)=>Math.max(kfLo(L),Math.min(kfHi(L),tm));/* keyframes live inside the object's own time span */
 function fxPrune(L,k){(EP[k]||[]).forEach(([pk])=>{if(pk&&!L.efx.some(o=>(EP[o]||[]).some(q=>q[0]==pk)))delete L.kf[pk]});delete L.kf[k]}
 /* after a trim: drop keyframes that fall outside the clip; if all of a track go, its value stays as the fixed value */

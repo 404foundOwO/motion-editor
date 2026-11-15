@@ -9,13 +9,13 @@ function mkStage(k){const c=AC,sm=(p,v)=>p.setTargetAtTime(v,c.currentTime+SMO,.
  const i=c.createGain(),o=c.createGain(),d=c.createGain(),w=c.createGain();i.connect(d);d.connect(o);w.connect(o);
  if(k=='rev'){const cv=c.createConvolver();cv.buffer=IR();i.connect(cv);cv.connect(w)}else{const dl=c.createDelay(1),fb=c.createGain();dl.delayTime.value=.25;fb.gain.value=.45;i.connect(dl);dl.connect(w);dl.connect(fb);fb.connect(dl)}
  return{i,o,u:v=>{v=Math.max(0,Math.min(1,v));sm(w.gain,v);sm(d.gain,1-v*.5)}}}
-const sig=()=>P.layers.filter(l=>l.type=='audio'||l.type=='cam'||l.type=='group').map(l=>(l.par||'')+l.id+l.efa.join('.')+l.s+l.e+(l.off||0)).join('|');
+const sig=()=>P.layers.filter(l=>l.type=='audio'||l.type=='cam'||l.type=='group').map(l=>(l.par||'')+l.id+l.efa.join('.')+l.s+l.e+(l.off||0)+'x'+spdOf(l)).join('|');
 function aStop(){Object.values(AS).forEach(a=>{try{a.src.stop()}catch(e){}a.g.disconnect()});for(const k in AS)delete AS[k];AON=0}
 function aStart(){aStop();refx();const c=ac();if(c.state=='suspended')c.resume();A0={c:c.currentTime,t};const GC={};AG=[];{const C=P.layers.find(l=>l.type=='cam');AN.disconnect();let nd=AN;AM=(C?C.efa.filter(k=>AUDK.includes(k)):[]).map(k=>({k,s:mkStage(k)}));AM.forEach(x=>{nd.connect(x.s.i);nd=x.s.o});nd.connect(MO)}
  P.layers.forEach(L=>{if(L.type!='audio'||!L.buf||t>=L.e)return;const g=c.createGain(),pn=c.createStereoPanner();g.gain.value=Math.max(0,val(L,'vol',t)*fadeK(L,t));g.connect(pn);let node=pn;
   const st=L.efa.filter(k=>AUDK.includes(k)).map(k=>({k,s:mkStage(k)}));st.forEach(x=>{node.connect(x.s.i);node=x.s.o});node.connect(gin(P.layers.find(l=>l.id==L.par&&l.type=='group'),GC));
-  const src=c.createBufferSource();src.buffer=L.buf;src.connect(g);const into=Math.max(0,t-L.s),off=into+(L.off||0);
-  if(off<L.buf.duration)src.start(c.currentTime+Math.max(0,L.s-t),off,Math.max(.001,Math.min(L.buf.duration-off,L.e-L.s-into)));AS[L.id]={src,g,pn,st,L}});
+  const src=c.createBufferSource();src.buffer=L.buf;src.connect(g);const sp=spdOf(L),into=Math.max(0,t-L.s),off=into*sp+(L.off||0);src.playbackRate.value=sp;
+  if(off<L.buf.duration)src.start(c.currentTime+Math.max(0,L.s-t),off,Math.max(.001,Math.min(L.buf.duration-off,(L.e-L.s-into)*sp)));AS[L.id]={src,g,pn,st,L}});
  AON=1;ASIG=sig();aUpd()}
 function aUpd(){AG.forEach(x=>x.s.u(val(x.G,x.k,t)));const c=AC,C=P.layers.find(l=>l.type=='cam');if(C)AM.forEach(x=>x.s.u(val(C,x.k,t)));Object.values(AS).forEach(a=>{const L=a.L;a.g.gain.setTargetAtTime(Math.max(0,val(L,'vol',t)*fadeK(L,t)),c.currentTime,.02);a.pn.pan.setTargetAtTime(Math.max(-1,Math.min(1,val(L,'pan',t))),c.currentTime,.02);a.st.forEach(x=>x.s.u(val(L,x.k,t)))})}
 function addAudio(buf,name,blob){const L=mk('audio');L.name=name.slice(0,14);L.buf=buf;BUF[L.id]=buf;if(blob)MB[L.id]={blob,name,kind:'audio'};L.e=L.s+buf.duration;sel=L.id;all();return L}

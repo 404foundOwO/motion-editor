@@ -23,7 +23,7 @@ const sc=new THREE.Scene();sc.add(gl.scene);sc.add(new THREE.AmbientLight(0xffff
 const bx=new THREE.Box3().setFromObject(gl.scene),sz=bx.getSize(new THREE.Vector3()),c=bx.getCenter(new THREE.Vector3()),cam=new THREE.PerspectiveCamera(30,720/1280,.01,1e5);
 const dist=Math.max(sz.y,sz.x/(720/1280))/2/Math.tan(15*Math.PI/180)*1.2,mixer=new THREE.AnimationMixer(gl.scene),clip=gl.animations[0];if(clip)mixer.clipAction(clip).play();
 el.__g={ok:1,r,sc,cam,mixer,c,dist,rad:Math.max(1e-6,sz.length()/2),dur:clip?clip.duration:0};L.glb=1;L.el=el;ELS[L.id]=el}
-function glbDraw(L,t,v){const g=L.el.__g;let a=0;if(g.dur>0){a=((((L.off||0)+t-L.s)%g.dur)+g.dur)%g.dur;a=Math.floor(a*15+1e-6)/15}
+function glbDraw(L,t,v){const g=L.el.__g;let a=0;if(g.dur>0){a=((((L.off||0)+(t-L.s)*spdOf(L))%g.dur)+g.dur)%g.dur;a=Math.floor(a*15+1e-6)/15}
 g.mixer.setTime(a);const ry=(v('mry')||0)*R,rx=(v('mrx')||0)*R,d=g.dist/(v('mzm')||1);
 g.cam.position.set(g.c.x+Math.sin(ry)*Math.cos(rx)*d,g.c.y+Math.sin(rx)*d,g.c.z+Math.cos(ry)*Math.cos(rx)*d);g.cam.lookAt(g.c);/* depth range fitted to the model: a huge near/far ratio is what makes surfaces z-fight when the angle or zoom changes */const rd=g.rad*1.6,nr=Math.max(d-rd,rd*.02),fr=d+rd;if(Math.abs(g.cam.near-nr)>1e-9||Math.abs(g.cam.far-fr)>1e-9){g.cam.near=nr;g.cam.far=fr;g.cam.updateProjectionMatrix()}g.r.render(g.sc,g.cam)}
 $('#ag').onclick=()=>{$('#menu').hidden=true;$('#fg').click()};
