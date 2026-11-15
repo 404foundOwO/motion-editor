@@ -9,5 +9,7 @@ const r=await pg.evaluate(()=>{P.layers.length=0;P.dur=10;const L=mk('rect');L.s
  const k=Object.keys(EF).find(k=>(EP[k]||[]).some(q=>q[0]));const pk=EP[k].find(q=>q[0])[0];CLAUDE.addEffect(L.id,k);L.kf[pk]=[{t:3,v:1,e:'ease'}];CLAUDE.removeEffect(L.id,k);o.fx=!!L.kf[pk];return o});
 ok('no keyframe before the object starts',r.before==0);ok('keyframe inside works',r.inside==1);ok('editing a keyframed value outside adds no keyframe',r.setOut==1);
 ok('API keyframes are clamped to the span ('+r.api+', '+r.api2+', '+r.anim+')',r.api==6&&r.api2=='2,6'&&r.anim=='2,6');
+const tr=await pg.evaluate(()=>{const L=P.layers[0];L.kf.x=[{t:2.5,v:1,e:'ease'},{t:5,v:2,e:'ease'}];L.kf.y=[{t:5.5,v:7,e:'ease'}];L.e=4;const n=kfTrim(L);return{n,x:L.kf.x.length,y:L.kf.y,py:L.p.y}});
+ok('trimming removes keyframes outside ('+JSON.stringify(tr)+')',tr.n>=2&&tr.x==1&&tr.y===undefined&&tr.py==7);
 ok('removing an effect removes its keyframes',!r.fx);
 console.log('errs',errs,'FAILS',F+errs.length);await br.close();process.exit(F||errs.length?1:0)})();

@@ -20,6 +20,8 @@ function val0(L,k,t){const a=L.kf[k];if(!a||!a.length)return L.p[k];if(t<=a[0].t
  for(let i=0;i<a.length;i++){if(i==a.length-1)return a[i].v;const n=a[i+1];if(t<n.t){const p=(t-a[i].t)/(n.t-a[i].t),e=a[i].e;const q=e=='bez'?bez(a[i].b,p):E[e](p);return typeof a[i].v=='string'?mix(a[i].v,n.v,q):a[i].v+(n.v-a[i].v)*q}}}
 const kfLo=L=>L.s,kfHi=L=>Math.min(L.e,P.dur),kfOk=(L,tm)=>tm>=L.s-.008&&tm<=Math.min(L.e,P.dur)+.008,kfC=(L,tm)=>Math.max(kfLo(L),Math.min(kfHi(L),tm));/* keyframes live inside the object's own time span */
 function fxPrune(L,k){(EP[k]||[]).forEach(([pk])=>{if(pk&&!L.efx.some(o=>(EP[o]||[]).some(q=>q[0]==pk)))delete L.kf[pk]});delete L.kf[k]}
+/* after a trim: drop keyframes that fall outside the clip; if all of a track go, its value stays as the fixed value */
+function kfTrim(L){let n=0;for(const k in L.kf){const a=L.kf[k],keep=a.filter(f=>kfOk(L,f.t));if(keep.length==a.length)continue;n+=a.length-keep.length;if(keep.length)L.kf[k]=keep;else{const f=a.reduce((b,x)=>Math.abs(x.t-L.s)<Math.abs(b.t-L.s)?x:b);if(FK.includes(k))L[k]=f.v;else L.p[k]=f.v;delete L.kf[k]}}return n}
 const ins=(a,f)=>{a.push(f);a.sort((x,y)=>x.t-y.t)};
 /* allowed range per parameter: values are clamped when typed/dragged (setV) and when read (val), so keyframe easing overshoot can't push e.g. opacity below 0 either */
 const RNG=(()=>{const o={},s=(r,ks)=>ks.split(' ').forEach(k=>o[k]=r);
