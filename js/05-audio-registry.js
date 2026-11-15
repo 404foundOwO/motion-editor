@@ -1,5 +1,5 @@
 const FK=['bg','hud','inv'],fv=(L,k,t)=>L.kf[k]&&L.kf[k].length?val(L,k,t):L[k];
-function setFlag(L,k,v){const a=L.kf[k];if(a&&a.length){const f=a.find(f=>Math.abs(f.t-t)<.008);if(f)f.v=v;else ins(a,{t,v,e:'hold'})}else L[k]=v}
+function setFlag(L,k,v){const a=L.kf[k];if(a&&a.length){const f=a.find(f=>Math.abs(f.t-t)<.008);if(f)f.v=v;else if(kfOk(L,t))ins(a,{t,v,e:'hold'})}else L[k]=v}
 let AG=[],AM=[],MO=null,AC=null,AN=null,AD=null,A0=null,AON=0,ASIG='',LT=0,IRB=null;const AS={};
 const ac=()=>{if(!AC){AC=new(window.AudioContext||window.webkitAudioContext)();AN=AC.createGain();MO=AC.createGain();MO.connect(AC.destination);AD=AC.createMediaStreamDestination();MO.connect(AD);AN.connect(MO)}return AC};
 const IR=()=>IRB||(IRB=(()=>{const n=AC.sampleRate*2,b=AC.createBuffer(2,n,AC.sampleRate);for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3)}return b})());

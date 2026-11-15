@@ -18,6 +18,8 @@ const E={lin:p=>p,ease:p=>p*p*(3-2*p),cin:p=>1-Math.sqrt(1-p*p),cout:p=>Math.sqr
 function bez(b,x){let lo=0,hi=1,m=.5;const c=(a,b2,u)=>3*(1-u)*(1-u)*u*a+3*(1-u)*u*u*b2+u*u*u;for(let i=0;i<20;i++){m=(lo+hi)/2;c(b[0],b[2],m)<x?lo=m:hi=m}return c(b[1],b[3],m)}
 function val0(L,k,t){const a=L.kf[k];if(!a||!a.length)return L.p[k];if(t<=a[0].t)return a[0].v;
  for(let i=0;i<a.length;i++){if(i==a.length-1)return a[i].v;const n=a[i+1];if(t<n.t){const p=(t-a[i].t)/(n.t-a[i].t),e=a[i].e;const q=e=='bez'?bez(a[i].b,p):E[e](p);return typeof a[i].v=='string'?mix(a[i].v,n.v,q):a[i].v+(n.v-a[i].v)*q}}}
+const kfLo=L=>L.s,kfHi=L=>Math.min(L.e,P.dur),kfOk=(L,tm)=>tm>=L.s-.008&&tm<=Math.min(L.e,P.dur)+.008,kfC=(L,tm)=>Math.max(kfLo(L),Math.min(kfHi(L),tm));/* keyframes live inside the object's own time span */
+function fxPrune(L,k){(EP[k]||[]).forEach(([pk])=>{if(pk&&!L.efx.some(o=>(EP[o]||[]).some(q=>q[0]==pk)))delete L.kf[pk]});delete L.kf[k]}
 const ins=(a,f)=>{a.push(f);a.sort((x,y)=>x.t-y.t)};
 /* allowed range per parameter: values are clamped when typed/dragged (setV) and when read (val), so keyframe easing overshoot can't push e.g. opacity below 0 either */
 const RNG=(()=>{const o={},s=(r,ks)=>ks.split(' ').forEach(k=>o[k]=r);
@@ -27,8 +29,8 @@ const RNG=(()=>{const o={},s=(r,ks)=>ks.split(' ').forEach(k=>o[k]=r);
  s([1,120],'lofps wbf');s([10,22000],'lpf hpf');s([1,16],'crush');s([0,50],'rvf');s([1,1000],'rvb');s([0,60000],'rvg rpt rrt lkn lkm');s([0,60],'oaf wgf plf ors lks lkh lke');s([0,240],'rsf');s([0,120],'fkr');
  s([0,400],'rpn');s([1,999],'rpb bobm flb');s([.01,64],'rpq');s([0,1000],'rrw rrh rrs tfn');s([.1,20],'bobc lcp');s([0,5000],'lbh');s([0,3600],'lkt');s([2,200],'ascs');s([.05,5],'ascg');s([0,20],'lcs fls');s([1,20000],'tlx tly');s([.1,100],'fld');s([.1,1000],'twf');return o})();
 const clampV=(k,v)=>{const r=RNG[k];return r&&typeof v=='number'?(v<r[0]?r[0]:v>r[1]?r[1]:v):v};
-function setV(L,k,v){v=clampV(k,v);const a=L.kf[k];if(a&&a.length){const f=a.find(f=>Math.abs(f.t-t)<.008);if(f)f.v=v;else ins(a,{t,v,e:'ease'})}else L.p[k]=v}
-function tog(L,k){const fl=FK.includes(k),a=L.kf[k]=L.kf[k]||[],i=a.findIndex(f=>Math.abs(f.t-t)<.008);if(i>=0){if(a.length==1){if(fl)L[k]=a[0].v;else L.p[k]=a[0].v}a.splice(i,1)}else ins(a,{t,v:fl?+!!fv(L,k,t):val(L,k,t),e:fl?'hold':'ease'})}
+function setV(L,k,v){v=clampV(k,v);const a=L.kf[k];if(a&&a.length){const f=a.find(f=>Math.abs(f.t-t)<.008);if(f)f.v=v;else if(kfOk(L,t))ins(a,{t,v,e:'ease'})}else L.p[k]=v}
+function tog(L,k){if(!kfOk(L,t)&&!(L.kf[k]||[]).some(f=>Math.abs(f.t-t)<.008))return;const fl=FK.includes(k),a=L.kf[k]=L.kf[k]||[],i=a.findIndex(f=>Math.abs(f.t-t)<.008);if(i>=0){if(a.length==1){if(fl)L[k]=a[0].v;else L.p[k]=a[0].v}a.splice(i,1)}else ins(a,{t,v:fl?+!!fv(L,k,t):val(L,k,t),e:fl?'hold':'ease'})}
 function mk(type){const L={id:id++,name:defLayerName(type),type,text:'TEXT',col:'#ffffff',p:{...PR},kf:{},s:0,e:1e9,bg:0,efx:[],efa:[],efo:[],gn:2,gt:'lin',gs:0,font:'Roboto Flex',br:{on:0,t:2,mode:'screen',g:1500,sp:1,bo:.5,co:1,wt:0}};if(type=='text')L.p.sz=210;if(['tri','poly','star','ring','mshape'].includes(type)){L.p.w=L.p.h=300;if(type=='ring')L.p.lw=40}if(type=='mshape'){L.mk='cookie9';L.p.c1='#8b7bff'}if(type=='bubble'){L.text='Hey! This is a message bubble.';Object.assign(L.p,{c1:'#0a84ff',bw:560,bsz:56,bpd:34,brd:58,btl:2,bts:1,btc:'#ffffff'})}if(type=='line'){L.p.w=900;L.p.lw=8;L.p.lbpm=P.bpm||120;L.lm=0;L.lsrc=0}if(type=='emitter'){L.pm=0;L.pshape=0;L.psrc=0;L.p.y=300;L.p.c1='#ffd166';L.p.c2='#ff4d6d'}P.layers.push(L);return L}
 const cur=()=>P.layers.find(l=>l.id==sel);
 function init(){mk('cam').name='Camera';sel=null}
