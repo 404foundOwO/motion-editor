@@ -26,3 +26,7 @@ function placeAddMenu(){const m=$('#menu'),f=$('#fab');if(!m||m.hidden||!f)retur
 $('#fab').addEventListener('click',()=>{placeAddMenu();requestAnimationFrame(placeAddMenu)});
 addEventListener('resize',placeAddMenu);
 /* the empty-canvas button opens the same menu, so it lands by the + button too */
+/* F: preview fullscreen (Esc leaves). In the 3D orbit view F frames the selection, so use Shift+F there. */
+function fsToggle(){const s=$('#stage');if(document.fullscreenElement)document.exitFullscreen();else if(s.requestFullscreen)s.requestFullscreen().catch(()=>{})}
+addEventListener('keydown',e=>{if(e.code!='KeyF'||e.ctrlKey||e.metaKey||e.altKey||/INPUT|TEXTAREA|SELECT/.test((e.target||{}).tagName||'')||e.repeat)return;if(mode=='3d'&&!e.shiftKey)return;if(mode!='3d'&&e.shiftKey)return;e.preventDefault();fsToggle()});
+document.addEventListener('fullscreenchange',()=>{dirty=1;try{dispatchEvent(new Event('resize'))}catch(_){}});

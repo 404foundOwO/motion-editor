@@ -29,7 +29,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 20-audio-export | audio-only encoders (WAV, Ogg Opus, M4A AAC) |
 | 21-export-dialog | the Export dialog: format list + settings (video and audio). Selected zone export: the in/out range `P.lp` (I, O keys) via `zoneGet`/`zoneForget` (19); `o.zone` is honoured by `startOffline`, `startExport` (`EXZ`) and `startAudioExport`, audio is rendered to the zone end then cut with `sliceAudio` (16). Run `node tests/zoneexport.js` after changing it |
 | 22-mp4-convert | WebM to MP4 with ffmpeg.wasm, downloaded from a CDN on demand (never bundled: x264 is GPL) |
-| 23-ux | version label, empty-canvas hint, timeline name-column resize |
+| 23-ux | F = fullscreen preview (`fsToggle`; Shift+F in the 3D view where F frames), run `node tests/fullscreen.js`; version label, empty-canvas hint, timeline name-column resize |
 | 24-timeline-clips | clip fade dots (`L.fi`/`L.fo`, applied by `fadeK`), cut-mode split preview, compact/comfortable density. Calmer timeline: keyframe markers and fade handles are small/faint on layers that are not selected or hovered (CSS on `#app:not(.kfall)`), the `#tlk` diamond button shows all (`setKFA`, localStorage `meKFA`); run `node tests/tlfocus.js` after changing it |
 | 25-projects | the Projects dialog (`#prj` top-bar button): switch, create, rename, duplicate, delete. Storage is in 16 |
 | 26-reveal-fx | Shape reveal shader (`srev`) and Droplets (`drRun`, Canvas 2D, Placement Manual: `L.dpts` points in layer space, edited on canvas by `drDown`/`drOv`; a few circles in the layer's own space grow until it is covered; timing is stretched so the last gap closes at 100%). After changing Droplets run `node tests/droplets.js` |
