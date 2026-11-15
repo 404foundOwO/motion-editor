@@ -60,6 +60,7 @@ poolLoad=()=>pq=pq.then(async()=>{const id=CURID;if(!id||typeof idb!='function')
  for(const o of(meta&&meta.items)||[]){const r=await idb('media','readonly',q=>q.get(id+':pool'+o.id));if(r&&r.blob){L.push(mkItem(new File([r.blob],r.name||o.name,{type:r.blob.type}),r.kind||o.kind,o.id,1));n=Math.max(n,o.id+1)}}
  if(id!=CURID)return;clear();items=L;seq=n;keep=!meta||meta.keep!==0;sync()}).catch(()=>{});
 poolImport=async b=>{clear();keep=b.keep!==0;for(const o of b.items||[]){const bl=d2b(o.data),f=new File([bl],o.name,{type:bl.type}),k=kind(f)||o.kind;if(k)items.push(mkItem(f,k,seq++,0))}sync();await persist()};
+window.poolItems=()=>items.map(i=>({id:i.id,name:i.name,kind:i.kind,file:i.file}));
 poolBundle=async()=>keep&&items.length?{keep:1,items:await Promise.all(items.map(async it=>({name:it.name,kind:it.kind,data:await b64(it.file)})))}:null;
 render();place();if(typeof CURID!='undefined'&&CURID)poolLoad();
 })();
