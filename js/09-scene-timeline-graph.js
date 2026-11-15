@@ -19,7 +19,7 @@ function fx0(L,t){for(const e of L.efa){if(AUDK.includes(e)||e=='mb')continue;co
 function grid(c,t){const ln=(a,b)=>{const p=proj(a[0],a[1],a[2],c),q=proj(b[0],b[1],b[2],c);if(p&&q){cx.beginPath();cx.moveTo(W/2+p.x,H/2+p.y);cx.lineTo(W/2+q.x,H/2+q.y);cx.stroke()}};cx.lineWidth=1;cx.strokeStyle='#ffffff22';for(let i=-2000;i<=2000;i+=200){ln([i,600,-2000],[i,600,2000]);ln([-2000,600,i],[2000,600,i])}}
 function fxFill(){for(const L of P.layers){if(!L.efx||!L.efx.length)continue;for(const k of L.efx){const ep=EP[k];if(!ep)continue;for(const a of ep){if(a[0]&&L.p[a[0]]===undefined&&a[2]!==undefined)L.p[a[0]]=a[2]}}}}
 function refx(){fxFill();P.layers.forEach(l=>{l.efa=FXOFF||l.fxoff?[]:l.efx.filter(k=>!(l.efo||[]).includes(k))})}
-function draw(t){const q=exp?1:PVQ[PV]||1;if(q!=Q)setQ(q);refx();const C=P.layers.find(l=>l.type=='cam'),mb=mode!='3d'&&C&&C.efa.includes('mb')?val(C,'mb',t):0;
+function draw(t){const q=exp?1:PVQ[PV]||1;if(q!=Q)setQ(q);refx();vpark(t);const C=P.layers.find(l=>l.type=='cam'),mb=mode!='3d'&&C&&C.efa.includes('mb')?val(C,'mb',t):0;
  if(mb>.001){const n=exp?32:play?8:20;cx.setTransform(Q,0,0,Q,0,0);cx.globalAlpha=1;cx.fillStyle='#000';cx.fillRect(0,0,W,H);for(let i=0;i<n;i++){const o=offBegin();drawScene(t+(i/(n-1)-.5)*mb/FPS);offEnd(o);cx.globalAlpha=1/(i+1);cx.drawImage(o.o.canvas,0,0,W,H)}cx.globalAlpha=1}else drawScene(t);
  if(mode!='3d')P.layers.filter(l=>l.type=='cam').forEach(l=>fx(l,t))}
 var GZ=null;

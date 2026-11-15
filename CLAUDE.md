@@ -10,7 +10,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 01-icons-state | globals (W,H,Q,PV), icon set |
 | 02-shapes | Material 3 expressive shape generators |
 | 03-model-layers | add-layer list, project `P`, `val`/keyframes, `mk()` layer factory |
-| 04-text-physics | letter/glyph layout, text physics |
+| 04-text-physics | letter/glyph layout, text physics, video clip sync (`vsync` while drawing, `vpark` keeps upcoming clips at their first frame; one seek at a time aimed ahead by the measured seek time, hold if it lands ahead). After changing them run `node tests/media.js` (needs ffmpeg) |
 | 05-audio-registry | audio, effect registries `EF`/`EP`, `effOf`, layer hierarchy |
 | 06-render-core | offscreen pools, `postSrc0`, `layerDraw0`, `drawGroup0`, repeat/tile, `glRun` (WebGL effects) |
 | 07-panels-editing | effect UI, context menu, copy/paste, tools |
