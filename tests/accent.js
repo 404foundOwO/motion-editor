@@ -11,4 +11,6 @@ await pg.evaluate(()=>{const i=document.querySelector('#accc');i.value='#ff0000'
 await pg.reload();await pg.waitForTimeout(1500);c=await css();ok('it is remembered after a reload ('+c.a+', '+c.btn+')',c.a=='#ff0000'&&c.btn=='rgb(255, 0, 0)');
 await pg.click('#thm');await pg.click('#accr');c=await css();ok('Reset restores the default and forgets it ('+c.a+')',c.a=='#8b7bff'&&(await pg.evaluate(()=>localStorage.getItem('meAcc')))===null);
 await pg.keyboard.press('Escape');ok('Esc closes the picker',await pg.evaluate(()=>!document.querySelector('#accp')));
+const css0=require('fs').readFileSync(path.resolve(__dirname,'../css/app.css'),'utf8');ok('no CSS value glues hex digits onto var(--a) (that silently drops the rule)',!/var\(--a2?\)[0-9a-fA-F]{2}(?![0-9a-zA-Z-])/.test(css0));
+await pg.evaluate(()=>{P.layers.length=0;mk('rect');sel=P.layers[0].id;all()});await pg.waitForTimeout(300);ok('the selected row is tinted and clip bars have a fill',await pg.evaluate(()=>{const r=document.querySelector('#tlin .row.on'),b=document.querySelector('#tlin .row .bar');return !!r&&getComputedStyle(r).backgroundColor!='rgba(0, 0, 0, 0)'&&!!b&&getComputedStyle(b).backgroundColor!='rgba(0, 0, 0, 0)'}));
 console.log('errs',errs,'FAILS',F+errs.length);await br.close();process.exit(F||errs.length?1:0)})();
