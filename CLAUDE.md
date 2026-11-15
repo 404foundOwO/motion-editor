@@ -38,6 +38,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 29-media-pool | Floating Media pool window (`#mp`, top-bar `#mpbtn`): per-project file list (checkbox Keep in project; saved in IndexedDB and the exported project .json as `pool`); clicking a clip adds it at the playhead via `addMediaFile`/`addAudioFile` (in 17). Window position in localStorage, re-clamped on resize |
 | 30-expressions | Property expressions: `L.xp={key:'formula'}`, evaluated by `exprEval` from `val()` (06). Own parser `xpParse` (never eval: project files are untrusted), time-only so paused = playing. UI is the Expressions box in the Flags tab (`XPUI`); API `CLAUDE.setExpression`. Add functions in `XF`, names in `XV`. Run `node tests/expressions.js` after changes |
 | 31-text-fx | Text effects: Text randomizer (`trand`) and Number riser (`tcount`) change the shown string (`glyphs()` in 04 asks `txMod()`); Zigzag reveal (`zzrev`) offsets and fades each letter or word (`animG()` in 07 adds `zzOff()`); widths come from the real text so layout does not jump. Run `node tests/textfx.js` after changing them |
+| 32-camera-impact | Camera effect Impact shake (`impact`): explosion-style hit, a kick then a damped spring wobble with roll and zoom punch, repeatable. `camAt()` (03) adds `impactAt()`; time-only. Run `node tests/impact.js` after changing it |
 
 ## Conventions
 - Never hard-code 1920x1080 or device pixels. Shaders get `R` (project size) and `q` (render scale); canvas shadow/line sizes that ignore the transform must be multiplied by `Q`.
