@@ -38,7 +38,7 @@ ${row('Prevent clipping',`<input id=axn type=checkbox checked>`,'axnr')}
   const Z=zoneGet();if(!Z)g('xz').checked=false;g('xz').disabled=!Z;g('xzb').style.display=Z?'':'none';g('xzt').textContent='Selected zone export'+(Z?' ('+Z.a.toFixed(2)+'\u2013'+Z.b.toFixed(2)+' s)':' (set In and Out first: I and O)');g('xzr').style.opacity=Z?1:.55;
   const zon=zoneOn(),dur=zon?zon.b-zon.a:P.dur;
   const f=EXFMT,vid=f=='mp4'||f=='webm',conv=f=='mp4'&&!vm.mp4.length,ms=vid?(conv?vm.webm:vm[f]):[];
-  d.querySelectorAll('#xfl button[data-f]').forEach(b=>{const on=b.dataset.f==f&&!b.disabled;b.style.borderColor=on?'#8b7bff':'#3a3a45';b.style.background=on?'#2a2650':'#0d0d10'});
+  d.querySelectorAll('#xfl button[data-f]').forEach(b=>{const on=b.dataset.f==f&&!b.disabled;b.style.borderColor=on?ACCV:'#3a3a45';b.style.background=on?'#2a2650':'#0d0d10'});
   ['xrr','xfr','xqr','xbr','xtr'].forEach(i=>show(i,vid));
   if(vid)['axbr','axsr','axkr','axnr'].forEach(i=>show(i,false));
   g('xcv').style.display=conv?'block':'none';g('xcv1').style.display=conv&&canConv?'block':'none';g('xcv2').style.display=conv&&!canConv?'block':'none';g('xgw').style.display=conv&&canConv?'':'none';g('xg').textContent=conv?(canConv?'Export as MP4':'Export WebM'):'Export';

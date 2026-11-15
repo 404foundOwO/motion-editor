@@ -48,6 +48,8 @@ const LTI={bubble:'msg',mshape:'shapes',text:'type',rect:'square',circle:'circle
 let SG=null;const FXC=new Set();let fxFocus=0;
 const isDefName=L=>!L.name||new RegExp('^'+L.type+'\\d+$').test(L.name)||new RegExp('^'+typeLabel(L.type).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'( \\d+)?$').test(L.name);
 const LN=L=>{if((L.type=='text'||L.type=='bubble')&&isDefName(L)){const x=(L.text||'').replace(/\s+/g,' ').trim();if(x)return x.length>22?x.slice(0,21)+'…':x}return L.name||L.type};
+/* accent colour: ACCV is the current one (#rrggbb), set by accSet in 36-accent.js */
+let ACCV=(()=>{try{const v=localStorage.getItem('meAcc');return/^#[0-9a-f]{6}$/i.test(v)?v:'#8b7bff'}catch(e){return'#8b7bff'}})();
 const setIc=(b,n,t,f)=>{if(!b)return;b.innerHTML=IC(n,(f||FILLED[n])?'f':'');if(t)b.title=t};
 document.querySelectorAll('[data-ic]').forEach(b=>{const n=b.dataset.ic;b.innerHTML=IC(n,FILLED[n]?'f':'')+(b.dataset.lbl?`<span class=lbl>${b.dataset.lbl}</span>`:'');if(!b.dataset.lbl&&b.tagName=='BUTTON')b.setAttribute('data-ib','')});
 
