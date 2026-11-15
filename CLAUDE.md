@@ -10,7 +10,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 01-icons-state | globals (W,H,Q,PV), icon set |
 | 02-shapes | Material 3 expressive shape generators |
 | 03-model-layers | add-layer list, project `P`, `val`/keyframes, `mk()` layer factory |
-| 04-text-physics | letter/glyph layout, text physics, video clip sync (`vsync` while drawing, `vpark` keeps upcoming clips at their first frame; one seek at a time aimed ahead by the measured seek time, hold if it lands ahead). Every video layer owns its own element (`vdup`: split, paste and duplicate clone it, `vsync` repairs any sharing), so two zones of one clip can play at once. After changing them run `node tests/media.js` and `node tests/mediasplit.js` (need ffmpeg) |
+| 04-text-physics | letter/glyph layout, text physics, video clip sync (`vsync` while drawing, `vpark` keeps upcoming clips at their first frame; one seek at a time aimed ahead by the measured seek time, hold if it lands ahead). Every video layer owns its own element (`vdup`: split, paste and duplicate clone it, `vsync` repairs any sharing), so two zones of one clip can play at once. Media preview cost: `vfr` (18) keeps the seek fallback frame cheap, finished seeks and first frames set `dirty`, large photos get a 4096 px bitmap for the preview (`imgPrep`, 17; exports still draw the original). After changing them run `node tests/media.js`, `node tests/mediasplit.js` and `node tests/mediaperf.js` (need ffmpeg) |
 | 05-audio-registry | audio, effect registries `EF`/`EP`, `effOf`, layer hierarchy |
 | 06-render-core | offscreen pools, `postSrc0`, `layerDraw0`, `drawGroup0`, repeat/tile, `glRun` (WebGL effects) |
 | 07-panels-editing | effect UI, context menu, copy/paste, tools |

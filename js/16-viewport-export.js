@@ -114,7 +114,7 @@ const d2b=u=>{const[h,b]=u.split(','),m=/:(.*?);/.exec(h)[1],bin=atob(b),a=new U
 const b64=blob=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(blob)});
 async function attach(l,m){MB[l.id]=m;STORED.add(l.id);const u=URL.createObjectURL(m.blob);
  if(m.kind=='glb'){await glbAttach(l,m.blob)}
- else if(m.kind=='image'){const el=new Image();el.src=u;try{await el.decode()}catch(e){}l.el=el;ELS[l.id]=el}
+ else if(m.kind=='image'){const el=new Image();el.src=u;try{await el.decode()}catch(e){}l.el=el;ELS[l.id]=el;imgPrep(el)}
  else if(m.kind=='video'){const el=document.createElement('video');el.muted=true;el.playsInline=true;el.preload='auto';el.src=u;await new Promise(r=>{el.onloadedmetadata=r;el.onerror=r;setTimeout(r,4000)});l.el=el;l.vid=true;ELS[l.id]=el}
  else if(m.kind=='audio'){try{const b=await ac().decodeAudioData(await m.blob.arrayBuffer());l.buf=b;BUF[l.id]=b}catch(e){}}else if(m.kind=='blip'){try{const b=await ac().decodeAudioData(await m.blob.arrayBuffer());l.sbuf=b;BUF['b'+l.id]=b}catch(e){}}}
 async function regFont(n,blob){try{const ff=new FontFace(n,await blob.arrayBuffer(),{weight:'1 1000',stretch:'25% 200%',style:'oblique -90deg 90deg'});await ff.load();document.fonts.add(ff);if(!FONTS.includes(n))FONTS.push(n);if(!FB.some(f=>f.name==n))FB.push({name:n,blob})}catch(e){}}
