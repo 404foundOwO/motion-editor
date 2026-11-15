@@ -22,7 +22,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 13-shortcuts | `?` cheat sheet (data in `KBD`) |
 | 14-blend-groups | blend modes (`blendDraw`), grouping, timeline drag into groups |
 | 15-render-safety | `safeDraw`, error isolation, GL recovery, main `tick` |
-| 16-viewport-export | aspect ratio, preview quality, audio + video export, project storage in IndexedDB (`saveNow`, `projOpen`, `projNew`, `projImport`, `restore`; keys `p:<id>`, `m:<id>`, `<id>:<layer>`, `last`) |
+| 16-viewport-export | aspect ratio, preview quality, audio + video export, project storage in IndexedDB (`saveNow`, `projOpen`, `projNew`, `projImport`, `restore`; keys `p:<id>`, `m:<id>`, `<id>:<layer>`, `pool:<id>` + `<id>:pool<n>` (media pool, see 29), `last`) |
 | 17-project-media | save/load, media import, `ld()` loader for three.js |
 | 18-canvas-handles | canvas overlay handles, snapping, motion paths |
 | 19-view-layout | orbit view, layout, toolbar |
@@ -35,7 +35,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 26-reveal-fx | Shape reveal shader (`srev`) and Droplets (`drRun`, Canvas 2D, Placement Manual: `L.dpts` points in layer space, edited on canvas by `drDown`/`drOv`; a few circles in the layer's own space grow until it is covered; timing is stretched so the last gap closes at 100%). After changing Droplets run `node tests/droplets.js` |
 | 27-copy-bg | Liquid glass (`lglass`, `lgRun`, WebGL, backdrop passed to `glRun` as 2nd texture `B`) and Copy background effect (`cbg`): snapshot of the canvas before the layer (`cbgSnap`, called in `layerDraw0`), layer shape masks it (`cbgRun`, in `postSrc0`); CSS-filter effects apply to the copy |
 | 28-claude-api | `window.CLAUDE`: full outside-the-page API (state, catalog, layers, keyframes, effects, project/beat settings, group, undo, play, screenshot, `audioInfo` envelope/onsets, projects) built on the UI's own functions, for Claude in Chrome via `Runtime.evaluate` |
-| 29-media-pool | Floating Media pool window (`#mp`, top-bar `#mpbtn`): session-only file list; clicking a clip adds it at the playhead via `addMediaFile`/`addAudioFile` (in 17). Position in localStorage, re-clamped on resize |
+| 29-media-pool | Floating Media pool window (`#mp`, top-bar `#mpbtn`): per-project file list (checkbox Keep in project; saved in IndexedDB and the exported project .json as `pool`); clicking a clip adds it at the playhead via `addMediaFile`/`addAudioFile` (in 17). Window position in localStorage, re-clamped on resize |
 
 ## Conventions
 - Never hard-code 1920x1080 or device pixels. Shaders get `R` (project size) and `q` (render scale); canvas shadow/line sizes that ignore the transform must be multiplied by `Q`.
