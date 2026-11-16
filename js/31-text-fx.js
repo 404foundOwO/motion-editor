@@ -22,3 +22,10 @@ function zzOff(L,t,i,n,wi,wc){const v=k=>val(L,k,t),words=v('zzu')>.5,k=words?(w
  let sx,sy;if(m==1){sx=sg;sy=-sg}else if(m==2){sx=sg;sy=0}else if(m==3){sx=0;sy=sg}else if(m==4){sx=[-1,1,1,-1][k%4];sy=[-1,-1,1,1][k%4]}else if(k%2==0){sx=k%4==0?-1:1;sy=0}else{sx=0;sy=k%4==1?-1:1}
  const e=(ZZE[Math.round(v('zze'))]||ZZE[0])(q),ax=sx*(v('zzx')||0),ay=sy*(v('zzy')||0),len=Math.hypot(ax,ay),nx=len?-ay/len:0,ny=len?ax/len:1,w=(v('zzw')||0)*zzTri(q*Math.max(1,v('zzf')||3))*(1-q);
  return{dx:ax*(1-e)+w*nx,dy:ay*(1-e)+w*ny,op:c01(q*4)}}
+/* Letter break out (lbk): every letter breaks away on its own and leaves the screen, the left half to the left and the right half to the right, equally. The letters go one after another (spread over lbks seconds) in the chosen order, each one starting at once and speeding up. animG() (07) calls lbkOff(). */
+EF.lbk=['Letter break out',0];EP.lbk=[['lbkt','Start (s into layer)',1],['lbks','Spread over (s) (0 = all letters at once)',.4],['lbko','Order',0],['lbke','Time to leave (s)',.6],['lbkd','Distance (px, 0 = off the screen)',0],['lbkf','Fall while leaving (px)',120],['lbkr','Spin (°)',40],['lbkx','Fade while leaving (0/1)',0],['lbkm','Direction',0],['lbksd','Seed',3]];
+SELO.lbko=[['From the middle out',0],['From the edges in',1],['Left to right',2],['Random',3]];SELO.lbkm=[['Sideways: left half left, right half right',0],['Sideways and up',1],['Left half up, right half down',2]];
+Object.assign(KA,{lbkt:.1,lbks:.05,lbke:.05,lbkd:10,lbkf:10,lbkr:1});
+function lbkOff(L,t,i,n,o){const v=k=>val(L,k,t),u=(i+.5)/n,sd=v('lbksd')||1,mid=n%2&&i==(n-1)/2,side=mid?(hn(sd,7)<.5?-1:1):u<.5?-1:1,r=mid?0:Math.abs(u-.5)*2,od=Math.round(v('lbko'))||0,rank=od==1?1-r:od==2?u:od==3?hn(i*2.3,sd+5):r,tau=t-L.s-v('lbkt')-rank*Math.max(0,v('lbks'));if(tau<=0)return;
+ const T=Math.max(.05,v('lbke')),q=Math.min(1,tau/T),e=q*q*(1.6-.6*q),dist=v('lbkd')>0?v('lbkd'):(typeof W=='number'?W:1920)*.75+200,m=Math.round(v('lbkm'))||0;
+ o.dx+=side*dist*e;if(m==1)o.dy-=dist*.35*e;else if(m==2)o.dy+=side*-dist*.35*e;o.dy+=v('lbkf')*q*q;o.rot+=side*v('lbkr')*q;if(v('lbkx')>.5)o.op*=1-q;if(q>=1&&v('lbkx')>.5)o.op=0}
