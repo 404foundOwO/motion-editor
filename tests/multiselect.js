@@ -59,6 +59,10 @@ await build();await pg.evaluate(()=>{MS.clear();const A=P.layers.find(l=>l.name=
  const r=await pg.evaluate(()=>['A','B','C'].map(n=>{const l=P.layers.find(x=>x.name==n);return+l.s.toFixed(2)+'-'+(+l.e.toFixed(2))}).join());const [a,bb,c]=r.split(',');
  ok('dragging a selected clip moves every selected clip by the same amount ('+r+')',+a.split('-')[0]>0&&Math.abs(+bb.split('-')[0]-4-(+a.split('-')[0]))<.02&&c=='8-11');
  ok('the panel says several clips are selected',await pg.evaluate(()=>!!document.querySelector('#side .msn')));}
+// double-click on empty timeline space deselects
+await build();await pg.evaluate(()=>{MS.clear();sel=P.layers.find(l=>l.name=='A').id;MS.add(sel);MS.add(P.layers.find(l=>l.name=='B').id);all()});
+{const e=await spot('C',2);await pg.mouse.dblclick(e.x,e.y);await pg.waitForTimeout(250);ok('double-click on empty timeline space clears the selection',await pg.evaluate(()=>sel==null&&MS.size==0&&ks.length==0));}
+await pg.evaluate(()=>{sel=P.layers.find(l=>l.name=='A').id;all()});{const b=await bar('A');await pg.mouse.dblclick(b.x,b.y);await pg.waitForTimeout(250);ok('double-click on a clip does not deselect',await pg.evaluate(()=>sel!=null));}
 // lanes view
 await build();await pg.evaluate(()=>setLanes(true,false));await pg.waitForTimeout(300);
 {const s=await spot('B',3.5),e=await spot('C',11.8);await pg.keyboard.down('Shift');await pg.mouse.move(s.x,s.top);await pg.mouse.down();await pg.mouse.move((s.x+e.x)/2,(s.top+e.bot)/2,{steps:6});await pg.mouse.move(e.x,e.bot,{steps:6});await pg.mouse.up();await pg.keyboard.up('Shift');await pg.waitForTimeout(250);
