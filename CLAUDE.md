@@ -26,7 +26,7 @@ Browser-only motion editor. No framework, no bundler, no modules: `js/*.js` are 
 | 17-project-media | Over 100 MB of media (`BIGSAVE`) Save project writes a binary `.mep` file instead of JSON (`projBinBlob`: "MEP1" + header length + header JSON + raw media; opened by `projBinRead`, which slices the file so nothing big is read into memory); Save project to file is streamed (`projFileBlob`: 3 MB base64 slices appended to a Blob, progress + Cancel, same format; pool via `poolRaw` in 29); run `node tests/savefile.js`; save/load, media import, `ld()` loader for three.js |
 | 18-canvas-handles | canvas overlay handles, snapping, motion paths |
 | 19-view-layout | orbit view, layout, toolbar |
-| 20-audio-export | audio-only encoders (WAV, Ogg Opus, M4A AAC) |
+| 20-audio-export | Audio pan `pan` runs -1 (left) to 1 (right), 0 centre (range set in 03, `node tests/pan.js`); audio-only encoders (WAV, Ogg Opus, M4A AAC) |
 | 21-export-dialog | the Export dialog: format list + settings (video and audio). Selected zone export: the in/out range `P.lp` (I, O keys) via `zoneGet`/`zoneForget` (19); `o.zone` is honoured by `startOffline`, `startExport` (`EXZ`) and `startAudioExport`, audio is rendered to the zone end then cut with `sliceAudio` (16). Run `node tests/zoneexport.js` after changing it |
 | 22-mp4-convert | WebM to MP4 with ffmpeg.wasm, downloaded from a CDN on demand (never bundled: x264 is GPL) |
 | 23-ux | F = fullscreen preview (`fsToggle`; Shift+F in the 3D view where F frames), run `node tests/fullscreen.js`; version label, empty-canvas hint, timeline name-column resize |
