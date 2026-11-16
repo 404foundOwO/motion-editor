@@ -19,9 +19,10 @@ function fx0(L,t){for(const e of L.efa){if(AUDK.includes(e)||e=='mb')continue;co
 function grid(c,t){const ln=(a,b)=>{const p=proj(a[0],a[1],a[2],c),q=proj(b[0],b[1],b[2],c);if(p&&q){cx.beginPath();cx.moveTo(W/2+p.x,H/2+p.y);cx.lineTo(W/2+q.x,H/2+q.y);cx.stroke()}};cx.lineWidth=1;cx.strokeStyle='#ffffff22';for(let i=-2000;i<=2000;i+=200){ln([i,600,-2000],[i,600,2000]);ln([-2000,600,i],[2000,600,i])}}
 function fxFill(){for(const L of P.layers){if(!L.efx||!L.efx.length)continue;for(const k of L.efx){const ep=EP[k];if(!ep)continue;for(const a of ep){if(a[0]&&L.p[a[0]]===undefined&&a[2]!==undefined)L.p[a[0]]=a[2]}}}}
 function refx(){fxFill();P.layers.forEach(l=>{l.efa=FXOFF||l.fxoff?[]:l.efx.filter(k=>!(l.efo||[]).includes(k))})}
-function draw(t){const q=exp?1:PVQ[PV]||1;if(q!=Q)setQ(q);refx();vpark(t);const C=P.layers.find(l=>l.type=='cam'),mb=mode!='3d'&&C&&C.efa.includes('mb')?val(C,'mb',t):0;
+function draw(t){const q=exp?1:PVQ[PV]||1;if(q!=Q)setQ(q);refx();vpark(t);const C=P.layers.find(l=>l.type=='cam');NCFDEF=ncfDefer(C)?1:0;const mb=mode!='3d'&&C&&C.efa.includes('mb')?val(C,'mb',t):0;
  if(mb>.001){const n=exp?32:play?8:20;cx.setTransform(Q,0,0,Q,0,0);cx.globalAlpha=1;cx.fillStyle='#000';cx.fillRect(0,0,W,H);for(let i=0;i<n;i++){const o=offBegin();drawScene(t+(i/(n-1)-.5)*mb/FPS);offEnd(o);cx.globalAlpha=1/(i+1);cx.drawImage(o.o.canvas,0,0,W,H)}cx.globalAlpha=1}else drawScene(t);
- if(mode!='3d')P.layers.filter(l=>l.type=='cam').forEach(l=>fx(l,t))}
+ if(mode!='3d')P.layers.filter(l=>l.type=='cam').forEach(l=>fx(l,t));
+ if(NCFDEF){NCFDEF=0;drawScene(t,1)}}
 var GZ=null;
 function gizmos(c,t){const A=[],pr=a=>proj(a[0],a[1],a[2],c),seg=(a,b,col,lw,n)=>{for(let i=0;i<n;i++){const u=[0,1,2].map(k=>a[k]+(b[k]-a[k])*i/n),w=[0,1,2].map(k=>a[k]+(b[k]-a[k])*(i+1)/n),p=pr(u),q=pr(w);if(!p||!q)continue;
 A.push({d:800/((p.s+q.s)/2),f:()=>{cx.save();cx.globalAlpha=1;cx.filter='none';cx.setLineDash([]);cx.strokeStyle=col;cx.lineWidth=lw;cx.beginPath();cx.moveTo(W/2+p.x,H/2+p.y);cx.lineTo(W/2+q.x,H/2+q.y);cx.stroke();cx.restore()}})}};
@@ -29,11 +30,14 @@ const k=camAt(t),o=[k.x,k.y,k.z-800],cs=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([a,b]
 cs.forEach((q,i)=>{seg(o,q,'#ffcf4a',2,14);seg(q,cs[(i+1)%4],'#ffcf4a',2,8)});fr.forEach((q,i)=>seg(q,fr[(i+1)%4],ACCV,2,8));
 const p=pr(o);if(p)A.push({d:800/p.s,f:()=>{cx.save();cx.globalAlpha=1;cx.filter='none';cx.fillStyle='#ffcf4a';cx.beginPath();cx.arc(W/2+p.x,H/2+p.y,9*p.s,0,7);cx.fill();cx.restore()}});
 return A.sort((x,y)=>y.d-x.d)}
-function drawScene(t){const d3=mode=='3d',c=d3?{x:orb.x||0,y:orb.y||0,z:orb.z||0,rx:orb.rx/R,ry:orb.ry/R,d:orb.d-800,rz:0}:camAt(t);
- cx.setTransform(Q,0,0,Q,0,0);cx.globalAlpha=1;cx.filter='none';cx.fillStyle=d3?'#101015':'#000';cx.fillRect(0,0,W,H);if(d3)grid(c,t);cx.save();
+/* Ignore camera effects (L.ncf) on root layers: when the camera has effects that work on the whole picture (flash, letterbox, vignette, glow, blur, motion blur...), those layers are left out of the scene and drawn again on top of the finished picture, so nothing covers them. */
+let NCFDEF=0;const CAMNP=['shk','impact','bop','dof','fog'];
+function ncfDefer(C){return mode!='3d'&&!!C&&C.efa.some(e=>!CAMNP.includes(e)&&!AUDK.includes(e)&&!(typeof MOVK!='undefined'&&MOVK.includes(e)))&&P.layers.some(l=>l.ncf&&!l.par&&l.type!='cam')}
+function drawScene(t,over){const d3=mode=='3d',c=d3?{x:orb.x||0,y:orb.y||0,z:orb.z||0,rx:orb.rx/R,ry:orb.ry/R,d:orb.d-800,rz:0}:camAt(t);
+ cx.setTransform(Q,0,0,Q,0,0);cx.globalAlpha=1;cx.filter='none';if(!over){cx.fillStyle=d3?'#101015':'#000';cx.fillRect(0,0,W,H)}if(d3)grid(c,t);cx.save();
  if(!d3){const bp=bopAt(t);cx.translate(W/2,H/2);cx.rotate(-c.rz*R+bp.rot);cx.scale(bp.k,bp.k);cx.translate(-W/2,-H/2)}
  GZ=d3?{a:gizmos(c,t),i:0}:null;
- drawList(P.layers.filter(root),t,c,d3);
+ drawList(P.layers.filter(root).filter(l=>over?l.ncf:!(NCFDEF&&l.ncf)),t,c,d3);
  cx.restore();
  if(d3){while(GZ.i<GZ.a.length)GZ.a[GZ.i++].f();GZ=null}}
 function side(){trkHome();const S=$('#side'),L=cur();if(!L){S.innerHTML=`<div class=empty>${IC('layers')}<b>No layer selected</b><p class=m>Pick a layer in the timeline to edit it, or add a new one.</p><button class=pri data-act=fab>${IC('plus')}Add layer</button></div>`;return}

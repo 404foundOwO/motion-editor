@@ -13,6 +13,10 @@ await pg.evaluate(()=>{const C=P.layers[0];C.efx=C.efx.filter(k=>k!='shk');addFx
 const c1=await bbox(.1),c2=await bbox(.37),c3=await bbox(.6);
 ok('under bop the unflagged layer changes size or place ('+c1.r+' / '+c2.r+' / '+c3.r+')',!(same(c1.r,c2.r)&&same(c2.r,c3.r)));
 ok('and the flagged layer does not ('+c1.g+' / '+c2.g+' / '+c3.g+')',same(c1.g,c2.g)&&same(c2.g,c3.g));
+// whole-picture camera effects (here: grayscale) do not touch a flagged layer
+await pg.evaluate(()=>{const C=P.layers[0];C.efx=C.efx.filter(k=>k!='bop');addFx(C,'gr');C.p.gr=1;refx();all()});
+const px=await pg.evaluate(async()=>{t=.5;dirty=1;await new Promise(r=>setTimeout(r,400));const c=cv.getContext('2d'),s=cv.width/W,g=(x,y)=>[...c.getImageData(Math.round(cv.width/2+x*s),Math.round(cv.height/2+y*s),1,1).data].slice(0,3);return{r:g(-300,0),g:g(300,0)}});
+ok('grayscale on the camera: the unflagged layer turns grey ('+px.r+'), the flagged one keeps its colour ('+px.g+')',Math.abs(px.r[0]-px.r[1])<12&&px.g[1]>200&&px.g[0]<60);
 ok('the Flags tab has the option for a layer',await pg.evaluate(()=>{sel=P.layers[2].id;tab='Flags';side();return !!document.querySelector('#side [data-f=ncf]')}));
 ok('and not for the camera',await pg.evaluate(()=>{sel=P.layers[0].id;tab='Flags';side();return !document.querySelector('#side [data-f=ncf]')}));
 console.log('errs',errs,'FAILS',F+errs.length);await br.close();process.exit(F||errs.length?1:0)})();
