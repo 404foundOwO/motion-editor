@@ -94,14 +94,14 @@ function lbG(L,t,i,n,o){const v=k=>val(L,k,t),sd=v('lksd')||1,dl=(v('lkn')+hn(i*
  if(th>hv){const q=Math.min(1,(th-hv)/eT),dir=v('lkx')<.5?-1:v('lkx')<1.5?1:(hn(i*5.9,sd)<.5?-1:1);dy+=dir*(H*.6+300)*q*q;o.rot+=spin*q;if(v('lkf')>.5)o.op*=1-q;if(q>=1)o.op=0}
  o.dx+=tx;o.dy+=dy}
 function bopAt(t){const C=P.layers.find(l=>l.type=='cam');if(!C||!(C.efa||[]).includes('bop'))return{k:1,rot:0};const v=k=>val(C,k,t),bt=60/Math.max(20,v('bobm')),x=(t-(v('bobo')||0))/bt,ph=x-Math.floor(x),env=Math.pow(1-ph,Math.max(.1,v('bobc')||3)),par=(((Math.floor(x)%2)+2)%2)?1:-1;return{k:1+v('bobi')/100*env,rot:v('bobt')*env*par*R}}
-function animG(L,t,i,n){let any=0;const o={dx:0,dy:0,rot:0,sc:1,sx:1,op:1,bl:0,col:null},u0=(i+.5)/n*100,wi=wordIdx(L.text),wc=(wi[wi.length-1]||0)+1;
+function animG(L,t,i,n,gx,gw){let any=0;const o={dx:0,dy:0,rot:0,sc:1,sx:1,op:1,bl:0,col:null},u0=(i+.5)/n*100,wi=wordIdx(L.text),wc=(wi[wi.length-1]||0)+1;
  for(let j=1;j<=3;j++){if(!L.efa.includes('an'+j))continue;any=1;const p='a'+j,v=k=>val(L,p+k,t)||0,uu=v('u')>.5?((wi[i]||0)+.5)/wc*100:u0,f=ainf(L,t,j,uu);o.dx+=v('x')*f;o.dy+=v('y')*f;o.rot+=v('r')*f;o.sc*=1+v('z')*f;o.op*=1-(1-(val(L,p+'p',t)===undefined?1:val(L,p+'p',t)))*f;o.bl+=v('b')*f;if(!L.grad&&v('m')>0)o.col=mix(o.col||val(L,'c1',t),val(L,p+'c',t),Math.min(1,f*v('m')))}
  if(L.efa.includes('twob')){any=1;const v=k=>val(L,k,t),fr=Math.floor(t*Math.max(1,v('wbf'))),k=v('wbu')>.5?(wi[i]||0):i,sd=v('wbs')||1;o.dx+=(hn(fr*7.1+k*13.7,sd)*2-1)*v('wbm');o.dy+=(hn(fr*5.3+k*29.9+1.7,sd)*2-1)*v('wbm');o.rot+=(hn(fr*3.7+k*17.1+9.1,sd)*2-1)*v('wbr')}
  if(L.efa.includes('zzrev')){any=1;const z=zzOff(L,t,i,n,wi,wc);o.dx+=z.dx;o.dy+=z.dy;o.op*=z.op}
  if(L.efa.includes('tpath')){any=1;const v=k=>val(L,k,t),u=(i+.5)/n-.5,A=v('tpa'),ln=v('tpl');if(v('tpm')>1.5){}else if(v('tpm')<.5){const w=Math.max(20,v('tpw')),ph=(u*ln/w+t*v('tps'))*6.2832;o.dy+=A*Math.sin(ph);o.rot+=Math.atan(A*6.2832/w*Math.cos(ph))/R}else if(Math.abs(A)>.5){const th=u*A*R,r=ln/(Math.abs(A)*R)*Math.sign(A);o.dx+=r*Math.sin(th)-u*ln;o.dy+=r*(1-Math.cos(th));o.rot+=u*A}}
  if(L.efa.includes('tflip')){any=1;{const nf=val(L,'tfn',t)||0;let p=(t-L.s)*val(L,'tfs',t)-i*val(L,'tfd',t);if(nf>0)p=Math.max(0,Math.min(nf,p));o.sx*=Math.cos(p*6.2832)}}
  if(L.efa.includes('lbrk')){any=1;lbG(L,t,i,n,o)}
- if(L.efa.includes('lbk')){any=1;lbkOff(L,t,i,n,o)}
+ if(L.efa.includes('lbk')){any=1;lbkOff(L,t,i,n,o,gx,gw)}
  return any?o:null}
 const snapT=x=>{let r=Math.round(x*FPS)/FPS;if(P.snap){const u=60/(P.bpm||120)/(P.sub||1),o=P.boff||0;r=Math.round((Math.round((x-o)/u)*u+o)*FPS)/FPS}return Math.max(0,r)};
 function syncBeat(){const g=i=>$('#'+i);if(!g('bpm'))return;g('bpm').value=P.bpm||120;g('bof').value=P.boff||0;g('bpb').value=P.bpb||4;g('bsb').value=P.sub||1;g('bgd').className=P.grid?'on':'';g('bsn').className=P.snap?'on':'';g('bgd').textContent=P.grid?'Grid shown':'Show grid';g('bsn').textContent=P.snap?'Snap on':'Snap off';g('bmt').checked=!!P.met;g('bmv').value=P.metv==null?.5:P.metv;g('bmn').className=(P.grid||P.snap||P.met)?'on':''}
