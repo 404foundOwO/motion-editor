@@ -6,7 +6,7 @@ function exportMenu(){
  const rtMp4=typeof MediaRecorder!='undefined'&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported('video/mp4;codecs=avc1');
  /* video: which capture methods can make this format here */
  const vm={mp4:[],webm:[]};
- if(OFFC.ok){if(OFFC.avc&&(!hasAud||OFFC.aac))vm.mp4.push('1');if(OFFC.vp9&&(!hasAud||OFFC.opus))vm.webm.push('1')}
+ if(OFFC.ok){if(OFFC.avc&&(!hasAud||OFFC.aac||OFFC.opus))vm.mp4.push('1');if(OFFC.vp9&&(!hasAud||OFFC.opus))vm.webm.push('1')}
  if(rtMp4)vm.mp4.push('0');vm.webm.push('0');
  const FM=[
   ['Video',[['mp4','MP4',vm.mp4.length?'H.264, plays everywhere':'Not encodable here, converts from WebM',true,''],['webm','WebM','VP9, small and sharp',true,'']]],

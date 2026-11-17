@@ -62,17 +62,18 @@ async function startOffline(o){
  try{
   await yld();
   const hasAud=P.layers.some(l=>(l.type=='audio'&&l.buf)||l.sbuf);let aOK=false;
-  if(hasAud){aOK=mp4?OFFC.aac:OFFC.opus;if(!aOK)note='This browser cannot encode this audio format, so the video has no sound.'}
+  if(hasAud){aOK=mp4?(OFFC.aac||OFFC.opus):OFFC.opus;if(!aOK)note='This browser cannot encode this audio format, so the video has no sound.';else if(mp4&&!OFFC.aac)note='This browser cannot encode AAC, so the sound in the MP4 is Opus. Chrome, Firefox and VLC play it; Apple QuickTime may not.'}
+  const aco=mp4&&OFFC.aac?'aac':'opus';
   const aq=[];let mux=null;
   const cands=mp4?['avc1.640034','avc1.4d0034','avc1.64002a','avc1.42e034']:['vp09.00.50.08','vp09.00.41.08','vp09.00.40.08'];let vcfg=null;
   for(const c of cands){const cfg={codec:c,width:ow,height:oh,bitrate:Math.round(o.br*1e6),framerate:fps};if(mp4)cfg.avc={format:'avc'};try{const r=await VideoEncoder.isConfigSupported(cfg);if(r&&r.supported){vcfg=r.config||cfg;if(mp4)vcfg.avc={format:'avc'};break}}catch(e){}}
   if(!vcfg)throw new Error('This browser cannot encode '+(mp4?'H.264':'VP9')+' video at '+ow+'×'+oh+'. Try WebM, a lower resolution, or real-time recording.');
-  mux=mp4?new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:'avc',width:ow,height:oh},audio:aOK?{codec:'aac',numberOfChannels:2,sampleRate:SR}:undefined,fastStart:'in-memory',firstTimestampBehavior:'offset'}):new WebMMuxer.Muxer({target:new WebMMuxer.ArrayBufferTarget(),video:{codec:'V_VP9',width:ow,height:oh,frameRate:fps},audio:aOK?{codec:'A_OPUS',numberOfChannels:2,sampleRate:SR}:undefined,firstTimestampBehavior:'offset'});
+  mux=mp4?new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:'avc',width:ow,height:oh},audio:aOK?{codec:aco,numberOfChannels:2,sampleRate:SR}:undefined,fastStart:'in-memory',firstTimestampBehavior:'offset'}):new WebMMuxer.Muxer({target:new WebMMuxer.ArrayBufferTarget(),video:{codec:'V_VP9',width:ow,height:oh,frameRate:fps},audio:aOK?{codec:'A_OPUS',numberOfChannels:2,sampleRate:SR}:undefined,firstTimestampBehavior:'offset'});
   const flushA=ts=>{while(aq.length&&aq[0].c.timestamp<=ts){const a=aq.shift();mux.addAudioChunk(a.c,a.m)}};
   if(aOK){
    setP('Rendering audio…',0);await yld();
    let ab=await renderAudioOffline(Z?Z.b:P.dur,SR);if(ab&&Z)ab=sliceAudio(ab,Z.a,SR);
-   if(ab){aenc=new AudioEncoder({output:(c,m)=>aq.push({c,m}),error:e=>{err=e}});aenc.configure({codec:mp4?'mp4a.40.2':'opus',sampleRate:SR,numberOfChannels:2,bitrate:192000});
+   if(ab){aenc=new AudioEncoder({output:(c,m)=>aq.push({c,m}),error:e=>{err=e}});aenc.configure({codec:aco=='aac'?'mp4a.40.2':'opus',sampleRate:SR,numberOfChannels:2,bitrate:192000});
     const c0=ab.getChannelData(0),c1=ab.numberOfChannels>1?ab.getChannelData(1):c0,CH=48000;
     for(let i=0;i<ab.length&&!cancel;i+=CH){const nn=Math.min(CH,ab.length-i),d=new Float32Array(nn*2);d.set(c0.subarray(i,i+nn),0);d.set(c1.subarray(i,i+nn),nn);
      const ad=new AudioData({format:'f32-planar',sampleRate:SR,numberOfFrames:nn,numberOfChannels:2,timestamp:Math.round(i/SR*1e6),data:d});aenc.encode(ad);ad.close();if(err)throw err}
