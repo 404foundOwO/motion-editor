@@ -14,3 +14,5 @@ function startClipMq(e){const A=$('#tlin'),ra=A.getBoundingClientRect(),x0=e.cli
 function msUp(l){for(let p=P.layers.find(x=>x.id==l.par),n=0;p&&n<50;p=P.layers.find(x=>x.id==p.par),n++)if(MS.has(p.id))return true;return false}
 /* panel note: the properties below belong to the current clip only */
 {const s0=side;side=function(){s0.apply(this,arguments);const S=$('#side');if(!S||MS.size<2)return;const d=document.createElement('div');d.className='msn m';d.textContent=MS.size+' clips selected. Drag, copy, duplicate, cut and delete act on all of them. The properties below are for '+LN(cur())+' only.';S.insertBefore(d,S.firstChild)}}
+/* double-click on empty timeline space (not a clip, keyframe, handle, name or the ruler) deselects everything */
+$('#tlin').addEventListener('dblclick',e=>{if(e.button||e.target.closest('.bar,.kf,.hd,.fd,.nm,#ru,button,input,select,textarea,[data-fxb],[data-eyer]'))return;sel=null;MS.clear();ks=[];rep=null;side();tl();ovd=1;dirty=1});
