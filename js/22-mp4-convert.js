@@ -45,3 +45,12 @@ async function webmToMp4(blob){
  if(stop){if(confirm('Conversion cancelled. Save the WebM instead?'))sv(fname('webm'),blob);return}
  console.error(fail);sv(fname('webm'),blob);
  alert('Could not convert to MP4: '+(fail&&fail.message||fail)+'\n\nThe high-quality WebM was saved instead. You can convert it with ffmpeg (see the Export dialog).')}
+
+/* Chrome's real-time MP4 recording writes each track's mdhd duration in milliseconds while its timescale is 30000, so players that read the track header (phones, galleries) show a tiny length like 0:01 although the whole video plays. Set every track's duration from the movie duration. Only the small moov box is read and rewritten */
+async function mp4FixDur(bl){try{const n=bl.size;let o=0;while(o+8<=n){const h=new DataView(await bl.slice(o,o+16).arrayBuffer());let sz=h.getUint32(0);const ty=h.getUint32(4);if(sz==1)sz=Number(h.getBigUint64(8));if(!sz)sz=n-o;if(sz<8)break;
+ if(ty==0x6d6f6f76){const mb=new Uint8Array(await bl.slice(o,o+sz).arrayBuffer()),dv=new DataView(mb.buffer),walk=(a,e,f)=>{while(a+8<=e){const s=dv.getUint32(a),t=dv.getUint32(a+4);if(s<8)return;f(a,s,t);a+=s}};let mvTs=0,mvDu=0;const tr=[];
+  walk(8,mb.length,(a,s,t)=>{if(t==0x6d766864){const v=mb[a+8];mvTs=dv.getUint32(a+8+(v?20:12));mvDu=v?Number(dv.getBigUint64(a+8+24)):dv.getUint32(a+8+16)}else if(t==0x7472616b)walk(a+8,a+s,(b,s2,t2)=>{if(t2==0x6d646961)walk(b+8,b+s2,(c,s3,t3)=>{if(t3==0x6d646864)tr.push(c)})})});
+  if(!mvTs||!mvDu||mvDu>=2**32)return bl;
+  for(const c of tr){const v=mb[c+8],ts=dv.getUint32(c+8+(v?20:12)),du=Math.round(mvDu/mvTs*ts);if(v)dv.setBigUint64(c+8+24,BigInt(du));else dv.setUint32(c+8+16,du)}
+  return new Blob([bl.slice(0,o),mb,bl.slice(o+sz)],{type:bl.type})}
+ o+=sz}}catch(e){}return bl}
