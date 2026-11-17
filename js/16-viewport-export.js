@@ -97,14 +97,14 @@ async function startOffline(o){
   if(cancel){try{venc.close()}catch(e){}venc=null;return}
   setP('Finishing…',1);await venc.flush();venc.close();venc=null;if(err)throw err;
   flushA(Infinity);mux.finalize();
-  {const vb=new Blob([mux.target.buffer],{type:mp4?'video/mp4':'video/webm'});if(o.onBlob)o.onBlob(vb);else sv(fname(mp4?'mp4':'webm'),vb)}
+  {const vb=new Blob([mux.target.buffer],{type:mp4?'video/mp4':'video/webm'});if(o.onBlob)o.onBlob(vb);else if(mp4)mp4Save(vb,!!(o.aac&&aOK&&aco=='opus'),Z?Z.b-Z.a:P.dur);else sv(fname('webm'),vb)}
   if(note)alert(note);
  }catch(e){console.error(e);alert('Export failed: '+(e&&e.message||e)+'\n\nTry real-time recording in the export dialog instead.')}
  finally{try{venc&&venc.state!='closed'&&venc.close()}catch(e){}try{aenc&&aenc.state!='closed'&&aenc.close()}catch(e){}ovl.remove();OFFX=0;exp=0;mode=m0;t=t0;play=p0;dirty=1;ph&&ph()}
 }
-function startExport(o){let xc=0;const ec=document.createElement('canvas'),sc=o.sc;ec.width=Math.round(W*sc);ec.height=Math.round(H*sc);const eg=ec.getContext('2d'),src=sc==1?cv:ec;let raf=0;const copy=()=>{eg.drawImage(cv,0,0,ec.width,ec.height);raf=requestAnimationFrame(copy)};
+function startExport(o){let xc=0;const EXZ0=o.zone||null;const ec=document.createElement('canvas'),sc=o.sc;ec.width=Math.round(W*sc);ec.height=Math.round(H*sc);const eg=ec.getContext('2d'),src=sc==1?cv:ec;let raf=0;const copy=()=>{eg.drawImage(cv,0,0,ec.width,ec.height);raf=requestAnimationFrame(copy)};
 const mt=o.mp4?'video/mp4;codecs=avc1':(MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm'),ch=[],r=new MediaRecorder(new MediaStream([...src.captureStream(o.fps).getVideoTracks(),...(P.layers.some(l=>l.type=='audio'||l.sbuf)?(ac(),AD.stream.getAudioTracks()):[])]),{mimeType:mt,videoBitsPerSecond:o.br*1e6}),m=mode;
-mode='comp';r.ondataavailable=e=>e.data.size&&ch.push(e.data);r.onstop=()=>{EXZ=null;cancelAnimationFrame(raf);play=0;mode=m;dirty=1;setIc($('#pl'),'play','Play / pause (Space)',1);$('#exs').textContent='';if(!xc){const vb0=new Blob(ch,{type:o.mp4?'video/mp4':'video/webm'});(o.mp4?mp4FixDur(vb0):Promise.resolve(vb0)).then(vb=>{if(o.onBlob)o.onBlob(vb);else sv(fname(o.mp4?'mp4':'webm'),vb)})}};
+mode='comp';r.ondataavailable=e=>e.data.size&&ch.push(e.data);r.onstop=()=>{EXZ=null;cancelAnimationFrame(raf);play=0;mode=m;dirty=1;setIc($('#pl'),'play','Play / pause (Space)',1);$('#exs').textContent='';if(!xc){const vb0=new Blob(ch,{type:o.mp4?'video/mp4':'video/webm'});(o.mp4?mp4FixDur(vb0):Promise.resolve(vb0)).then(vb=>{if(o.onBlob)o.onBlob(vb);else if(o.mp4)mp4Save(vb,!!(o.aac&&!OFFC.aac&&P.layers.some(l=>l.type=='audio'||l.sbuf)),EXZ0?EXZ0.b-EXZ0.a:P.dur);else sv(fname('webm'),vb)})}};
 rec=r;EXZ=o.zone||null;t=EXZ?EXZ.a:0;dirty=1;exp=1;play=1;setIc($('#pl'),'pause','Play / pause (Space)',1);const xs=$('#exs');xs.textContent='Recording in real time… ';const xb=document.createElement('button');xb.textContent='Cancel';xb.title='Stop recording and discard it (Esc)';xb.onclick=()=>{if(!exp||r.state=='inactive')return;xc=1;exp=0;play=0;r.stop()};xs.appendChild(xb);if(sc!=1)copy();r.start();const esc=e=>{if(r.state=='inactive')removeEventListener('keydown',esc,true);else if(e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();xb.onclick()}};addEventListener('keydown',esc,true)}
 $('#exp').onclick=()=>{const m=mode,e0=exp;mode='comp';exp=1;draw(t);cv.toBlob(b=>{mode=m;dirty=1;sv(fname('png'),b)});exp=e0;dirty=1};
 const MB={},STORED=new Set(),FB=[];let SAVEON=false,sTimer=0;

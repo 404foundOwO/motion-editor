@@ -23,6 +23,7 @@ function exportMenu(){
 ${row('Resolution',`<select id=xr style="${sty}"></select>`,'xrr')}${row('Frame rate',`<select id=xf style="${sty}"><option>24<option>30<option selected>60</select>`,'xfr')}
 ${row('Quality',`<select id=xq style="${sty}">${Q.map(([n,b])=>`<option value=${b} ${b==25?'selected':''}>${n}`).join('')}<option value=0>Custom</select>`,'xqr')}${row('Bitrate (Mbps)',`<input id=xb type=number min=1 max=200 step=1 value=25 style="${sty};width:80px">`,'xbr')}
 ${row('Method',`<select id=xt style="${sty}"></select>`,'xtr')}
+${row('Sound as AAC',`<input id=xaa type=checkbox checked title="Phones and Apple apps cannot play the Opus sound this browser makes. Needs a one-time download of about 30 MB.">`,'xar')}
 ${row('Bit depth',`<select id=axb style="${sty}"><option value=16>16-bit<option value=24>24-bit<option value=32>32-bit float</select>`,'axbr')}
 ${row('Sample rate',`<select id=axs style="${sty}"><option value=48000>48 kHz<option value=44100>44.1 kHz</select>`,'axsr')}
 ${row('Bitrate',`<select id=axk style="${sty}"><option value=96>96 kbps<option value=128>128 kbps<option value=192 selected>192 kbps<option value=256>256 kbps<option value=320>320 kbps</select>`,'axkr')}
@@ -39,7 +40,7 @@ ${row('Prevent clipping',`<input id=axn type=checkbox checked>`,'axnr')}
   const zon=zoneOn(),dur=zon?zon.b-zon.a:P.dur;
   const f=EXFMT,vid=f=='mp4'||f=='webm',conv=f=='mp4'&&!vm.mp4.length,ms=vid?(conv?vm.webm:vm[f]):[];
   d.querySelectorAll('#xfl button[data-f]').forEach(b=>{const on=b.dataset.f==f&&!b.disabled;b.style.borderColor=on?ACCV:'#3a3a45';b.style.background=on?'#2a2650':'#0d0d10'});
-  ['xrr','xfr','xqr','xbr','xtr'].forEach(i=>show(i,vid));
+  ['xrr','xfr','xqr','xbr','xtr'].forEach(i=>show(i,vid));show('xar',f=='mp4'&&!conv&&hasAud&&!OFFC.aac&&canConv);
   if(vid)['axbr','axsr','axkr','axnr'].forEach(i=>show(i,false));
   g('xcv').style.display=conv?'block':'none';g('xcv1').style.display=conv&&canConv?'block':'none';g('xcv2').style.display=conv&&!canConv?'block':'none';g('xgw').style.display=conv&&canConv?'':'none';g('xg').textContent=conv?(canConv?'Export as MP4':'Export WebM'):'Export';
   if(vid){
@@ -60,7 +61,7 @@ ${row('Prevent clipping',`<input id=axn type=checkbox checked>`,'axnr')}
  g('xb').oninput=()=>{g('xq').value=[...g('xq').options].some(o=>o.value==g('xb').value)?g('xb').value:0;info()};
  g('xc').onclick=()=>d.remove();g('xcp').onclick=()=>{const t=g('xcm').textContent;try{navigator.clipboard.writeText(t).then(()=>{g('xcp').textContent='Copied'})}catch(e){const r=document.createRange();r.selectNodeContents(g('xcm'));getSelection().removeAllRanges();getSelection().addRange(r);g('xcp').textContent='Selected, press Ctrl+C'}};
  d.addEventListener('keydown',e=>{if(e.key=='Escape')d.remove()});d.tabIndex=-1;d.focus();
- const goVideo=(f,conv)=>{const o={sc:+g('xr').value,fps:+g('xf').value,br:Math.max(1,+g('xb').value||25),mp4:f=='mp4'&&vm.mp4.length>0,precise:g('xt').value=='1',zone:zoneOn()};if(conv)o.onBlob=webmToMp4;d.remove();o.precise?startOffline(o):startExport(o)};
+ const goVideo=(f,conv)=>{const o={sc:+g('xr').value,fps:+g('xf').value,br:Math.max(1,+g('xb').value||25),mp4:f=='mp4'&&vm.mp4.length>0,precise:g('xt').value=='1',zone:zoneOn(),aac:g('xar').style.display!='none'&&g('xaa').checked};if(conv)o.onBlob=webmToMp4;d.remove();o.precise?startOffline(o):startExport(o)};
  g('xgw').onclick=()=>goVideo('webm',false);
  g('xg').onclick=()=>{const f=EXFMT;
   if(f=='mp4'||f=='webm')goVideo(f,f=='mp4'&&!vm.mp4.length&&canConv);else{d.remove();

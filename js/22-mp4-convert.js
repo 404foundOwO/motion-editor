@@ -54,3 +54,26 @@ async function mp4FixDur(bl){try{const n=bl.size;let o=0;while(o+8<=n){const h=n
   for(const c of tr){const v=mb[c+8],ts=dv.getUint32(c+8+(v?20:12)),du=Math.round(mvDu/mvTs*ts);if(v)dv.setBigUint64(c+8+24,BigInt(du));else dv.setUint32(c+8+16,du)}
   return new Blob([bl.slice(0,o),mb,bl.slice(o+sz)],{type:bl.type})}
  o+=sz}}catch(e){}return bl}
+
+/* Saves an MP4 whose sound is Opus (this browser cannot encode AAC). With aac on, the same video gets its sound re-encoded to AAC so phones and Apple apps play it; the video is copied, not re-encoded. If that fails or is cancelled the MP4 with Opus sound is saved instead */
+async function mp4Save(blob,aac,dur){
+ if(!aac){sv(fname('mp4'),blob);return}
+ let stop=0;const L=loadingShow(FFM?'Making the sound AAC':'Getting the converter ready','Preparing…',{cancel:()=>{stop=1;ffKill()}});
+ let out=null,fail=null;
+ try{
+  const ff=await ffLoad((f,t)=>L.set(f,t));if(stop)throw new Error('cancelled');
+  L.title('Making the sound AAC');L.set(0,'Working… 0%');
+  const cb=({progress,time})=>{const f=Math.min(.99,Math.max(isFinite(progress)?progress:0,time>0&&dur>0?time/(dur*1e6):0));L.set(f,'Working… '+Math.round(f*100)+'%')};
+  ff.on('progress',cb);
+  try{
+   await ff.writeFile('in.mp4',new Uint8Array(await blob.arrayBuffer()));
+   const code=await ff.exec(['-i','in.mp4','-c:v','copy','-c:a','aac','-b:a','192k','-movflags','+faststart','out.mp4']);
+   if(code!==0)throw new Error('The converter stopped with an error ('+code+')');
+   L.set(1,'Saving…');out=new Blob([await ff.readFile('out.mp4')],{type:'video/mp4'})
+  }finally{try{ff.off('progress',cb);await ff.deleteFile('in.mp4');await ff.deleteFile('out.mp4')}catch(e){}}
+ }catch(e){fail=e}
+ L.done();
+ if(out){sv(fname('mp4'),out);return}
+ if(stop){if(confirm('Cancelled. Save the MP4 with Opus sound instead?'))sv(fname('mp4'),blob);return}
+ console.error(fail);sv(fname('mp4'),blob);
+ alert('Could not make the sound AAC: '+(fail&&fail.message||fail)+'\n\nThe MP4 was saved with Opus sound. Chrome, Firefox and VLC play it; many phones do not.')}
