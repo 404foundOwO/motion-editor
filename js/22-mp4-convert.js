@@ -41,7 +41,7 @@ async function webmToMp4(blob){
   }finally{try{ff.off('progress',cb);await ff.deleteFile('in.webm');await ff.deleteFile('out.mp4')}catch(e){}}
  }catch(e){fail=e}
  L.done();
- if(out){sv('motion.mp4',out);return}
- if(stop){if(confirm('Conversion cancelled. Save the WebM instead?'))sv('motion.webm',blob);return}
- console.error(fail);sv('motion.webm',blob);
+ if(out){sv(fname('mp4'),out);return}
+ if(stop){if(confirm('Conversion cancelled. Save the WebM instead?'))sv(fname('webm'),blob);return}
+ console.error(fail);sv(fname('webm'),blob);
  alert('Could not convert to MP4: '+(fail&&fail.message||fail)+'\n\nThe high-quality WebM was saved instead. You can convert it with ffmpeg (see the Export dialog).')}

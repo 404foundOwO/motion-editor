@@ -81,7 +81,7 @@ async function startAudioExport(o){
    if(F.ext=='ogg')blob=axOgg(ck,ch.c[0].length,SR);
    else{const mux=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),audio:{codec:'aac',numberOfChannels:2,sampleRate:SR},fastStart:'in-memory',firstTimestampBehavior:'offset'});
     ck.forEach(x=>mux.addAudioChunk(x.c,x.m));mux.finalize();blob=new Blob([mux.target.buffer],{type:'audio/mp4'})}}
-  sv('motion-audio.'+F.ext,blob);
+  sv(fname(F.ext),blob);
   if(ch.gain<1)alert('The mix was louder than 0 dB, so it was turned down by '+(-20*Math.log10(ch.gain)).toFixed(1)+' dB to avoid distortion.')
  }catch(e){console.error(e);alert('Audio export failed: '+(e&&e.message||e))}
  finally{ovl.remove();OFFX=0;play=0;if(p0)setIc($('#pl'),'play','Play / pause (Space)',1);dirty=1}

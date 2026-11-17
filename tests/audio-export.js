@@ -15,7 +15,7 @@ q('#exv').click();ok('audio formats enabled when project has audio',!q('[data-f=
 q('[data-f=wav]').click();ok('WAV shows bit depth, hides quality',vis('axbr')&&!vis('xqr')&&!vis('axkr')&&vis('axsr'));
 q('[data-f=ogg]').click();ok('Ogg shows bitrate, hides sample rate',vis('axkr')&&!vis('axsr')&&!vis('axbr'));
 q('[data-f=mp4]').click();const conv=w.location.protocol!='file:';ok('mp4 unsupported -> convert note, Max quality, right buttons',vis('xrr')&&q('#xcv').style.display=='block'&&q('#xb').value=='50'&&q('#xg').textContent==(conv?'Export as MP4':'Export WebM')&&(q('#xgw').style.display!='none')==conv,[q('#xcv').style.display,q('#xg').textContent,q('#xgw').style.display,q('#xb').value]);
-ok('note mentions Chromium',/Chrome, Edge or Brave/.test(q('#xcv').textContent)&&/ffmpeg -i motion.webm/.test(q('#xcm').textContent));
+ok('note mentions Chromium',/Chrome, Edge or Brave/.test(q('#xcv').textContent)&&/ffmpeg -i ".+\.webm"/.test(q('#xcm').textContent));
 q('[data-f=wav]').click();ok('note hidden for audio',q('#xcv').style.display=='none'&&q('#xg').textContent=='Export'&&q('#xgw').style.display=='none');
 q('[data-f=webm]').click();ok('note hidden for WebM',q('#xcv').style.display=='none');
 q('#xc').click();ok('cancel closes',!q('#exm'));
