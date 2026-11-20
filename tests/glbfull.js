@@ -28,7 +28,7 @@ function makeGLB(){
   const b=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
   const p=await b.newPage({viewport:{width:1280,height:720}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
   await p.goto('file://'+path.resolve(__dirname,'../index.html'));
-  await p.waitForFunction(()=>typeof SAVEON!='undefined'&&SAVEON===true,null,{timeout:15000});
+  await p.waitForFunction(()=>typeof SAVEON!='undefined'&&SAVEON===true&&typeof lpDraw=='function',null,{timeout:15000});   // lpDraw is in one of the last scripts: wait until every script has loaded
   // add the model layer
   const made=await p.evaluate(async bytes=>{
     const L=mk('media');L.p.w=405;L.p.h=720;
