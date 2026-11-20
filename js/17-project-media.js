@@ -42,8 +42,12 @@ const bx=new THREE.Box3().setFromObject(gl.scene),sz=bx.getSize(new THREE.Vector
 const mixer=new THREE.AnimationMixer(gl.scene),clip=gl.animations[0];if(clip){mixer.clipAction(clip).play();
 /* Fit the camera to everything the animation reaches, not only the rest pose (a raised arm was cropped by the canvas). The extents stay symmetric around the rest centre so the model does not drift off-centre. Rigid meshes only: r128 does not include skinning in Box3. */const ex=bx.clone();for(let i=0;i<=40;i++){mixer.setTime(clip.duration*i/40);gl.scene.updateMatrixWorld(true);ex.union(new THREE.Box3().setFromObject(gl.scene))}mixer.setTime(0);sz.set(Math.max(c.x-ex.min.x,ex.max.x-c.x)*2,Math.max(c.y-ex.min.y,ex.max.y-c.y)*2,Math.max(c.z-ex.min.z,ex.max.z-c.z)*2)}
 const dist=Math.max(sz.y,sz.x/(720/1280))/2/Math.tan(15*Math.PI/180)*1.2;
-el.__g={ok:1,r,sc,cam,mixer,c,dist,rad:Math.max(1e-6,sz.length()/2),dur:clip?clip.duration:0};L.glb=1;L.el=el;ELS[L.id]=el}
-function glbDraw(L,t,v){const g=L.el.__g;let a=0;if(g.dur>0){a=((((L.off||0)+(t-L.s)*spdOf(L))%g.dur)+g.dur)%g.dur;a=Math.floor(a*15+1e-6)/15}
+el.__g={ok:1,r,sc,cam,mixer,c,dist,sz,rad:Math.max(1e-6,sz.length()/2),dur:clip?clip.duration:0};L.glb=1;L.el=el;ELS[L.id]=el}
+/* Full canvas (L.fc): the model layer is as big as the project and the model is rendered at that size (times the preview scale Q), so there is no 720x1280 box to crop it. Turning it on sets the layer to the project size at the centre, turning it off puts the old size back. */
+function glbFull(L){if(L.fc){L.fcs={w:L.p.w,h:L.p.h,x:L.p.x,y:L.p.y};L.p.w=W;L.p.h=H;L.p.x=0;L.p.y=0}else if(L.fcs){L.p.w=L.fcs.w;L.p.h=L.fcs.h;L.p.x=L.fcs.x;L.p.y=L.fcs.y;delete L.fcs}dirty=1}
+function glbDraw(L,t,v){const g=L.el.__g;let a=0;
+const rw=L.fc?Math.min(4096,Math.max(2,Math.round(v('w')*Q))):720,rh=L.fc?Math.min(4096,Math.max(2,Math.round(v('h')*Q))):1280;
+if(L.el.width!=rw||L.el.height!=rh){g.r.setSize(rw,rh,false);g.cam.aspect=rw/rh;g.cam.updateProjectionMatrix();g.dist=Math.max(g.sz.y,g.sz.x/(rw/rh))/2/Math.tan(15*Math.PI/180)*1.2}if(g.dur>0){a=((((L.off||0)+(t-L.s)*spdOf(L))%g.dur)+g.dur)%g.dur;a=Math.floor(a*15+1e-6)/15}
 g.mixer.setTime(a);const ry=(v('mry')||0)*R,rx=(v('mrx')||0)*R,d=g.dist/(v('mzm')||1);
 g.cam.position.set(g.c.x+Math.sin(ry)*Math.cos(rx)*d,g.c.y+Math.sin(rx)*d,g.c.z+Math.cos(ry)*Math.cos(rx)*d);g.cam.lookAt(g.c);/* depth range fitted to the model: a huge near/far ratio is what makes surfaces z-fight when the angle or zoom changes */const rd=g.rad*1.6,nr=Math.max(d-rd,rd*.02),fr=d+rd;if(Math.abs(g.cam.near-nr)>1e-9||Math.abs(g.cam.far-fr)>1e-9){g.cam.near=nr;g.cam.far=fr;g.cam.updateProjectionMatrix()}g.r.render(g.sc,g.cam)}
 $('#ag').onclick=()=>{$('#menu').hidden=true;$('#fg').click()};
