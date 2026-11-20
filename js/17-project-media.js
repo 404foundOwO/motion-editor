@@ -37,7 +37,7 @@ async function glbAttach(L,blob){await ld('https://cdnjs.cloudflare.com/ajax/lib
 const buf=await blob.arrayBuffer(),gl=await new Promise((ok,no)=>new THREE.GLTFLoader().parse(buf,'',ok,no));
 const el=document.createElement('canvas');el.width=720;el.height=1280;
 const r=new THREE.WebGLRenderer({canvas:el,alpha:true,antialias:true,preserveDrawingBuffer:true});r.outputEncoding=THREE.sRGBEncoding;r.setClearColor(0,0);
-const sc=new THREE.Scene();sc.add(gl.scene);sc.add(new THREE.AmbientLight(0xffffff,1.1));const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(1,2,3);sc.add(dl);
+const sc=new THREE.Scene();sc.add(gl.scene);/* Shaded look (was one strong ambient light, which flattens a model): low ambient + sky/ground fill, a key light from the upper right front, and a cool rim light from behind to lift the outline. */sc.add(new THREE.AmbientLight(0xffffff,.35));sc.add(new THREE.HemisphereLight(0xffffff,0x555566,.6));const dl=new THREE.DirectionalLight(0xffffff,1.1);dl.position.set(2,3,3);sc.add(dl);const rl=new THREE.DirectionalLight(0xaac4ff,.5);rl.position.set(-3,2,-2);sc.add(rl);
 const bx=new THREE.Box3().setFromObject(gl.scene),sz=bx.getSize(new THREE.Vector3()),c=bx.getCenter(new THREE.Vector3()),cam=new THREE.PerspectiveCamera(30,720/1280,.01,1e5);
 const dist=Math.max(sz.y,sz.x/(720/1280))/2/Math.tan(15*Math.PI/180)*1.2,mixer=new THREE.AnimationMixer(gl.scene),clip=gl.animations[0];if(clip)mixer.clipAction(clip).play();
 el.__g={ok:1,r,sc,cam,mixer,c,dist,rad:Math.max(1e-6,sz.length()/2),dur:clip?clip.duration:0};L.glb=1;L.el=el;ELS[L.id]=el}
