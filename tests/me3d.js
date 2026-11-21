@@ -93,6 +93,27 @@ let fails=0;const ok=(n,c,x)=>{console.log((c?'PASS ':'FAIL ')+n+(c?'':' '+JSON.
  await p.waitForFunction(()=>!document.querySelector('#me3d'),null,{timeout:5000});
  ok('Cancel closes the pop-up and adds nothing',await p.evaluate(n=>P.layers.length==n,before.n));
 
+ // 5b. window mode: used when motion-editor is on a public address and 3d-editor is local (Chrome blocks a
+ // public page from loading a local address in a frame). Forced here, since this test page is a file.
+ await p.evaluate(()=>{localStorage.setItem('me3dMode','window');ME3D.wait=60000});
+ const countBefore=await p.evaluate(()=>P.layers.length);
+ const [pop]=await Promise.all([p.waitForEvent('popup',{timeout:20000}),p.evaluate(()=>me3dOpen(null))]);
+ ok('window mode opens 3d-editor in its own window, no frame',await p.evaluate(()=>!!document.querySelector('#me3d')&&!document.querySelector('#me3df')&&!!document.querySelector('[data-a=focus]')));
+ await pop.waitForFunction(()=>{const b=document.querySelector('#embedsave');return b&&!b.disabled},null,{timeout:120000});
+ await pop.evaluate(()=>{const s=document.querySelector('#tlsz');s.add(new Option('320x180','320x180'));s.value='320x180';me3d.timeline.loadPose({duration:1,bones:{Head:[{f:0,rot:[0,0,0]},{f:8,rot:[0,40,0]},{f:15,rot:[0,0,0]}]}})});
+ await pop.click('#embedsave');
+ await p.waitForFunction(n=>P.layers.length>n&&P.layers.some(l=>MB[l.id]&&MB[l.id].src3d&&l.e<1e9&&l.id>=n),countBefore,{timeout:120000}).catch(()=>{});
+ await p.waitForTimeout(800);
+ const w1=await p.evaluate(n=>({n:P.layers.length-n,popupGone:!document.querySelector('#me3d')&&!ME3D.win}),countBefore);
+ ok('window mode: Save adds the clip and closes the overlay',w1.n==1&&w1.popupGone,w1);
+ ok('window mode: 3d-editor\'s window is closed after Save',await pop.evaluate(()=>1).then(()=>false).catch(()=>true));
+ // closing the window by hand ends the session
+ const [pop2]=await Promise.all([p.waitForEvent('popup',{timeout:20000}),p.evaluate(()=>me3dOpen(null))]);
+ await pop2.waitForLoadState();await pop2.close();
+ await p.waitForFunction(()=>!document.querySelector('#me3d'),null,{timeout:5000}).catch(()=>{});
+ ok('window mode: closing the window by hand removes the overlay',await p.evaluate(()=>!document.querySelector('#me3d')&&!ME3D.box&&!ME3D.win));
+ await p.evaluate(()=>localStorage.setItem('me3dMode','frame'));
+
  // 6. a frame that never answers says what to do
  await p.evaluate(()=>{localStorage.setItem('me3dUrl','http://127.0.0.1:59999/');ME3D.wait=1500;me3dOpen(null)});
  await p.waitForFunction(()=>/did not answer/.test((document.querySelector('#me3ds')||{}).textContent||''),null,{timeout:8000}).catch(()=>{});

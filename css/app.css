@@ -553,3 +553,4 @@ body.fddrag,body.fddrag *{cursor:ew-resize!important;user-select:none}
 .me3dh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.me3dh b{font-size:14px}.me3dh .grow{flex:1}.me3dst{color:#9a9aa6;font-size:12px}
 .me3dh button{background:#24242c;color:#ddd;border:1px solid #3a3a45;border-radius:7px;padding:5px 12px;font:inherit;cursor:pointer}.me3dh button:hover{border-color:var(--a)}
 #me3df{flex:1;min-height:0;width:100%;border:1px solid #3a3a45;border-radius:10px;background:#1b1b21}
+.me3dw{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;color:#9a9aa6;font-size:14px;padding:20px}
