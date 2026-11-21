@@ -16,7 +16,7 @@ function MEDUI(L){const m=MB[L.id],el=L.el,uses=mediaUses(L),au=L.type=='audio',
  const ext=m?((m.name.match(/\.([^.]+)$/)||[])[1]||'').toUpperCase():'',dim=!au&&el?(L.vid?[el.videoWidth,el.videoHeight]:[el.naturalWidth,el.naturalHeight]):null,dur=au?(L.buf&&L.buf.duration):(L.vid&&el&&isFinite(el.duration)?el.duration:0);
  const thumb=au?`<div class=mdth>${IC('wave')}</div>`:L.vid&&el?`<video class=mdth src="${el.currentSrc||el.src}#t=0.1" preload=metadata muted playsinline></video>`:el?`<img class=mdth src="${el.src}" alt="">`:'';
  return `<div class=mdi>${thumb}<b>${m?esc(m.name):esc(L.name)}</b><div class=m>${m?`${au?'Audio':L.vid?'Video':'Image'}${ext?' · '+esc(ext):''} · ${mdSz(m.blob.size)}`:'File not available'}</div>${dim&&dim[0]?`<div class=m>${dim[0]}×${dim[1]} px</div>`:''}${dur?`<div class=m>Duration ${mdT(dur)}</div>`:''}</div>`
- +mdSpd(L)+mdPart(L)+`<div class=sech>Replace media</div><div class=r><button id=mrep data-mrep=1>Replace media…</button></div>`
+ +mdSpd(L)+mdPart(L)+(typeof me3dUI=='function'?me3dUI(L):'')+`<div class=sech>Replace media</div><div class=r><button id=mrep data-mrep=1>Replace media…</button></div>`
  +(pool.length?`<div class=r><label>From pool</label><select data-mpool><option value="">Choose…${pool.map(i=>`<option value=${i.id}>${esc(i.name)}`).join('')}</select></div>`:'')
  +(uses.length>1?`<div class=r><input type=checkbox id=mall><span class=ckl>Replace in all ${uses.length} places it is used</span></div>`:'')
  +`<p class=hint id=mst style="margin:6px 0 0;padding:0;border:0">Keeps the position, size, fades, keyframes, effects and timing. To reuse a transition: copy and paste the layer, then replace the media in the copy.</p>`
@@ -38,7 +38,7 @@ let mdShift=false;addEventListener('pointerdown',e=>{mdShift=e.shiftKey},true);
 /* returns {note, fit}: fit describes how the new media sits in the clip's slot (the clip keeps its in/out; the new media starts from its beginning unless keepZone) */
 async function mdReplaceOne(L,f,ids,keepZone){const old=MB[L.id];let note='',fit='',dur=0;
  if(L.type=='audio'){const b=await mdAudio(f);if(!b)throw new Error('This audio file cannot be decoded');L.buf=b;BUF[L.id]=b;MB[L.id]={blob:f,name:f.name,kind:'audio'};STORED.delete(L.id);if(old&&L.name==String(old.name).slice(0,14))L.name=f.name.slice(0,14);if(!keepZone)L.off=0;return{note,fit:mdFit(L,b.duration)}}
- const m=await mdLoad(f);m.el.__own=L.id;L.el=m.el;ELS[L.id]=m.el;L.vid=!!m.vid;MB[L.id]={blob:f,name:f.name,kind:m.vid?'video':'image'};STORED.delete(L.id);
+ const m=await mdLoad(f);m.el.__own=L.id;L.el=m.el;ELS[L.id]=m.el;L.vid=!!m.vid;MB[L.id]={blob:f,name:f.name,kind:m.vid?'video':'image',...(f.me3dSrc?{src3d:f.me3dSrc}:{})};STORED.delete(L.id);
  if(m.w&&m.h){const s=Math.min(L.p.w/m.w,L.p.h/m.h);if(isFinite(s)&&s>0){L.p.w=Math.round(m.w*s);L.p.h=Math.round(m.h*s)}}
  if(old&&L.name==String(old.name).slice(0,14))L.name=f.name.slice(0,14);
  /* a pasted copy shares its link tag (and so its audio) with the original: it must not change the original's sound, so it detaches and gets its own */

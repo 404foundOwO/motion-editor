@@ -548,3 +548,8 @@ body.fddrag,body.fddrag *{cursor:ew-resize!important;user-select:none}
 #side .msn{padding:7px 10px;margin:6px;border-radius:8px;background:color-mix(in srgb,var(--a) 16%,var(--p));font-size:12px}
 #stage:fullscreen{background:#000}#stage:fullscreen #ov{display:none}
 #accp{position:fixed;z-index:60;background:var(--p2);border:1px solid var(--l);border-radius:10px;padding:10px;box-shadow:0 8px 28px #0008;display:flex;flex-direction:column;gap:8px;width:210px;font-size:12px}#accp .accs{display:flex;flex-wrap:wrap;gap:6px}#accp .accs button{width:26px;height:26px;border-radius:50%;padding:0;border:2px solid transparent;min-width:0}#accp .accs button.on{border-color:var(--t)}#accp .r{display:flex;align-items:center;gap:8px}#accp input[type=color]{width:34px;height:26px;padding:0;border:0;background:none}
+/* 3D animation pop-up: 3d-editor in a frame (37-3d-editor.js) */
+#me3d{position:fixed;inset:0;z-index:70;background:#000c;display:flex;flex-direction:column;gap:8px;padding:10px;font:13px system-ui,sans-serif;color:#ddd}
+.me3dh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.me3dh b{font-size:14px}.me3dh .grow{flex:1}.me3dst{color:#9a9aa6;font-size:12px}
+.me3dh button{background:#24242c;color:#ddd;border:1px solid #3a3a45;border-radius:7px;padding:5px 12px;font:inherit;cursor:pointer}.me3dh button:hover{border-color:var(--a)}
+#me3df{flex:1;min-height:0;width:100%;border:1px solid #3a3a45;border-radius:10px;background:#1b1b21}

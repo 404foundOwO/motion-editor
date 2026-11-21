@@ -149,7 +149,7 @@ async function projNew(name){if(PBUSY)return;PBUSY=true;try{await projFlush();pr
 async function projImport(pr,bundle,name){if(!pr||!Array.isArray(pr.layers))throw new Error('not a project');if(PBUSY)return;PBUSY=true;const LD=loadingShow('Opening project file','Reading…');try{await projFlush();SAVEON=false;
   if(bundle)for(const f of bundle.fonts||[])await regFont(f.name,d2b(f.data));
   projReset();P=pr;fixP();applyFmt(P.fmt||'16:9');CURID=newPid();PNAME=name||await projNextName();THUMB=null;prjLbl();
-  if(bundle&&bundle.media)for(const l of P.layers){const m=bundle.media[l.id];if(m){await attach(l,{blob:d2b(m.data),name:m.name,kind:m.kind});STORED.delete(l.id)}}
+  if(bundle&&bundle.media)for(const l of P.layers){const m=bundle.media[l.id];if(m){await attach(l,{blob:d2b(m.data),name:m.name,kind:m.kind,...(m.src?{src3d:d2b(m.src)}:{})});STORED.delete(l.id)}}
   if(bundle&&bundle.pool&&typeof poolImport=='function')await poolImport(bundle.pool);
   c0=ser();all();SAVEON=true;await saveNow(true)}finally{SAVEON=true;LD.done();PBUSY=false}}
 async function projDup(id){if(id==CURID)await projFlush();const rec=await idb('proj','readonly',q=>q.get('p:'+id)),me=await idb('proj','readonly',q=>q.get('m:'+id));if(!rec)return null;const nid=newPid(),keys=(await idb('media','readonly',q=>q.getAllKeys(rng(id+':'))))||[];
